@@ -9,6 +9,5 @@ This script will create sample users, products, and sales data in your MongoDB i
 -   `mongosh` (MongoDB Shell) is required to execute the script.
 
 ```sh
-mongosh ecommerce-store/backend/scripts/init-script.js
+mongosh scripts/init-script.js
 ```
-

@@ -1,7 +1,0 @@
-# Ignore node_modules and built files
-node_modules/
-dist/
-.env
-
-# Ignore MongoDB data
-backend/data/mongo/
