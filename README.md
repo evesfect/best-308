@@ -19,13 +19,13 @@ A base for boutique fashion market websites with ease of deployment
 
 3. **Initialize the database**:
 
-   Copy the init-script.js into the MongoDB container:
+   Copy the init-script.js into the MongoDB container: (from db/)
 
    ```bash
    docker cp ../scripts/init-script.js mongodb:/init-script.js
    ```
 
-   Execute the script inside the container:
+   Execute the script inside the container: (from db/)
 
    ```bash
    docker exec mongodb mongosh admin -u root -p rpassword --authenticationDatabase admin /init-script.js
