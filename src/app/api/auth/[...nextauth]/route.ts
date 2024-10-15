@@ -23,7 +23,7 @@ export const authOptions: NextAuthOptions = {
                 password: { label: 'Password', type: 'password' },
             },
             async authorize(credentials): Promise<any | null> {
-                console.log("selam");
+                console.log("Attempting to authorize:", credentials?.email);
                 const db = await connectToDatabase();
                 const usersCollection = db.collection('user');
 
@@ -31,13 +31,18 @@ export const authOptions: NextAuthOptions = {
                     email: credentials?.email,
                 });
 
+                console.log("User found:", user);
+
                 if (!user) {
+                    console.log("No user found with that email");
                     throw new Error('No user found with that email');
                 }
 
                 const isValid = await compare(credentials!.password, user.password);
+                console.log("Password valid:", isValid);
 
                 if (!isValid) {
+                    console.log("Incorrect password");
                     throw new Error('Incorrect password');
                 }
 
@@ -45,6 +50,7 @@ export const authOptions: NextAuthOptions = {
                     id: user._id.toString(),
                     email: user.email,
                     role: user.role,
+                    name: user.username
                 };
             },
         }),
