@@ -7,7 +7,7 @@ let client: MongoClient;
 
 async function connectToDatabase() {
     if (!client) {
-        client = await MongoClient.connect(process.env.MONGO_URI as string, {
+        client = await MongoClient.connect('mongodb://root:rpassword@localhost:27017/e-commerce?authSource=admin', {
             maxPoolSize: 10,
         });
     }

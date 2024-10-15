@@ -1,9 +1,6 @@
 import { MongoClient } from 'mongodb';
 
-const uri: string = process.env.MONGO_URI || 'mongodb://root:rpassword@localhost:27017/e-commerce?authSource=admin';
-if (!uri) {
-    throw new Error('Please add your Mongo URI to .env.local');
-}
+const uri = 'mongodb://root:rpassword@localhost:27017/e-commerce?authSource=admin';
 
 let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
