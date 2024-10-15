@@ -23,35 +23,45 @@ export const authOptions: NextAuthOptions = {
                 password: { label: 'Password', type: 'password' },
             },
             async authorize(credentials): Promise<any | null> {
+                console.log("==== Authorization Start ====");
                 console.log("Attempting to authorize:", credentials?.email);
-                const db = await connectToDatabase();
-                const usersCollection = db.collection('user');
+                try {
+                    const db = await connectToDatabase();
+                    console.log("Database connected:", db.databaseName);
+                    const usersCollection = db.collection('user');
 
-                const user = await usersCollection.findOne({
-                    email: credentials?.email,
-                });
+                    const user = await usersCollection.findOne({
+                        email: credentials?.email,
+                    });
+                    console.log("User found:", user ? "Yes" : "No");
+                    console.log("User details:", user ? JSON.stringify(user, null, 2) : "Not found");
 
-                console.log("User found:", user);
+                    if (!user) {
+                        console.log("No user found with that email");
+                        throw new Error('No user found with that email');
+                    }
 
-                if (!user) {
-                    console.log("No user found with that email");
-                    throw new Error('No user found with that email');
+                    console.log("Comparing passwords...");
+                    const isValid = await compare(credentials!.password, user.password);
+                    console.log("Password comparison result:", isValid);
+
+                    if (!isValid) {
+                        console.log("Incorrect password");
+                        throw new Error('Incorrect password');
+                    }
+
+                    console.log("==== Authorization Success ====");
+                    return {
+                        id: user._id.toString(),
+                        email: user.email,
+                        role: user.role,
+                        name: user.username
+                    };
+                } catch (error) {
+                    console.error("==== Authorization Error ====");
+                    console.error(error);
+                    return null;
                 }
-
-                const isValid = await compare(credentials!.password, user.password);
-                console.log("Password valid:", isValid);
-
-                if (!isValid) {
-                    console.log("Incorrect password");
-                    throw new Error('Incorrect password');
-                }
-
-                return {
-                    id: user._id.toString(),
-                    email: user.email,
-                    role: user.role,
-                    name: user.username
-                };
             },
         }),
     ],

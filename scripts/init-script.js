@@ -23,7 +23,8 @@ db.user.insertOne({
     _id: ObjectId("212c6359345678f123456789"),
     username: "ege",
     email: "ege.yurtsever@sabanciuniv.edu",
-    password: "$2a$12$.IEn8URXSN7e5rJK1lC4zO72b3ASTbnnuruR3uU9eDjZUW8M0dgji" //scrummaster
+    password: "$2a$12$.IEn8URXSN7e5rJK1lC4zO72b3ASTbnnuruR3uU9eDjZUW8M0dgji", //scrummaster
+    role: "product_manager"
 })
 
 db.user.insertOne({
