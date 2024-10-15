@@ -1,4 +1,4 @@
-db = db.getSiblingDB("commerce");
+db = db.getSiblingDB("e-commerce");
 
 db.createUser({
     user: "project-user",
@@ -6,7 +6,7 @@ db.createUser({
     roles: [
         {
             role: "dbOwner",
-            db: "commerce"
+            db: "e-commerce"
         }
     ]
 });
@@ -50,7 +50,13 @@ db.user.insertOne({
     role: "customer"
 })
 
-
+db.user.insertOne({
+    _id: ObjectId("612c6359345678f123456789"),
+    username: "eren",
+    email: "eeren@sabanciuniv.edu",
+    password: "$2a$12$71AddlKXdl79mYWhIzxG7uwBIIcuTfcyf3EP5wH2PeK.vZx70qBFi", //308eren
+    role: "customer"
+})
 
 db.product.insertOne({
     _id: ObjectId("122c6359345678f123456789"),
