@@ -24,17 +24,18 @@ const ShoppingPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [query, setQuery] = useState<string>('');
   const [category, setCategory] = useState<string>('');
+  const [order, setOrder] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     fetchProducts();
-  }, [query, category]);
+  }, [query, category,order]);
 
   const fetchProducts = async () => {
     setLoading(true);
     try {
       const response = await axios.get('/api/products', {
-        params: { query, category },
+        params: { query, category, order },
       });
       setProducts(response.data);
     } catch (error) {
@@ -50,6 +51,11 @@ const ShoppingPage = () => {
       <div className="bg-blue-600 py-12 text-center text-white">
         <h1 className="text-4xl font-bold">Welcome to Our Shop</h1>
         <p className="mt-2">Explore our latest products and find your style!</p>
+
+        {/* Go to Cart Button */}
+        <button className="absolute middle-4 right-4 bg-white text-blue-600 font-bold py-2 px-3 rounded-lg shadow-t-md hover:bg-gray-100 transition">
+        Go to Cart
+        </button>
       </div>
 
       {/* Search and Filter Section */}
@@ -72,6 +78,18 @@ const ShoppingPage = () => {
             <option value="shirt">Shirt</option>
             <option value="shoes">Shoes</option>
             {/* Add more categories here */}
+          </select>
+
+          {/* Order By Dropdown */}
+          <select
+            value={order}
+            onChange={(e) => setOrder(e.target.value)}
+            className="ml-4 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          >
+            <option value="">Order By</option>
+            <option value="asc">Price: Low to High</option>
+            <option value="desc">Price: High to Low</option>
+            {/* Add options for reviews and popularity when implemented */}
           </select>
         </div>
 

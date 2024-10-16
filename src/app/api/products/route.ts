@@ -23,6 +23,7 @@ export async function GET(req: Request) {
         const url = new URL(req.url);
         const query = url.searchParams.get('query');
         const category = url.searchParams.get('category');
+        const order = url.searchParams.get('order')
 
         let searchCriteria: any = {};
 
@@ -37,7 +38,14 @@ export async function GET(req: Request) {
             searchCriteria.category = category; //Search by category
         }
 
-        const products = await productsCollection.find(searchCriteria).toArray();
+        let sortCriteria: any = {};
+        if (order === 'asc') {
+            sortCriteria.price = 1; // Ascending order
+        } else if (order === 'desc') {
+            sortCriteria.price = -1; // Descending order
+        }
+
+        const products = await productsCollection.find(searchCriteria).sort(sortCriteria).toArray();
         console.log("Products fetched:", products.length);
 
         return NextResponse.json(products);
