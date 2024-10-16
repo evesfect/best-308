@@ -1,19 +1,30 @@
-import { MongoClient } from 'mongodb';
+import mongoose, { Connection } from 'mongoose';
 
-const uri = 'mongodb://root:rpassword@localhost:27017/e-commerce?authSource=admin';
+const MONGO_URI = 'mongodb://root:rpassword@localhost:27017/e-commerce?authSource=admin';
 
-let client: MongoClient;
-let clientPromise: Promise<MongoClient>;
 
-if (process.env.NODE_ENV === 'development') {
-    if (!(global as any)._mongoClientPromise) {
-        client = new MongoClient(uri);
-        (global as any)._mongoClientPromise = client.connect();
-    }
-    clientPromise = (global as any)._mongoClientPromise;
-} else {
-    client = new MongoClient(uri);
-    clientPromise = client.connect();
+declare global {
+    // eslint-disable-next-line no-var
+    var _mongooseConnectionPromise: Promise<Connection> | undefined;
 }
 
-export default clientPromise;
+let connectionPromise: Promise<Connection>;
+
+if (!global._mongooseConnectionPromise) {
+    global._mongooseConnectionPromise = mongoose.connect(MONGO_URI).then((mongooseInstance) => {
+        console.log('Connected to MongoDB');
+        return mongooseInstance.connection;
+    }).catch((err) => {
+        console.error('MongoDB connection error:', err);
+        if (process.env.NODE_ENV === 'production') {
+            process.exit(1);  // Exit the process if in production and the connection fails
+        }
+        throw err;  // Ensure error bubbles up in non-production environments
+    });
+}
+
+// Set the connection promise to the global variable
+connectionPromise = global._mongooseConnectionPromise;
+
+export default connectionPromise;
+
