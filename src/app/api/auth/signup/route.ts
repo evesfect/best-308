@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       email,
       password: hashedPassword,
       username,
-      role: 'user', // You can customize the default role here
+      role: 'customer', // You can customize the default role here
     };
 
     // Insert the new user into the database
