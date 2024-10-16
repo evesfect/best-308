@@ -22,21 +22,13 @@ const Home = () => {
         <h1 className="text-5xl font-bold">Welcome to Our E-commerce Store</h1>
         <p className="mt-4 text-xl">Discover the best products at unbeatable prices</p>
         <div className="mt-8">
-          {session ? (
+          
             <button
-              onClick={() => router.push('/shop')}
+              onClick={() => router.push('/shop/browse')}
               className="bg-white text-blue-600 py-3 px-8 rounded-lg shadow-lg font-bold hover:bg-gray-200 transition duration-300"
             >
               Start Shopping
             </button>
-          ) : (
-            <button
-              onClick={() => signIn()}
-              className="bg-white text-blue-600 py-3 px-8 rounded-lg shadow-lg font-bold hover:bg-gray-200 transition duration-300"
-            >
-              Sign in to Start Shopping
-            </button>
-          )}
         </div>
       </div>
 
