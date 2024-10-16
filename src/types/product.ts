@@ -4,8 +4,9 @@ import { ObjectId } from 'mongodb';
 export interface Product {
     _id: ObjectId;
     name: string;
-    price: number;
     description: string;
-    inStock: boolean;
-    quantity: number;
+    category: string;
+    price: number;
+    total_stock: Map<string, number>;
+    available_stock: Map<string, number>;
 }
