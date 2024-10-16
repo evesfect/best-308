@@ -32,6 +32,12 @@ A base for boutique fashion market websites with ease of deployment
      ./scripts/reset_db.sh
      ```
 
+   - Stop the database:
+
+     ```bash
+     ./scripts/stop_db.sh
+     ```
+
    - Remove the database container and volume:
 
      ```bash
@@ -65,8 +71,7 @@ A base for boutique fashion market websites with ease of deployment
 2. Stop MongoDB and MongoDB Express:
 
    ```bash
-   cd db
-   docker-compose down
+   ./scripts/stop_db.sh
    ```
 
 ## Development
