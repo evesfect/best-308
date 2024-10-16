@@ -64,7 +64,7 @@ db.product.insertOne({
     name: "oxford shirt",
     description: "A boxy fit shirt made from tightly woven cotton fabric. It features long sleeves with buttoned cuffs, a collared neckline, and a patch pocket on the chest. The front is buttoned for closure.",
     category: "shirt",
-    price: "39.99",
+    price: 39.99,
     total_stock: {
         "XS": 5,
         "S": 25,
@@ -86,7 +86,7 @@ db.product.insertOne({
     name: "straight fit jean",
     description: "A straight fit pant made from a blend of linen and cotton. It features front pockets, back patch pockets, and a front zipper with a button closure",
     category: "jean",
-    price: "79.99",
+    price: 79.99,
     total_stock: {
         "XS": 2,
         "S": 4,
@@ -108,7 +108,7 @@ db.product.insertOne({
     name: "faux suede bomber jacket",
     description: "Regular fit bomber jacket made of faux suede fabric, padded on the inside. Features a ribbed elastic collar, long sleeves, welt pockets at the hip and an inside pocket detail. Ribbed trims. Zip-up front.",
     category: "jacket",
-    price: "59.99",
+    price: 59.99,
     total_stock: {
         "S": 15,
         "M": 10,
