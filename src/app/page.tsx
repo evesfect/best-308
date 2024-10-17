@@ -1,83 +1,114 @@
 "use client";
 
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 const Home = () => {
-  const { data: session, status } = useSession();
+  const [showLoginDropdown, setShowLoginDropdown] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [scrollPosition, setScrollPosition] = useState(0);
   const router = useRouter();
 
-  if (status === "loading") {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-xl font-semibold">Loading...</div>
-      </div>
-    );
-  }
+  const images = [
+    '/images/carousel/image1.jpg',
+    '/images/carousel/image2.jpg',
+    '/images/carousel/image3.jpg',
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 5000); // Change image every 5 seconds
+
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Hero Section */}
-      <div className="relative bg-blue-600 text-white py-20 text-center">
-        <h1 className="text-5xl font-bold">Welcome to Our E-commerce Store</h1>
-        <p className="mt-4 text-xl">Discover the best products at unbeatable prices</p>
-        <div className="mt-8">
-          
-            <button
-              onClick={() => router.push('/shop/browse')}
-              className="bg-white text-blue-600 py-3 px-8 rounded-lg shadow-lg font-bold hover:bg-gray-200 transition duration-300"
-            >
-              Start Shopping
-            </button>
-        </div>
-      </div>
+    <div className="min-h-screen bg-white">
+      {/* Top Bar */}
+      <nav className="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/">
+            <Image src="/images/logo.png" alt="Shop Logo" width={100} height={40} />
+          </Link>
 
-      {/* Features Section */}
-      <div className="py-12 bg-gray-100">
-        <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-6">Why Shop with Us?</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="p-6 bg-white rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold mb-4">Wide Selection of Products</h3>
-              <p className="text-gray-600">Explore a diverse range of products to meet all your needs.</p>
+          {/* Navigation Links */}
+          <div className="hidden md:flex space-x-6">
+            <Link href="/new-arrivals" className="text-gray-600 hover:text-gray-900">New Arrivals</Link>
+            <Link href="/men" className="text-gray-600 hover:text-gray-900">Men</Link>
+            <Link href="/women" className="text-gray-600 hover:text-gray-900">Women</Link>
+            <Link href="/best-sellers" className="text-gray-600 hover:text-gray-900">Best Sellers</Link>
+          </div>
+
+          {/* Icons */}
+          <div className="flex items-center space-x-4">
+            <button aria-label="Search">
+              <Image src="/icons/search.svg" alt="Search" width={24} height={24} />
+            </button>
+            <div className="relative">
+              <button 
+                aria-label="Login" 
+                onMouseEnter={() => setShowLoginDropdown(true)}
+                onMouseLeave={() => setShowLoginDropdown(false)}
+              >
+                <Image src="/icons/user.svg" alt="Login" width={24} height={24} />
+              </button>
+              {showLoginDropdown && (
+                <div 
+                  className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10"
+                  onMouseEnter={() => setShowLoginDropdown(true)}
+                  onMouseLeave={() => setShowLoginDropdown(false)}
+                >
+                  <Link href="/auth/signin" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Login</Link>
+                  <div className="px-4 py-2 text-sm text-gray-500">Don't have an account?</div>
+                  <Link href="/auth/signup" className="block px-4 py-2 text-sm text-blue-500 hover:bg-gray-100">Sign up</Link>
+                </div>
+              )}
             </div>
-            <div className="p-6 bg-white rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold mb-4">Fast and Free Shipping</h3>
-              <p className="text-gray-600">Get your products delivered to your doorstep quickly and with no extra cost.</p>
-            </div>
-            <div className="p-6 bg-white rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold mb-4">24/7 Customer Support</h3>
-              <p className="text-gray-600">Our team is available around the clock to assist you with any inquiries.</p>
-            </div>
+            <button aria-label="Favorites">
+              <Image src="/icons/heart.svg" alt="Favorites" width={24} height={24} />
+            </button>
+            <button aria-label="Shopping Cart">
+              <Image src="/icons/cart.svg" alt="Shopping Cart" width={24} height={24} />
+            </button>
           </div>
         </div>
+      </nav>
+
+      {/* Image Carousel */}
+      <div className="relative h-screen">
+        <Image 
+          src={images[currentImageIndex]} 
+          alt={`Carousel Image ${currentImageIndex + 1}`} 
+          layout="fill"
+          objectFit="cover"
+        />
+        <div className="absolute bottom-0 left-0 right-0 h-2 bg-gray-200">
+          <div 
+            className="h-full bg-black transition-all duration-5000 ease-linear"
+            style={{ width: `${((currentImageIndex + 1) / images.length) * 100}%` }}
+          ></div>
+        </div>
       </div>
 
-      {/* Session Info Section */}
-      <div className="py-12 bg-white">
-        <div className="max-w-lg mx-auto text-center">
-          {session ? (
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-              <h2 className="text-2xl font-bold mb-4">Welcome back, {session.user?.name}!</h2>
-              <p className="text-gray-700 mb-4">Email: {session.user?.email}</p>
-              <button
-                onClick={() => signOut()}
-                className="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition duration-300"
-              >
-                Sign out
-              </button>
+      {/* Category Links */}
+      <div className="container mx-auto px-4 py-12 pt-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Link href="/men" className="relative h-64 rounded-lg overflow-hidden">
+            <Image src="/images/mens-category.jpg" alt="Men's Selection" layout="fill" objectFit="cover" />
+            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+              <span className="text-white text-2xl font-bold">Men's Selection</span>
             </div>
-          ) : (
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-              <h2 className="text-2xl font-bold mb-4">You are not signed in</h2>
-              <button
-                onClick={() => signIn()}
-                className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300"
-              >
-                Sign in
-              </button>
+          </Link>
+          <Link href="/women" className="relative h-64 rounded-lg overflow-hidden">
+            <Image src="/images/womens-category.jpg" alt="Women's Selection" layout="fill" objectFit="cover" />
+            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+              <span className="text-white text-2xl font-bold">Women's Selection</span>
             </div>
-          )}
+          </Link>
         </div>
       </div>
     </div>
