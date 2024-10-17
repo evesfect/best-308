@@ -31,7 +31,9 @@ done
 echo "MongoDB is up and running!"
 
 # Copy the init script to the container
-docker cp ../scripts/db/init-script.js mongodb:/init-script.js
+SCRIPT_DIR=$(dirname "$0")
+INIT_SCRIPT_PATH=$(cygpath -w "${SCRIPT_DIR}/db/init-script.js")
+docker cp "${INIT_SCRIPT_PATH}" mongodb:/init-script.js
 
 # Execute the init script
 echo "Attempting to execute init script..."
