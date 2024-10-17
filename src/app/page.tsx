@@ -41,19 +41,24 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Top Bar */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300`}
+      <nav 
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
         style={{ 
-          backgroundColor: `rgba(255, 255, 255, ${Math.max(0.25, Math.min(scrollPosition / 300, 1))})`,
-          boxShadow: scrollPosition > 0 ? '0 1px 3px rgba(0, 0, 0, 0.1)' : 'none'
-        }}>
-        <div className="container mx-auto px-6 py-2 flex items-center justify-between">
+          backgroundColor: `rgba(255, 255, 255, ${Math.max(0.0, Math.min(scrollPosition / 150, 1))})`,
+        }}
+      >
+        {/* Gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-transparent pointer-events-none" />
+        
+        {/* Nav content */}
+        <div className="container mx-auto px-6 py-2 flex items-center justify-between relative z-10">
           {/* Logo */}
           <Link href="/">
             <Image src="/images/logo.png" alt="Shop Logo" width={80} height={32} />
           </Link>
 
           {/* Navigation Links */}
-          <div className="hidden md:flex space-x-6">
+          <div className="hidden md:flex space-x-6 flex-grow justify-center">
             <Link href="/new-arrivals" className={`font-bold hover:text-gray-900 ${scrollPosition > 0 ? 'text-gray-600' : 'text-white'}`}>New Arrivals</Link>
             <Link href="/men" className={`font-bold hover:text-gray-900 ${scrollPosition > 0 ? 'text-gray-600' : 'text-white'}`}>Men</Link>
             <Link href="/women" className={`font-bold hover:text-gray-900 ${scrollPosition > 0 ? 'text-gray-600' : 'text-white'}`}>Women</Link>
@@ -61,7 +66,7 @@ const Home = () => {
           </div>
 
           {/* Icons */}
-          <div className="flex items-center space-x-6 ml-auto">
+          <div className="flex items-center space-x-6">
             <button aria-label="Search" className="flex items-center">
               <Image src="/icons/search.svg" alt="Search" width={24} height={24} className={`${scrollPosition > 0 ? 'text-gray-600' : 'text-white'}`} />
             </button>
@@ -100,6 +105,8 @@ const Home = () => {
           alt={`Carousel Image ${currentImageIndex + 1}`} 
           layout="fill"
           objectFit="cover"
+          objectPosition="top"
+          priority
         />
         <div className="absolute bottom-0 left-0 right-0 h-2 bg-gray-200">
           <div 
