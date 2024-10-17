@@ -25,10 +25,25 @@ const Home = () => {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const position = window.pageYOffset;
+      setScrollPosition(position);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Top Bar */}
-      <nav className="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrollPosition > 0 ? 'bg-white shadow-md' : 'bg-transparent'
+      }`} style={{ backgroundColor: `rgba(255, 255, 255, ${Math.min(scrollPosition / 300, 1)})` }}>
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           {/* Logo */}
           <Link href="/">
@@ -37,10 +52,10 @@ const Home = () => {
 
           {/* Navigation Links */}
           <div className="hidden md:flex space-x-6">
-            <Link href="/new-arrivals" className="text-gray-600 hover:text-gray-900">New Arrivals</Link>
-            <Link href="/men" className="text-gray-600 hover:text-gray-900">Men</Link>
-            <Link href="/women" className="text-gray-600 hover:text-gray-900">Women</Link>
-            <Link href="/best-sellers" className="text-gray-600 hover:text-gray-900">Best Sellers</Link>
+            <Link href="/new-arrivals" className={`hover:text-gray-900 ${scrollPosition > 0 ? 'text-gray-600' : 'text-white'}`}>New Arrivals</Link>
+            <Link href="/men" className={`hover:text-gray-900 ${scrollPosition > 0 ? 'text-gray-600' : 'text-white'}`}>Men</Link>
+            <Link href="/women" className={`hover:text-gray-900 ${scrollPosition > 0 ? 'text-gray-600' : 'text-white'}`}>Women</Link>
+            <Link href="/best-sellers" className={`hover:text-gray-900 ${scrollPosition > 0 ? 'text-gray-600' : 'text-white'}`}>Best Sellers</Link>
           </div>
 
           {/* Icons */}
