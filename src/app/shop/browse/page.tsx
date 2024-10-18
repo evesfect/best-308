@@ -34,7 +34,7 @@ const ShoppingPage = () => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/products', {
+      const response = await axios.get('/api/product', {
         params: { query, category, order },
       });
       setProducts(response.data);
