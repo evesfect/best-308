@@ -21,7 +21,7 @@ const Home = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 5000); // Change image every 5 seconds
+    }, 8000); // Change image every 8 seconds
 
     return () => clearInterval(timer);
   }, []);
@@ -44,15 +44,24 @@ const Home = () => {
       <TopBar scrollPosition={scrollPosition} />
 
       {/* Image Carousel */}
-      <div className="relative h-screen">
-        <Image 
-          src={images[currentImageIndex]} 
-          alt={`Carousel Image ${currentImageIndex + 1}`} 
-          layout="fill"
-          objectFit="cover"
-          objectPosition="top"
-          priority
-        />
+      <div className="relative h-screen overflow-hidden">
+        {images.map((image, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-500 ease-in-out ${
+              index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <Image 
+              src={image} 
+              alt={`Carousel Image ${index + 1}`} 
+              layout="fill"
+              objectFit="cover"
+              objectPosition="top"
+              priority={index === 0}
+            />
+          </div>
+        ))}
         <div className="absolute bottom-4 left-4 right-4 flex space-x-4">
           {images.map((_, index) => (
             <div key={index} className="flex-1 progress-container opacity-85">

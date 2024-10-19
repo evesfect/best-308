@@ -8,7 +8,7 @@
 }
 
 .animate-progress {
-  animation: progress 5s linear;
+  animation: progress 8s linear;
   animation-fill-mode: forwards;
 }
 
