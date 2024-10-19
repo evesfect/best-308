@@ -28,6 +28,10 @@ const StaticTopBar: React.FC = () => {
     router.push('/');
   };
 
+  const goToShoppingCart = () => {
+    router.push('/shop/cart')
+  }
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
       <div 
@@ -77,7 +81,7 @@ const StaticTopBar: React.FC = () => {
             <button aria-label="Favorites" className="flex items-center">
               <Image src="/icons/heart.svg" alt="Favorites" width={20} height={20} />
             </button>
-            <button aria-label="Shopping Cart" className="flex items-center">
+            <button aria-label="Shopping Cart" className="flex items-center" onClick={goToShoppingCart}>
               <Image src="/icons/cart.svg" alt="Shopping Cart" width={20} height={20} />
             </button>
           </div>
