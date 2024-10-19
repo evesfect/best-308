@@ -33,6 +33,10 @@ const TopBar: React.FC<TopBarProps> = ({ scrollPosition }) => {
     router.push('/');
   };
 
+  const goToShoppingCart = () =>{
+    router.push('/shop/cart')
+  }
+
   const bgColorClass = scrollPosition > 0 ? 'bg-semi-transparent' : 'bg-transparent';
 
   const backgroundColor = `rgba(255, 255, 255, ${Math.min(scrollPosition / 100, 1)})`;
@@ -59,10 +63,10 @@ const TopBar: React.FC<TopBarProps> = ({ scrollPosition }) => {
 
           {/* Navigation Links */}
           <div className="hidden md:flex space-x-6 flex-grow justify-center">
-            <Link href="/new-arrivals" className={`font-bold hover:text-gray-900 ${scrollPosition > 0 ? 'text-gray-600' : 'text-white'}`}>New Arrivals</Link>
-            <Link href="/men" className={`font-bold hover:text-gray-900 ${scrollPosition > 0 ? 'text-gray-600' : 'text-white'}`}>Men</Link>
-            <Link href="/women" className={`font-bold hover:text-gray-900 ${scrollPosition > 0 ? 'text-gray-600' : 'text-white'}`}>Women</Link>
-            <Link href="/best-sellers" className={`font-bold hover:text-gray-900 ${scrollPosition > 0 ? 'text-gray-600' : 'text-white'}`}>Best Sellers</Link>
+            <Link href="/shop/browse/new-arrivals" className={`font-bold hover:text-gray-900 ${scrollPosition > 0 ? 'text-gray-600' : 'text-white'}`}>New Arrivals</Link>
+            <Link href="/shop/browse/men" className={`font-bold hover:text-gray-900 ${scrollPosition > 0 ? 'text-gray-600' : 'text-white'}`}>Men</Link>
+            <Link href="/shop/browse/women" className={`font-bold hover:text-gray-900 ${scrollPosition > 0 ? 'text-gray-600' : 'text-white'}`}>Women</Link>
+            <Link href="/shop/browse/best-sellers" className={`font-bold hover:text-gray-900 ${scrollPosition > 0 ? 'text-gray-600' : 'text-white'}`}>Best Sellers</Link>
           </div>
 
           {/* Icons */}
@@ -95,7 +99,7 @@ const TopBar: React.FC<TopBarProps> = ({ scrollPosition }) => {
             <button aria-label="Favorites" className="flex items-center">
               <Image src="/icons/heart.svg" alt="Favorites" width={20} height={20} className={`transition-colors duration-300`} style={{ filter: `invert(${iconColor === 'white' ? 1 : 0})` }} />
             </button>
-            <button aria-label="Shopping Cart" className="flex items-center">
+            <button aria-label="Shopping Cart" className="flex items-center" onClick={goToShoppingCart}>
               <Image src="/icons/cart.svg" alt="Shopping Cart" width={20} height={20} className={`transition-colors duration-300`} style={{ filter: `invert(${iconColor === 'white' ? 1 : 0})` }} />
             </button>
           </div>

@@ -109,13 +109,13 @@ const Home = () => {
       {/* Category Links */}
       <div className="container mx-auto px-4 py-12 pt-24">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Link href="/men" className="relative h-64 rounded-lg overflow-hidden">
+          <Link href="/shop/browse/men" className="relative h-64 rounded-lg overflow-hidden">
             <Image src="/images/mens-category.jpg" alt="Men's Selection" layout="fill" objectFit="cover" />
             <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
               <span className="text-white text-2xl font-bold">Men's Selection</span>
             </div>
           </Link>
-          <Link href="/women" className="relative h-64 rounded-lg overflow-hidden">
+          <Link href="/shop/browse/women" className="relative h-64 rounded-lg overflow-hidden">
             <Image src="/images/womens-category.jpg" alt="Women's Selection" layout="fill" objectFit="cover" />
             <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
               <span className="text-white text-2xl font-bold">Women's Selection</span>
