@@ -107,20 +107,79 @@ const Home = () => {
       </div>
 
       {/* Category Links */}
-      <div className="container mx-auto px-4 py-12 pt-24">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Link href="/men" className="relative h-64 rounded-lg overflow-hidden">
-            <Image src="/images/mens-category.jpg" alt="Men's Selection" layout="fill" objectFit="cover" />
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-              <span className="text-white text-2xl font-bold">Men's Selection</span>
+      <div className="w-full pt-24 pb-12">
+        <div className="flex flex-col space-y-24">
+          <div className="flex flex-col space-y-4">
+            <span className={`text-[#003153] text-4xl font-bold text-center ${libreBaskerville.className}`}>
+              Men's Selection
+            </span>
+            <div className="flex w-full h-[600px]">
+              <Link href="/men" className="relative w-1/2 overflow-hidden">
+                <Image 
+                  src="/images/mens-category-1.jpg" 
+                  alt="Men's Selection 1" 
+                  layout="fill" 
+                  objectFit="cover"
+                  objectPosition="center"
+                />
+              </Link>
+              <Link href="/men" className="relative w-1/2 overflow-hidden">
+                <Image 
+                  src="/images/mens-category-2.jpg" 
+                  alt="Men's Selection 2" 
+                  layout="fill" 
+                  objectFit="cover"
+                  objectPosition="center"
+                />
+              </Link>
             </div>
-          </Link>
-          <Link href="/women" className="relative h-64 rounded-lg overflow-hidden">
-            <Image src="/images/womens-category.jpg" alt="Women's Selection" layout="fill" objectFit="cover" />
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-              <span className="text-white text-2xl font-bold">Women's Selection</span>
+          </div>
+          <div className="flex flex-col space-y-4">
+            <span className={`text-[#8B4513] text-4xl font-bold text-center ${libreBaskerville.className}`}>
+              Women's Selection
+            </span>
+            <div className="flex w-full h-[600px]">
+              <Link href="/women" className="relative w-1/2 overflow-hidden">
+                <Image 
+                  src="/images/womens-category-1.jpg" 
+                  alt="Women's Selection 1" 
+                  layout="fill" 
+                  objectFit="cover"
+                  objectPosition="center"
+                />
+              </Link>
+              <Link href="/women" className="relative w-1/2 overflow-hidden">
+                <Image 
+                  src="/images/womens-category-2.jpg" 
+                  alt="Women's Selection 2" 
+                  layout="fill" 
+                  objectFit="cover"
+                  objectPosition="center"
+                />
+              </Link>
             </div>
-          </Link>
+          </div>
+          <div className="flex flex-col space-y-4">
+            <span className={`text-[#003153] text-4xl font-bold text-center ${libreBaskerville.className}`}>
+              About Us
+            </span>
+            <div className="w-full h-[700px]">
+              <Link href="/about" className="relative w-full h-full overflow-hidden">
+                <Image 
+                  src="/images/about-us.jpg" 
+                  alt="About Us" 
+                  layout="fill" 
+                  objectFit="cover"
+                  objectPosition="center"
+                />
+                <img 
+  src="/images/about-us.jpg" 
+  alt="About Us" 
+  className="w-full h-full object-cover"
+/>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </div>
