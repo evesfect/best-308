@@ -11,7 +11,6 @@ function isValidObjectId(id: string): boolean {
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
     const { id } = params;
-    console.log("sa");
     await connectionPromise;
 
     if (!isValidObjectId(id)) {

@@ -1,0 +1,315 @@
+/* Container that divides the page into three sections: image, details, and description */
+.productContainer {
+    display: flex;
+    height: 100vh; /* Full viewport height */
+    width: 100%;
+    background-color: white; /* Same background across all sections */
+}
+
+/* Left Section: Product Image */
+.imageSection {
+    flex: 1; /* Take up 1/3 of the space */
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Center the image vertically and horizontally */
+}
+
+.productImage {
+    object-fit: contain;
+    max-height: 100%; /* Ensure image scales properly */
+}
+
+/* Middle Section: Product Details (name, price, and actions) */
+.detailsSection {
+    flex: 1; /* Take up the middle 1/3 of the space */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+/* Product Name and Price styling */
+.namePriceSection {
+    display: flex;
+    flex-direction: column;
+}
+
+.productName {
+    font-size: 2rem;
+    font-weight: normal;
+    margin-bottom: 10px;
+}
+
+.productPrice {
+    font-size: 1.5rem;
+    margin: 0;
+    color: #333;
+}
+
+/* Actions: Size selector and Add to Cart button */
+.actionSection {
+    margin-top: auto; /* Push to the bottom */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Custom styling for "Please Select Size" button */
+.sizeButton {
+    background-color: white; /* White background */
+    border: 1px solid #ccc; /* Light border */
+    border-radius: 8px; /* Rounded edges */
+    height: 40px;
+    font-size: 1rem;
+    color: #333;
+    text-align: left;
+    padding-left: 15px;
+    cursor: pointer;
+    margin-bottom: 20px;
+
+    /* Make the width same as "Add to Cart" button */
+    width: 100%; /* Take up the full available width */
+    max-width: 600px; /* Adjust this value based on your layout needs */
+}
+
+/* Custom Add to Cart Button */
+.addToCartButton {
+    background-color: black; /* Lighter gray background */
+    border: none; /* Remove any border */
+    border-radius: 8px; /* Slightly round corners */
+    height: 50px;
+    font-size: 1.1rem;
+    color: white;
+    cursor: pointer;
+
+    /* Make the width same as "Please Select Size" button */
+    width: 100%; /* Take up the full available width */
+    max-width: 600px; /* Adjust this value based on your layout needs */
+}
+
+/* Right Section: Product Description */
+.descriptionSection {
+    flex: 1; /* Take up the right 1/3 of the space */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 20px;
+}
+
+.descriptionHeading {
+    font-weight: normal; /* Remove boldness */
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.productDescription {
+    font-weight: normal; /* Ensure description text is not bold */
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+.productContainer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.imageSection, .detailsSection, .descriptionSection {
+    flex: 1;
+    margin: 10px;
+}
+
+.namePriceSection {
+    margin-bottom: 20px;
+}
+
+.actionSection {
+    display: flex;
+    flex-direction: column;
+}
+
+.colorSection {
+    margin-top: 15px;
+    font-weight: normal;
+}
+
+.colorOptions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px; /* Add some margin before the next section */
+}
+
+.colorOption {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+}
+
+.selectedColor {
+    border-color: #000; /* Highlight selected color */
+}
+
+.sizeDropdownSection {
+    position: relative;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.sizeButton {
+    width: 100%;
+    height: 44px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 0 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1rem;
+    color: #333;
+    transition: border-color 0.2s ease;
+}
+
+.sizeButton:hover {
+    border-color: #999;
+}
+
+.sizeButtonText {
+    flex: 1;
+    text-align: left;
+}
+
+.caretIcon {
+    margin-left: 10px;
+    transition: transform 0.2s ease;
+    color: #666;
+}
+
+.caretIconUp {
+    transform: rotate(180deg);
+}
+
+.sizeDropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 100%;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.sizeOption {
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.sizeOption:hover {
+    background-color: #f5f5f5;
+}
+
+.sizeOption:first-child {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.sizeOption:last-child {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.verticalLine {
+    width: 1px;
+    background-color: #ccc; /* Light gray color */
+    height: auto;
+    align-self: stretch; /* Make it stretch between the elements */
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.horizontalLine {
+    border: 0;
+    border-top: 1px solid #ccc; /* Adjust the color and style as needed */
+    margin: 20px 0; /* Adjust spacing as needed */
+}
+
+.horizontalLine {
+    border: 0;
+    border-top: 1px solid #ccc; /* Adjust the color and style as needed */
+    margin: 10px 0; /* Adjust spacing as needed */
+}
+
+/* Quantity Section */
+.quantitySection {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 10px;
+    font-weight: normal;
+}
+
+.quantityControls {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    overflow: hidden;
+    width: 180px; /* Increased width for larger control */
+    height: 44px; /* Slightly increased height */
+}
+
+.quantityButton {
+    background-color: #f0f0f0;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    width: 60px; /* Increased button width */
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.quantityButton:hover {
+    background-color: #e0e0e0;
+}
+
+.quantityDisplay {
+    flex: 1;
+    text-align: center;
+    padding: 0;
+    background-color: #fff;
+    min-width: 60px; /* Increased display width */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    /* Removed border-left and border-right */
+}
+
+/* Ensure proper border radius for buttons */
+.quantityButton:first-child {
+    border-top-left-radius: 25px;
+    border-bottom-left-radius: 25px;
+}
+
+.quantityButton:last-child {
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+}
+
+.colorSection h3, .quantitySection h3 {
+    font-weight: normal; /* Ensure headings are not bold */
+}
+.hoveredColorName {
+    font-weight: bold; /* Make the color name bold */
+    color: #333; /* You can adjust this color as needed */
+}
+
+
