@@ -50,7 +50,7 @@ const StaticTopBar: React.FC = () => {
           {/* Icons */}
           <div className="flex items-center space-x-6">
             <button aria-label="Search" className="flex items-center">
-              <Image src="/icons/search.svg" alt="Search" width={24} height={24} />
+              <Image src="/icons/search.svg" alt="Search" width={20} height={20} />
             </button>
             <div className="relative flex items-center" ref={dropdownRef}>
               <button 
@@ -58,7 +58,7 @@ const StaticTopBar: React.FC = () => {
                 className="flex items-center"
                 onMouseEnter={() => setShowLoginDropdown(true)}
               >
-                <Image src="/icons/user.svg" alt="Login" width={24} height={24} />
+                <Image src="/icons/user.svg" alt="Login" width={20} height={20} />
               </button>
               {showLoginDropdown && (
                 <div 
@@ -75,10 +75,10 @@ const StaticTopBar: React.FC = () => {
               )}
             </div>
             <button aria-label="Favorites" className="flex items-center">
-              <Image src="/icons/heart.svg" alt="Favorites" width={24} height={24} />
+              <Image src="/icons/heart.svg" alt="Favorites" width={20} height={20} />
             </button>
             <button aria-label="Shopping Cart" className="flex items-center">
-              <Image src="/icons/cart.svg" alt="Shopping Cart" width={24} height={24} />
+              <Image src="/icons/cart.svg" alt="Shopping Cart" width={20} height={20} />
             </button>
           </div>
         </div>
@@ -88,4 +88,3 @@ const StaticTopBar: React.FC = () => {
 };
 
 export default StaticTopBar;
-

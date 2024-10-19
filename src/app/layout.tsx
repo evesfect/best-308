@@ -2,7 +2,6 @@
 
 import './fonts/global.css'; // Adjust path if needed
 
-
 import { SessionProvider } from "next-auth/react";
 
 export default function RootLayout({

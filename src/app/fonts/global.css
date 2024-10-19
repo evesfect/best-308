@@ -14,14 +14,17 @@
 
 /* Styles for the progress line */
 .progress-container {
-  height: 2px; /* Reduced from 4px to make it thinner */
-  background-color: transparent; /* Fully transparent background */
+  height: 2px;
+  background-color: transparent;
   overflow: hidden;
+  position: relative;
 }
 
 .progress-line {
   height: 100%;
   background-color: white;
+  position: relative;
+  z-index: 1;
 }
 
 /* New class for opacity */

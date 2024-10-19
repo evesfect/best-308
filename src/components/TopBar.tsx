@@ -68,7 +68,7 @@ const TopBar: React.FC<TopBarProps> = ({ scrollPosition }) => {
           {/* Icons */}
           <div className="flex items-center space-x-6">
             <button aria-label="Search" className="flex items-center">
-              <Image src="/icons/search.svg" alt="Search" width={24} height={24} className={`transition-colors duration-300`} style={{ filter: `invert(${iconColor === 'white' ? 1 : 0})` }} />
+              <Image src="/icons/search.svg" alt="Search" width={20} height={20} className={`transition-colors duration-300`} style={{ filter: `invert(${iconColor === 'white' ? 1 : 0})` }} />
             </button>
             <div className="relative flex items-center" ref={dropdownRef}>
               <button 
@@ -76,7 +76,7 @@ const TopBar: React.FC<TopBarProps> = ({ scrollPosition }) => {
                 className="flex items-center"
                 onMouseEnter={() => setShowLoginDropdown(true)}
               >
-                <Image src="/icons/user.svg" alt="Login" width={24} height={24} className={`transition-colors duration-300`} style={{ filter: `invert(${iconColor === 'white' ? 1 : 0})` }} />
+                <Image src="/icons/user.svg" alt="Login" width={20} height={20} className={`transition-colors duration-300`} style={{ filter: `invert(${iconColor === 'white' ? 1 : 0})` }} />
               </button>
               {showLoginDropdown && (
                 <div 
@@ -93,10 +93,10 @@ const TopBar: React.FC<TopBarProps> = ({ scrollPosition }) => {
               )}
             </div>
             <button aria-label="Favorites" className="flex items-center">
-              <Image src="/icons/heart.svg" alt="Favorites" width={24} height={24} className={`transition-colors duration-300`} style={{ filter: `invert(${iconColor === 'white' ? 1 : 0})` }} />
+              <Image src="/icons/heart.svg" alt="Favorites" width={20} height={20} className={`transition-colors duration-300`} style={{ filter: `invert(${iconColor === 'white' ? 1 : 0})` }} />
             </button>
             <button aria-label="Shopping Cart" className="flex items-center">
-              <Image src="/icons/cart.svg" alt="Shopping Cart" width={24} height={24} className={`transition-colors duration-300`} style={{ filter: `invert(${iconColor === 'white' ? 1 : 0})` }} />
+              <Image src="/icons/cart.svg" alt="Shopping Cart" width={20} height={20} className={`transition-colors duration-300`} style={{ filter: `invert(${iconColor === 'white' ? 1 : 0})` }} />
             </button>
           </div>
         </div>
