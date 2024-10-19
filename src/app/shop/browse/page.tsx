@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 interface Stock {
   S: number;
@@ -26,6 +27,7 @@ const ShoppingPage = () => {
   const [category, setCategory] = useState<string>('');
   const [order, setOrder] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   useEffect(() => {
     fetchProducts();
@@ -34,7 +36,7 @@ const ShoppingPage = () => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/products', {
+      const response = await axios.get('/api/product', {
         params: { query, category, order },
       });
       setProducts(response.data);
@@ -45,6 +47,10 @@ const ShoppingPage = () => {
     }
   };
 
+  const goToShoppingCart = () => {
+    router.push('/shop/cart'); // Navigate to the shopping cart
+};
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Hero Section */}
@@ -53,7 +59,10 @@ const ShoppingPage = () => {
         <p className="mt-2">Explore our latest products and find your style!</p>
 
         {/* Go to Cart Button */}
-        <button className="absolute middle-4 right-4 bg-white text-blue-600 font-bold py-2 px-3 rounded-lg shadow-t-md hover:bg-gray-100 transition">
+        <button 
+        type = 'button'
+        onClick={goToShoppingCart}
+        className="absolute middle-4 right-4 bg-white text-blue-600 font-bold py-2 px-3 rounded-lg shadow-t-md hover:bg-gray-100 transition">
         Go to Cart
         </button>
       </div>
