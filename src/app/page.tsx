@@ -53,11 +53,14 @@ const Home = () => {
           objectPosition="top"
           priority
         />
-        <div className="absolute bottom-0 left-0 right-0 h-2 bg-gray-200">
-          <div 
-            className="h-full bg-black transition-all duration-5000 ease-linear"
-            style={{ width: `${((currentImageIndex + 1) / images.length) * 100}%` }}
-          ></div>
+        <div className="absolute bottom-4 left-4 right-4 flex space-x-4">
+          {images.map((_, index) => (
+            <div key={index} className="flex-1 progress-container opacity-85">
+              <div 
+                className={`progress-line ${index === currentImageIndex ? 'animate-progress' : index < currentImageIndex ? 'w-full' : 'w-0'}`}
+              ></div>
+            </div>
+          ))}
         </div>
       </div>
 
