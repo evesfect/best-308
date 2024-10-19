@@ -12,8 +12,9 @@ docker rm mongodb || true
 docker volume rm db_mongodb_data || true
 
 # Start a new MongoDB container
-cd "$(dirname "$0")/../db" || exit
+cd db
 docker-compose up -d
+cd ..
 
 # Function to check if MongoDB is ready
 check_mongodb() {
@@ -31,7 +32,7 @@ done
 echo "MongoDB is up and running!"
 
 # Copy the init script to the container
-docker cp ../scripts/db/init-script.js mongodb:/init-script.js
+docker cp scripts/db/init-script.js mongodb:/init-script.js
 
 # Execute the init script
 echo "Attempting to execute init script..."

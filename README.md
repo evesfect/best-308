@@ -24,6 +24,7 @@ A base for boutique fashion market websites with ease of deployment
 
      ```bash
      ./scripts/seed_db.sh
+     ./scripts/seed_db.bat
      ```
 
    - Reset the database (remove all data and restart):

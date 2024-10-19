@@ -1,3 +1,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.animate-progress {
+  animation: progress 8s linear;
+  animation-fill-mode: forwards;
+}
+
+/* Styles for the progress line */
+.progress-container {
+  height: 2px;
+  background-color: transparent;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-line {
+  height: 100%;
+  background-color: white;
+  position: relative;
+  z-index: 1;
+}
+
+/* New class for opacity */
+.opacity-85 {
+  opacity: 0.85;
+}
