@@ -1,5 +1,6 @@
 "use client";
 
+import TopBar from '../../../../components/StaticTopBar';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -28,6 +29,18 @@ const ShoppingPage = () => {
   const [order, setOrder] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
+  const [scrollPosition, setScrollPosition] = useState<number>(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollPosition(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   useEffect(() => {
     fetchProducts();
@@ -47,25 +60,11 @@ const ShoppingPage = () => {
     }
   };
 
-  const goToShoppingCart = () => {
-    router.push('/shop/cart'); // Navigate to the shopping cart
-};
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Hero Section */}
-      <div className="bg-blue-600 py-12 text-center text-white">
-        <h1 className="text-4xl font-bold">Welcome to Our Shop</h1>
-        <p className="mt-2">Explore our latest products and find your style!</p>
-
-        {/* Go to Cart Button */}
-        <button 
-        type = 'button'
-        onClick={goToShoppingCart}
-        className="absolute middle-4 right-4 bg-white text-blue-600 font-bold py-2 px-3 rounded-lg shadow-t-md hover:bg-gray-100 transition">
-        Go to Cart
-        </button>
-      </div>
+    <div className="min-h-screen bg-white">
+      <TopBar />
+      <div style={{ height: '120px' }}/>
 
       {/* Search and Filter Section */}
       <div className="container mx-auto py-8 px-4">
