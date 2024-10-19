@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import TopBar from '../components/TopBar';
+import StaticTopBar from '@/components/StaticTopBar';
 
 const Home = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
