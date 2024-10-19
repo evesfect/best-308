@@ -33,7 +33,12 @@ export async function GET(req: Request) {
 
     // Log the current database and collections
     const db = mongoose.connection.db;
-    console.log("Current database:", db.databaseName);
+    if (db) {
+      console.log("Current database:", db.databaseName);
+    } else {
+      console.error("Database connection is undefined");
+      return NextResponse.json({ message: 'Database connection error' }, { status: 500 });
+    }
     const collections = await db.listCollections().toArray();
     console.log("Collections:", collections.map(c => c.name));
 
