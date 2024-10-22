@@ -34,10 +34,11 @@ export const authOptions: NextAuthOptions = {
                         email: credentials?.email,
                     });
                     console.log("User found:", user ? "Yes" : "No");
+                    console.log("User details:", user ? JSON.stringify(user, null, 2) : "Not found");
 
                     if (!user) {
                         console.log("No user found with that email");
-                        throw new Error('USER_NOT_FOUND');
+                        throw new Error('No user found with that email');
                     }
 
                     console.log("Comparing passwords...");
@@ -46,7 +47,7 @@ export const authOptions: NextAuthOptions = {
 
                     if (!isValid) {
                         console.log("Incorrect password");
-                        throw new Error('INCORRECT_PASSWORD');
+                        throw new Error('Incorrect password');
                     }
 
                     console.log("==== Authorization Success ====");
@@ -58,10 +59,7 @@ export const authOptions: NextAuthOptions = {
                     };
                 } catch (error) {
                     console.error("==== Authorization Error ====");
-                    console.error(error.message);
-                    if (error.message === 'USER_NOT_FOUND' || error.message === 'INCORRECT_PASSWORD') {
-                        throw new Error(error.message); // Rethrow to pass the error message back to the client.
-                    }
+                    console.error(error);
                     return null;
                 }
             },

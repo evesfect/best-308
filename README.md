@@ -10,54 +10,34 @@ A base for boutique fashion market websites with ease of deployment
    npm install
    ```
 
-2. **Database Management**:
-
-   We have several scripts to manage the MongoDB database:
-
-   - Start the database:
-
-     ```bash
-     ./scripts/start_db.sh
-     ```
-
-   - Seed the database with initial data:
-
-     ```bash
-     ./scripts/seed_db.sh
-     ./scripts/seed_db.bat
-     ```
-
-   - Reset the database (remove all data and restart):
-
-     ```bash
-     ./scripts/reset_db.sh
-     ```
-
-   - Stop the database:
-
-     ```bash
-     ./scripts/stop_db.sh
-     ```
-
-   - Remove the database container and volume:
-
-     ```bash
-     ./scripts/remove_db.sh
-     ```
-
-   Note: Make sure the scripts are executable. If not, run:
+2. **Start MongoDB and MongoDB Express**:
 
    ```bash
-   chmod +x scripts/*.sh
+   cd db
+   docker-compose up -d
    ```
 
-3. **Run the development server**:
+3. **Initialize the database**:
+
+   Copy the init-script.js into the MongoDB container: (from db/)
+
+   ```bash
+   docker cp ../scripts/init-script.js mongodb:/init-script.js
+   ```
+
+   Execute the script inside the container: (from db/)
+
+   ```bash
+   docker exec mongodb mongosh admin -u root -p rpassword --authenticationDatabase admin /init-script.js
+   ```
+
+4. **Run the development server**:
 
    ```bash
    npm run dev
    ```
 
-4. **Access the application**:
+5. **Access the application**:
    Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Accessing MongoDB Express
@@ -72,7 +52,8 @@ A base for boutique fashion market websites with ease of deployment
 2. Stop MongoDB and MongoDB Express:
 
    ```bash
-   ./scripts/stop_db.sh
+   cd db
+   docker-compose down
    ```
 
 ## Development

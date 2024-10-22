@@ -1,9 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import connectionPromise from '../../../lib/mongodb';
+import clientPromise from '../../../lib/mongodb';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
-        const db = await connectionPromise;
+        const client = await clientPromise;
+        const db = client.db();
 
         const users = await db.collection('user').find({}).toArray();
 

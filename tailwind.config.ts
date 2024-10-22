@@ -8,16 +8,12 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      backgroundColor: {
-        'transparent': 'transparent',
-        'semi-transparent': 'rgba(255, 255, 255, 0.8)',
-      },
-      transitionProperty: {
-        'background': 'background-color',
+      colors: {
+        background: "var(--background)",
+        foreground: "var(--foreground)",
       },
     },
   },
   plugins: [],
 };
-
 export default config;
