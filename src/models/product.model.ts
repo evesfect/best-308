@@ -4,6 +4,7 @@ import { Product as ProductType } from '../types/product';  // Import the TypeSc
 const productSchema = new Schema<ProductType>({
     name: { type: String, required: true },
     description: { type: String, required: true },
+    sex: { type: String, required: true },  
     category: { type: String, required: true },
     price: { type: Number, required: true },
     total_stock: {

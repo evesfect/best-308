@@ -40,7 +40,7 @@ const StaticTopBar: React.FC = () => {
         <div className="container mx-auto px-6 py-2 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" onClick={handleLogoClick}>
-            <Image src="/images/logo.png" alt="Shop Logo" width={80} height={32} />
+            <Image src="/images/logo_transparent.png" alt="Shop Logo" width={150} height={60} />
           </Link>
 
           {/* Navigation Links */}

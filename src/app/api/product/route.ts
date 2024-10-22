@@ -1,8 +1,10 @@
+
 // File: pages/api/product.ts (or wherever your API route is located)
 
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import connectionPromise from '@/lib/mongodb'; // Adjust the path as needed
+
 
 // Explicitly specify the collection name
 const productSchema = new mongoose.Schema({
@@ -26,6 +28,7 @@ const productSchema = new mongoose.Schema({
 const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
 
 export async function GET(req: Request) {
+
   try {
     // Ensure the database is connected
     await connectionPromise;
@@ -118,3 +121,5 @@ export async function GET(req: Request) {
     return NextResponse.json({ message: 'Error fetching products', error: error.toString() }, { status: 500 });
   }
 }
+
+
