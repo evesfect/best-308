@@ -45,10 +45,10 @@ const StaticTopBar: React.FC = () => {
 
           {/* Navigation Links */}
           <div className="hidden md:flex space-x-6 flex-grow justify-center">
-            <Link href="/new-arrivals" className="font-bold text-gray-600 hover:text-gray-900">New Arrivals</Link>
-            <Link href="/men" className="font-bold text-gray-600 hover:text-gray-900">Men</Link>
-            <Link href="/women" className="font-bold text-gray-600 hover:text-gray-900">Women</Link>
-            <Link href="/best-sellers" className="font-bold text-gray-600 hover:text-gray-900">Best Sellers</Link>
+            <Link href="/shop/browse/new-arrivals" className="font-bold text-gray-600 hover:text-gray-900">New Arrivals</Link>
+            <Link href="/shop/browse/men" className="font-bold text-gray-600 hover:text-gray-900">Men</Link>
+            <Link href="/shop/browse/women" className="font-bold text-gray-600 hover:text-gray-900">Women</Link>
+            <Link href="/shop/browse/best-sellers" className="font-bold text-gray-600 hover:text-gray-900">Best Sellers</Link>
           </div>
 
           {/* Icons */}
