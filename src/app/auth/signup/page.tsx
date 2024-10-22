@@ -21,8 +21,29 @@ const SignUpPage = () => {
     e.preventDefault();
     setError('');
 
+    // Check if all fields are filled
+    if (!email || !password || !confirmPassword) {
+      setError('Please fill in all fields.');
+      return;
+    }
+
+    // Check if passwords match
     if (password !== confirmPassword) {
-      setError("Passwords don't match");
+      setError("Passwords don't match.");
+      return;
+    }
+
+    // Simple email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Invalid email format.');
+      return;
+    }
+
+    // Password validation: at least 8 characters, one uppercase, one lowercase, one number, and one special character
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setError('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');
       return;
     }
 
@@ -41,7 +62,7 @@ const SignUpPage = () => {
 
       router.push('/auth/signin');
     } catch (err) {
-      setError('Failed to sign up. Please try again.');
+      setError(err.message || 'Failed to sign up. Please try again.');
     }
   };
 

@@ -21,6 +21,12 @@ const SignInPage = () => {
     e.preventDefault();
     setError('');
 
+    // Check if both email and password fields are filled
+    if (!email || !password) {
+      setError('Please fill in both the email and password fields.');
+      return;
+    }
+
     const result = await signIn('credentials', {
       redirect: false,
       email,
@@ -29,7 +35,14 @@ const SignInPage = () => {
     });
 
     if (result?.error) {
-      setError('Invalid email or password');
+      // Handle different error cases based on the error message from the backend
+      if (result.error === 'USER_NOT_FOUND') {
+        setError('No account found with this email address.');
+      } else if (result.error === 'INCORRECT_PASSWORD') {
+        setError('The password you entered is incorrect. Please try again.');
+      } else {
+        setError('Invalid email or password. Please try again.');
+      }
     } else {
       window.location.href = result?.url || '/';
     }
