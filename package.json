@@ -12,6 +12,7 @@
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
     "mongodb": "^6.9.0",
+    "mongoose": "^8.7.2",
     "next": "14.2.15",
     "next-auth": "^4.24.8",
     "react": "^18",
