@@ -65,7 +65,7 @@ const UserPanel = () => {
     return (
         <div>
             <TopBar/>
-            <div {...handleTabClick} className="flex mt-20 gap-10 p-10 px-20 h-[calc(100vh-96px)]">
+            <div {...handleTabClick} className="flex mt-20 gap-10 p-20 px-20 h-[calc(100vh-96px)]">
                 <UserSidebar onItemClick={setActiveItem}/>
                 <MainContent activeItem={activeItem} />
             </div>

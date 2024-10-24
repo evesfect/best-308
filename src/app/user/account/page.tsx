@@ -23,7 +23,7 @@ const AccountSettings = () => {
         phone: '+34 123 456 789',
         email: 'magicalonso@gmail.com',
         address: 'Oviedo, Spain',
-        password: 'magicalonso1',
+        password: '12345',
     }
 
     const [userData, setUserData] = useState(initialUserData);
