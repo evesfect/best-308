@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Role } from "@/types/roles";
 import TopBar from "@/components/StaticTopBar";
-//import AccountSettings from "./account/page";
+import AccountSettings from "./account/page";
 import UserSidebar from "@/components/UserSidebar";
 
 interface User {
@@ -24,7 +24,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeItem }) => {
         {/* Rendering according to the active sidebar item */}
         {activeItem === 'accountSettings' && (
           <div>
-            {/*<AccountSettings/>*/}
+            <AccountSettings/>
           </div>
         )}
         {activeItem === 'orders' && (
