@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import { useEffect } from 'react';
 import { Libre_Baskerville } from 'next/font/google';
 
 const libreBaskerville = Libre_Baskerville({
@@ -16,6 +17,9 @@ const SignInPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const message = searchParams.get('message');
+
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +51,12 @@ const SignInPage = () => {
       window.location.href = result?.url || '/';
     }
   };
+
+  useEffect(() => {
+    if (message === 'login_required') {
+      alert('You need to log in to access this page.');
+    }
+  }, [message]);
 
   const goToSignUpPage = () => {
     router.push('/auth/signup');
