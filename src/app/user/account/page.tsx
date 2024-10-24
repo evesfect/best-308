@@ -131,7 +131,7 @@ const AccountSettings = () => {
 
                     {/* Save and Cancel Buttons */}
                     {isEditable && (
-                        <div className="flex justify-end mt-3">
+                        <div className="flex justify-end mt-9">
                             <button
                                 type="submit"
                                 onClick={() => {
