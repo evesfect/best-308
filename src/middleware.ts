@@ -1,24 +1,44 @@
 import { NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt'; // Use next-auth's getToken to check for the session
+import { getToken } from 'next-auth/jwt';
+import { NextRequest } from 'next/server';
 
-export async function middleware(req: any) {
+export async function middleware(req: NextRequest) {
+  // Retrieve the token from the request using next-auth's getToken method
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-  // If there is no token, redirect to the login page with a message parameter
+  // If no token, redirect to login page
   if (!token) {
-    const loginUrl = new URL('/auth/signin', req.url);
-    loginUrl.searchParams.set('message', 'login_required');
-    return NextResponse.redirect(loginUrl);
+    console.log('No token found. Redirecting to /auth/signin');
+    return NextResponse.redirect(new URL('/auth/signin', req.url));
   }
 
-  // If the user is not an admin, redirect to an unauthorized page
-  if (token.role !== 'admin') {
+  // Define role-based access control pages
+  const productManagerPages = ['/product-mgr'];
+  const salesManagerPages = ['/sales-mgr'];
+  
+  // Retrieve the user's role from the token
+  const userRole = token.role; // Ensure the token has the role
+  
+  console.log(`User role: ${userRole}`);
+  console.log(`Accessing path: ${req.nextUrl.pathname}`);
+
+  // Restrict Product Manager access
+  if (productManagerPages.some(page => req.nextUrl.pathname.startsWith(page)) && userRole !== 'product_manager') {
+    console.log('Unauthorized access to Product Manager pages');
     return NextResponse.redirect(new URL('/unauthorized', req.url));
   }
 
+  // Restrict Sales Manager access
+  if (salesManagerPages.some(page => req.nextUrl.pathname.startsWith(page)) && userRole !== 'sales_manager') {
+    console.log('Unauthorized access to Sales Manager pages');
+    return NextResponse.redirect(new URL('/unauthorized', req.url));
+  }
+
+  // If authorized, allow the request to proceed
   return NextResponse.next();
 }
 
+// Apply the middleware to the specified routes and all their subroutes
 export const config = {
-  matcher: ['/admin/:path*'], // Apply middleware to all /admin routes
+  matcher: ['/product-mgr/:path*', '/sales-mgr/:path*'], // Ensures all subpaths are matched
 };
