@@ -13,14 +13,20 @@ export async function middleware(req: NextRequest) {
   }
 
   // Define role-based access control pages
-  const productManagerPages = ['/product-mgr'];
-  const salesManagerPages = ['/sales-mgr'];
+  const productManagerPages = ['/product-mgr', '/admin'];
+  const salesManagerPages = ['/sales-mgr', '/admin'];
   
+
+  const allowedRoles = ['product_manager', 'sales_manager', 'admin'];
   // Retrieve the user's role from the token
-  const userRole = token.role; // Ensure the token has the role
+  const userRole = token.role as string; // Ensure the token has the role
   
   console.log(`User role: ${userRole}`);
   console.log(`Accessing path: ${req.nextUrl.pathname}`);
+
+  if (userRole === 'admin') {
+    return NextResponse.next();
+  }
 
   // Restrict Product Manager access
   if (productManagerPages.some(page => req.nextUrl.pathname.startsWith(page)) && userRole !== 'product_manager') {
@@ -34,11 +40,16 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/unauthorized', req.url));
   }
 
+  if (req.nextUrl.pathname.startsWith('/api/admin') && !allowedRoles.includes(userRole)) {
+    console.log('Unauthorized access to /api/admin');
+    return NextResponse.redirect(new URL('/unauthorized', req.url));
+  }
+
   // If authorized, allow the request to proceed
   return NextResponse.next();
 }
 
 // Apply the middleware to the specified routes and all their subroutes
 export const config = {
-  matcher: ['/product-mgr/:path*', '/sales-mgr/:path*'], // Ensures all subpaths are matched
+  matcher: ['/product-mgr/:path*', '/sales-mgr/:path*', '/admin/:path*'], // Ensures all subpaths are matched
 };
