@@ -1,21 +1,16 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import { Schema,model} from 'mongoose';
+import { Review as ReviewType } from '../types/review';
 
 // Define the Mongoose Review schema
-const reviewSchema = new Schema({
+const reviewSchema = new Schema<ReviewType>({
     comment: { type: String, required: true },
     rating: { type: Number, required: true, min: 1, max: 5 },
-    user: { type: String, required: true },
+    user_id: { type: String, required: true },
     product_id: { type: String, required: true },
 },{
     timestamps : true
 });
 
-// Define the Review interface for TypeScript with Document
-export interface IReview extends Document {
-    comment: string;
-    rating: number;
-    user: string;
-    product_id: string;
-}
 
-export const ReviewModel = mongoose.models.Review || mongoose.model<IReview>('Review', reviewSchema, 'review');
+export const Review = model<ReviewType>('Review', reviewSchema, 'review');
+export default Review;
