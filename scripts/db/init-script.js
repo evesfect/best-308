@@ -1,5 +1,8 @@
 db = db.getSiblingDB("e-commerce");
 
+const currentdate = new Date();
+
+
 db.createUser({
     user: "project-user",
     pwd: "308user",
@@ -374,5 +377,140 @@ db.product.insertOne({
         "L": 29
     }
 });
+
+db.order.insertOne(
+    {
+        _id: ObjectId("322c6359345678f123456700")  ,
+        products: {
+          "122c6359345678f123456789": 2,
+          "322c6359345678f123456789": 1
+        },
+        
+        user_id: "112c6359345678f123456789",
+        address: "Cumhuriyet Caddesi No: 19, Kat: 4, Daire: 12 Nişantaşi Mahallesi, Şişli 34363 İstanbul, Türkiye",
+        completed: false,
+        date:currentdate
+  }
+)
+
+db.order.insertOne(
+    {
+        _id: ObjectId("322c6359345678f123456701")  ,
+        products: {
+          "222c6359345678f123456789": 1,
+          "322c6359345678f123456790": 2
+        },
+        user_id: "212c6359345678f123456789",
+        address: "İstasyon Caddesi No: 55, Daire: 7 Odunpazari Mahallesi, Odunpazari 26030 Eskişehir, Türkiye",
+        completed: true,
+        date:currentdate
+    }
+)
+
+db.order.insertOne(
+    {
+        _id: ObjectId("322c6359345678f123456702") ,
+        products: {
+          "322c6359345678f123456791": 3
+        },
+        user_id: "312c6359345678f123456789",
+        address: "Antalya Caddesi No: 14, Daire: 3 Lara Mahallesi, Muratpaşa 07100 Antalya, Türkiye",
+        completed: false,
+        date:currentdate
+    }
+)
+
+
+db.order.insertOne(
+    {
+        _id: ObjectId("322c6359345678f123456703") ,
+        products: {
+          "322c6359345678f123456792": 1,
+          "322c6359345678f123456793": 1
+        },
+        user_id: "412c6359345678f123456789",
+        address: "Konak Sokak No: 22, Daire: 8 Konak Mahallesi, Konak 35250 İzmir, Türkiye",
+        completed: true,
+        date:currentdate
+    }
+)
+
+db.order.insertOne(
+    {
+        _id: ObjectId("322c6359345678f123456704") ,
+        products: {
+        "322c6359345678f123456794": 2,
+        "322c6359345678f123456795": 1
+        },
+        user_id: "512c6359345678f123456789",
+        address: "Bağdat Caddesi No: 34, Daire: 5 Suadiye Mahallesi, Kadiköy 34740 İstanbul, Türkiye",
+        completed : false,
+        date:currentdate
+    }
+)
+
+db.review.insertOne(
+    {
+        _id: ObjectId("223c6359345678f145676794"),
+        comment: "Very good quality, worth the buy!",
+        rating: 4,
+        user_id:"512c6359345678f123456789",
+        product_id:"322c6359345678f123456794"
+    }
+)
+db.review.insertOne(
+    {
+        _id: ObjectId("223c6359345678f145676795"),
+        comment: "Absolutely love the fit and feel of this shirt!",
+        rating: 5,
+        user_id: "112c6359345678f123456789",
+        product_id: "122c6359345678f123456789"
+    }
+)
+
+db.review.insertOne(
+    {
+        _id: ObjectId("223c6359345678f145676796"),
+        comment: "Great value for money, highly recommend.",
+        rating: 4,
+        user_id: "212c6359345678f123456789",
+        product_id: "322c6359345678f123456793"
+    }
+)
+
+db.review.insertOne(
+    {
+        _id: ObjectId("223c6359345678f145676797"),
+        comment: "Nice quality but sizing was slightly off.",
+        rating: 3,
+        user_id: "312c6359345678f123456789",
+        product_id: "322c6359345678f123456790"
+    }
+)
+
+db.review.insertOne(
+    {
+        _id: ObjectId("223c6359345678f145676798"),
+        comment: "Very comfortable and stylish, would buy again.",
+        rating: 5,
+        user_id: "412c6359345678f123456789",
+        product_id: "322c6359345678f123456791"
+    }
+)
+
+db.review.insertOne(
+    {
+        _id: ObjectId("223c6359345678f145676799"),
+        comment: "Good quality, but delivery took longer than expected.",
+        rating: 2,
+        user_id: "612c6359345678f123456789",
+        product_id: "322c6359345678f123456792"
+    }
+)
+
+
+
+
+
 
 
