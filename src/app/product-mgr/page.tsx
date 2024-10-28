@@ -47,8 +47,8 @@ const ProductMgrMainPage = () => {
           <p className="text-3xl mt-2">{stats?.users || 0}</p>
         </div>
         <div className="p-6 bg-white rounded shadow">
-          <h2 className="text-xl font-semibold">Total Deliveries</h2>
-          <p className="text-3xl mt-2">{stats?.delivery || 0}</p>
+          <h2 className="text-xl font-semibold">Total Orders</h2>
+          <p className="text-3xl mt-2">{stats?.orders || 0}</p>
         </div>
       </div>
 

@@ -51,7 +51,7 @@ db.user.insertOne({
     username: "tolga",
     email: "tolga.tektunali@sabanciuniv.edu",
     password: "$2a$12$zruDtXPYTJAWs4T/EcXol.hilG/4Z/ymO0SqWy5dB8KEwdUPL.mc.", //308tolga
-    role: "customer"
+    role: "admin"
 })
 
 db.user.insertOne({

@@ -3,10 +3,15 @@ import { Order as OrderType } from '../types/order';
 
 // Define the Mongoose Review schema
 const orderSchema = new Schema<OrderType>({
-    products: { type: String, required: true },
-    user_id: { type: String, required: true },
+    products: { 
+        type: Map,
+        of: Number,
+        required: true
+    },
+    user_id: { type: Schema.Types.ObjectId, required: true },
     address: { type: String, required: true },
-    completed: {type: Boolean, required: true}
+    completed: {type: Boolean, required: true},
+    date: {type: Date,required: true}
 },{
     timestamps : true
 });
