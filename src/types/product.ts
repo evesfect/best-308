@@ -5,8 +5,12 @@ import {StaticImageData} from "next/image";
 export interface Product {
     _id: ObjectId;
     name: string;
-    price: number;
     description: string;
+    sex : string;
+    category: string;
+    price: number;
+    total_stock: Map<string, number>;
+    available_stock: Map<string, number>;
     inStock: boolean;
     quantity: number;
     imageUrl: string | StaticImageData;
