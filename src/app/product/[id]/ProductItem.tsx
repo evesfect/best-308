@@ -12,19 +12,13 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
     const [showSizeDropdown, setShowSizeDropdown] = useState(false);
     const [selectedColor, setSelectedColor] = useState<string | null>(null);
-    const [hoveredColor, setHoveredColor] = useState<string | null>(null); // State for hovered color
+    const [hoveredColor, setHoveredColor] = useState<string | null>(null);
     const [quantity, setQuantity] = useState(1);
-
-    if (!product) {
-        return <div>No product data available</div>;
-    }
 
     const formattedProductName = product.name
         .split(' ')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
-
-    const sizes = ['S', 'M', 'L'];
 
     return (
         <div className={styles.productContainer}>
@@ -47,20 +41,24 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
 
                     <div className={styles.colorSection}>
                         <div className={styles.colorHeaderSection}>
-                            <h3>Select color:{hoveredColor &&
+                            <h3>Select color: {hoveredColor &&
                                 <span className={styles.hoveredColorName}>{` ${hoveredColor}`}</span>}</h3>
                         </div>
                         <div className={styles.colorOptions}>
-                            {['Black', 'Blue', 'Grey'].map(color => (
-                                <div
-                                    key={color}
-                                    className={`${styles.colorOption} ${selectedColor === color ? styles.selectedColor : ''}`}
-                                    style={{backgroundColor: color.toLowerCase()}}
-                                    onClick={() => setSelectedColor(color)}
-                                    onMouseEnter={() => setHoveredColor(color)}
-                                    onMouseLeave={() => setHoveredColor(null)}
-                                />
-                            ))}
+                            {product.colors && product.colors.length > 0 ? (
+                                product.colors.map(color => (
+                                    <div
+                                        key={color}
+                                        className={`${styles.colorOption} ${selectedColor === color ? styles.selectedColor : ''}`}
+                                        style={{backgroundColor: color.toLowerCase()}}
+                                        onClick={() => setSelectedColor(color)}
+                                        onMouseEnter={() => setHoveredColor(color)}
+                                        onMouseLeave={() => setHoveredColor(null)}
+                                    />
+                                ))
+                            ) : (
+                                <div>No colors available</div> // Fallback if no colors are defined
+                            )}
                         </div>
                     </div>
 
@@ -119,22 +117,25 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
                                 >
                                     Please select size
                                 </div>
-                                {sizes.map(size => (
-                                    <div
-                                        key={size}
-                                        className={styles.sizeOption}
-                                        onClick={() => {
-                                            setSelectedSize(size);
-                                            setShowSizeDropdown(false);
-                                        }}
-                                    >
-                                        {size}
-                                    </div>
-                                ))}
+                                {product.sizes && product.sizes.length > 0 ? (
+                                    product.sizes.map(size => (
+                                        <div
+                                            key={size}
+                                            className={styles.sizeOption}
+                                            onClick={() => {
+                                                setSelectedSize(size);
+                                                setShowSizeDropdown(false);
+                                            }}
+                                        >
+                                            {size}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div>No sizes available</div> // Fallback if no sizes are defined
+                                )}
                             </div>
                         )}
                     </div>
-
                     <hr className={styles.horizontalLine}/>
 
                     <Button

@@ -10,4 +10,6 @@ export interface Product {
     inStock: boolean;
     quantity: number;
     imageUrl: string | StaticImageData;
+    sizes: string[];
+    colors: string[];
 }
