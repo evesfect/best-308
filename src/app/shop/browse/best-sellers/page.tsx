@@ -64,7 +64,7 @@ const ShoppingPage = () => {
   return (
     <div className="min-h-screen bg-white">
       <TopBar />
-      <div style={{ height: '120px' }}/>
+      <div style={{ height: '150px' }}/>
 
       {/* Search and Filter Section */}
       <div className="container mx-auto py-8 px-4">
@@ -85,6 +85,8 @@ const ShoppingPage = () => {
             <option value="jacket">Jacket</option>
             <option value="shirt">Shirt</option>
             <option value="shoes">Shoes</option>
+            <option value="pants">Pants</option>
+            
             {/* Add more categories here */}
           </select>
 

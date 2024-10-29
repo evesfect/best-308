@@ -12,7 +12,7 @@ const ProductMgrMainPage = () => {
 
   useEffect(() => {
     const fetchStats = async () => {
-      const response = await axios.get('/api/admin/product/stats'); // Create this API endpoint
+      const response = await axios.get('/api/admin/sales/stats'); // Create this API endpoint
       setStats(response.data);
     };
     fetchStats();
@@ -37,15 +37,15 @@ const ProductMgrMainPage = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         <div className="p-6 bg-white rounded shadow">
           <h2 className="text-xl font-semibold">Total Sales</h2>
-          <p className="text-3xl mt-2">{stats?.products || 0}</p>
+          <p className="text-3xl mt-2">{stats?.sales || 0}</p>
         </div>
         <div className="p-6 bg-white rounded shadow">
           <h2 className="text-xl font-semibold">Total Users</h2>
           <p className="text-3xl mt-2">{stats?.users || 0}</p>
         </div>
         <div className="p-6 bg-white rounded shadow">
-          <h2 className="text-xl font-semibold">Total </h2>
-          <p className="text-3xl mt-2">{stats?.orders || 0}</p>
+          <h2 className="text-xl font-semibold">Total Money Made</h2>
+          <p className="text-3xl mt-2">{stats?.money || 0}</p>
         </div>
       </div>
 
@@ -61,7 +61,7 @@ const ProductMgrMainPage = () => {
           onClick={goToPrice}
           className="p-10 bg-green-500 text-white rounded shadow w-48 text-lg font-bold" // Set a fixed width
         >
-          Price Change
+          Discount
         </button>
         <button
           onClick={goToInvoices}
