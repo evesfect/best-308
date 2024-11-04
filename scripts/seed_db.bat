@@ -29,4 +29,16 @@ if %errorlevel% neq 0 (
     echo Init script executed successfully.
 )
 
-echo Database seeding process completed.
+echo Running initWithImages.ts for image upload...
+
+npm install typescript ts-node @types/node
+
+npx ts-node scripts\db\init-images.ts
+if %errorlevel% neq 0 (
+    echo Failed to execute initWithImages.ts. Error code: %errorlevel%
+    exit /b %errorlevel%
+) else (
+    echo Image upload script executed successfully.
+)
+
+echo Database seeding process with images completed.

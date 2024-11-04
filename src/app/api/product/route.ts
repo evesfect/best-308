@@ -1,12 +1,10 @@
 
-// File: pages/api/product.ts (or wherever your API route is located)
-
-import { NextResponse } from 'next/server';
+// File: src/app/api/product/route.ts
+import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
-import connectionPromise from '@/lib/mongodb'; // Adjust the path as needed
+import connectionPromise from '@/lib/mongodb';
 
 
-// Explicitly specify the collection name
 const productSchema = new mongoose.Schema({
   name: String,
   description: String,
@@ -15,37 +13,31 @@ const productSchema = new mongoose.Schema({
   total_stock: {
     S: Number,
     M: Number,
-    L: Number
+    L: Number,
   },
   available_stock: {
     S: Number,
     M: Number,
-    L: Number
+    L: Number,
   },
-  imageUrl: String
-}, { collection: 'product' }); // This explicitly tells Mongoose to use the 'product' collection
+  imageUrl: String,
+}, { collection: 'product' });
 
 const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
 
-export async function GET(req: Request) {
-
+export async function GET(req: NextRequest) {
   try {
-    // Ensure the database is connected
     await connectionPromise;
     console.log("Database connected successfully");
 
-    // Log the current database and collections
     const db = mongoose.connection.db;
-    if (db) {
-      console.log("Current database:", db.databaseName);
-    } else {
+    if (!db) {
       console.error("Database connection is undefined");
       return NextResponse.json({ message: 'Database connection error' }, { status: 500 });
     }
     const collections = await db.listCollections().toArray();
     console.log("Collections:", collections.map(c => c.name));
 
-    // Verify that the 'product' collection exists
     if (!collections.some(c => c.name === 'product')) {
       console.error("The 'product' collection does not exist in the database");
       return NextResponse.json({ message: 'Product collection not found' }, { status: 500 });
@@ -76,7 +68,7 @@ export async function GET(req: Request) {
     if (query) {
       searchCriteria.$or = [
         { name: { $regex: query, $options: 'i' } },
-        { description: { $regex: query, $options: 'i' } }
+        { description: { $regex: query, $options: 'i' } },
       ];
     }
 
@@ -102,12 +94,11 @@ export async function GET(req: Request) {
     if (Object.keys(searchCriteria).length > 0 || Object.keys(sortCriteria).length > 0) {
       products = await Product.find(searchCriteria).sort(sortCriteria);
     } else {
-      // If no search criteria or sort order, fetch all products
       products = await Product.find();
     }
 
     console.log("Products fetched:", products.length);
-    
+
     if (products.length === 0) {
       console.log("No products found. Fetching a sample product...");
       const sampleProduct = await Product.findOne();
@@ -121,5 +112,3 @@ export async function GET(req: Request) {
     return NextResponse.json({ message: 'Error fetching products', error: error.toString() }, { status: 500 });
   }
 }
-
-

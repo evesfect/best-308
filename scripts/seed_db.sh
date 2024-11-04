@@ -33,6 +33,7 @@ echo "MongoDB is up and running!"
 
 # Copy the init script to the container
 docker cp scripts/db/init-script.js mongodb:/init-script.js
+docker cp scripts/db/init-images.ts mongodb:/init-images.ts
 
 # Execute the init script
 echo "Attempting to execute init script..."

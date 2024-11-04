@@ -4,19 +4,25 @@ import { Product as ProductType } from '../types/product';  // Import the TypeSc
 const productSchema = new Schema<ProductType>({
     name: { type: String, required: true },
     description: { type: String, required: true },
-    sex: { type: String, required: true },  
+    sex: { type: String, required: true },
     category: { type: String, required: true },
-    price: { type: Number, required: true },
-    total_stock: {
+    costPrice: { type: Number, required: true },
+    salePrice: { type: Number, required: true },
+    totalStock: {
         type: Map,
         of: Number,
         required: true
     },
-    available_stock: {
+    availableStock: {
         type: Map,
         of: Number,
         required: true
     },
+    inStock: { type: Boolean, required: true },
+    quantity: { type: Number, required: true },
+    imageId: { type: String, required: true },
+    sizes: { type: [String], required: true },
+    colors: { type: [String], required: true },
 }, {
     timestamps: true
 });

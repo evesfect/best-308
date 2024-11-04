@@ -1,3 +1,4 @@
+// File: ProductItem.tsx
 import React, { useState } from 'react';
 import { Product } from '@/types/product';
 import Image from 'next/image';
@@ -24,7 +25,7 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
         <div className={styles.productContainer}>
             <div className={styles.imageSection}>
                 <Image
-                    src={product.imageUrl}
+                    src={`/api/images/${product.imageId}`} // Use the image API route
                     alt={product.name}
                     width={300}
                     height={300}
@@ -36,7 +37,6 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
                 <div className={styles.namePriceSection}>
                     <h1 className={styles.productName}>{formattedProductName}</h1>
                     <p className={styles.productPrice}>${product.price}</p>
-
                     <hr className={styles.horizontalLine}/>
 
                     <div className={styles.colorSection}>
