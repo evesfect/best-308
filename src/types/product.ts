@@ -1,5 +1,4 @@
 import { ObjectId } from 'mongodb';
-import {StaticImageData} from "next/image";
 
 // Define the Product interface for TypeScript
 export interface Product {
@@ -8,12 +7,13 @@ export interface Product {
     description: string;
     sex : string;
     category: string;
-    price: number;
-    total_stock: Map<string, number>;
-    available_stock: Map<string, number>;
+    costPrice: number;
+    salePrice: number;
+    totalStock: Map<string, number>;
+    availableStock: Map<string, number>;
     inStock: boolean;
     quantity: number;
-    imageUrl: string | StaticImageData;
+    imageId: string;
     sizes: string[];
     colors: string[];
 }

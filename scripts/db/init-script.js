@@ -82,6 +82,7 @@ db.product.insertOne({
         "L": 24,
         "XL": 20
     },
+    imageId: "192c6359345678f123456789"
 });
 
 db.product.insertOne({
@@ -103,7 +104,8 @@ db.product.insertOne({
         "M": 3,
         "L": 3,
         "XL": 0
-    }
+    },
+    imageId: "292c6359345678f123456789"
 });
 
 db.product.insertOne({
@@ -121,7 +123,8 @@ db.product.insertOne({
         "S": 14,
         "M": 9,
         "L": 11
-    }
+    },
+    imageId: "392c6359345678f123456789"
 });
 
 
@@ -507,6 +510,87 @@ db.review.insertOne(
         product_id: "322c6359345678f123456792"
     }
 )
+
+
+db.review.insertOne({
+    _id: ObjectId("223c6359345678f145676700"),
+    comment: "Fantastic material and really comfortable!",
+    rating: 5,
+    user_id: "112c6359345678f123456789",
+    product_id: "322c6359345678f123456790"
+});
+
+db.review.insertOne({
+    _id: ObjectId("223c6359345678f145676701"),
+    comment: "Nice design, but the fit is a bit loose.",
+    rating: 3,
+    user_id: "212c6359345678f123456789",
+    product_id: "122c6359345678f123456789"
+});
+
+db.review.insertOne({
+    _id: ObjectId("223c6359345678f145676702"),
+    comment: "Love the color and style, goes well with anything!",
+    rating: 4,
+    user_id: "312c6359345678f123456789",
+    product_id: "322c6359345678f123456791"
+});
+
+db.review.insertOne({
+    _id: ObjectId("223c6359345678f145676703"),
+    comment: "Not as expected, material feels cheap.",
+    rating: 2,
+    user_id: "412c6359345678f123456789",
+    product_id: "322c6359345678f123456792"
+});
+
+db.review.insertOne({
+    _id: ObjectId("223c6359345678f145676704"),
+    comment: "Perfect for casual wear, very comfortable.",
+    rating: 4,
+    user_id: "512c6359345678f123456789",
+    product_id: "322c6359345678f123456793"
+});
+
+db.review.insertOne({
+    _id: ObjectId("223c6359345678f145676705"),
+    comment: "Looks amazing but runs a size smaller than expected.",
+    rating: 3,
+    user_id: "612c6359345678f123456789",
+    product_id: "322c6359345678f123456794"
+});
+
+db.review.insertOne({
+    _id: ObjectId("223c6359345678f145676706"),
+    comment: "Good value for the price, would recommend!",
+    rating: 4,
+    user_id: "112c6359345678f123456789",
+    product_id: "322c6359345678f123456795"
+});
+
+db.review.insertOne({
+    _id: ObjectId("223c6359345678f145676707"),
+    comment: "Stylish and warm, perfect for the winter season.",
+    rating: 5,
+    user_id: "212c6359345678f123456789",
+    product_id: "322c6359345678f123456796"
+});
+
+db.review.insertOne({
+    _id: ObjectId("223c6359345678f145676708"),
+    comment: "Fabric is a bit rough but otherwise good quality.",
+    rating: 3,
+    user_id: "312c6359345678f123456789",
+    product_id: "322c6359345678f123456797"
+});
+
+db.review.insertOne({
+    _id: ObjectId("223c6359345678f145676709"),
+    comment: "Excellent fit and finish, very satisfied with this purchase.",
+    rating: 5,
+    user_id: "412c6359345678f123456789",
+    product_id: "322c6359345678f123456798"
+});
 
 
 
