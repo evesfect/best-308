@@ -50,17 +50,9 @@ A base for boutique fashion market websites with ease of deployment
    ```bash
    chmod +x scripts/*.sh
    ```
-3. **Run Prisma Commands**:
-
-   You’ve successfully generated the Prisma Client and pushed the schema to the database using:
-   
-   ```bash 
-   npx prisma generate
-   npx prisma db push
-   ```
 
 
-5. **Run the development server**:
+4. **Run the development server**:
 
    ```bash
    npm run dev
