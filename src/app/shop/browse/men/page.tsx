@@ -50,7 +50,8 @@ const ShoppingPage = () => {
     setLoading(true);
     try {
       const response = await axios.get('/api/product', {
-        params: { query, category, order },
+        // unisex and male products
+        params: { query, category, order, sex: 'male' },
       });
       setProducts(response.data);
     } catch (error) {
@@ -59,6 +60,7 @@ const ShoppingPage = () => {
       setLoading(false);
     }
   };
+  
 
 
   return (
