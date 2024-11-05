@@ -50,14 +50,23 @@ A base for boutique fashion market websites with ease of deployment
    ```bash
    chmod +x scripts/*.sh
    ```
+3. **Run Prisma Commands**:
 
-3. **Run the development server**:
+   You’ve successfully generated the Prisma Client and pushed the schema to the database using:
+   
+   ```bash 
+   npx prisma generate
+   npx prisma db push
+   ```
+
+
+5. **Run the development server**:
 
    ```bash
    npm run dev
    ```
 
-4. **Access the application**:
+6. **Access the application**:
    Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Accessing MongoDB Express
