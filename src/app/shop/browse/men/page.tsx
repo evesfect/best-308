@@ -4,6 +4,7 @@ import TopBar from '../../../../components/StaticTopBar';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 interface Stock {
   S: number;
@@ -19,10 +20,11 @@ interface Product {
   price: string;
   total_stock: Stock;
   available_stock: Stock;
-  imageUrl: string; // Assume you have an image URL in your product data
+  imageUrl: string;
 }
 
 const ShoppingPage = () => {
+  const { data: session, status } = useSession();
   const [products, setProducts] = useState<Product[]>([]);
   const [query, setQuery] = useState<string>('');
   const [category, setCategory] = useState<string>('');
@@ -44,13 +46,12 @@ const ShoppingPage = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [query, category,order]);
+  }, [query, category, order]);
 
   const fetchProducts = async () => {
     setLoading(true);
     try {
       const response = await axios.get('/api/product', {
-        // unisex and male products
         params: { query, category, order, sex: 'male' },
       });
       setProducts(response.data);
@@ -60,8 +61,28 @@ const ShoppingPage = () => {
       setLoading(false);
     }
   };
-  
 
+  const addToCart = async (productId: string) => {
+    if (!session || !session.user) {
+      console.error("User is not logged in.");
+      return;
+    }
+
+    try {
+      const userId = session.user.id; // Retrieve userId from session
+      const response = await axios.post('/api/cart/add-to-cart', {
+        userId,
+        productId,
+      });
+      if (response.status === 200) {
+        console.log("Product added to cart successfully");
+        // Optionally, show success feedback to the user here
+      }
+    } catch (error) {
+      console.error("Error adding product to cart: stems from page.tsx ", error);
+      // Optionally, show error feedback to the user here
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -87,10 +108,8 @@ const ShoppingPage = () => {
             <option value="jacket">Jacket</option>
             <option value="shirt">Shirt</option>
             <option value="shoes">Shoes</option>
-            {/* Add more categories here */}
           </select>
 
-          {/* Order By Dropdown */}
           <select
             value={order}
             onChange={(e) => setOrder(e.target.value)}
@@ -99,7 +118,6 @@ const ShoppingPage = () => {
             <option value="">Order By</option>
             <option value="asc">Price: Low to High</option>
             <option value="desc">Price: High to Low</option>
-            {/* Add options for reviews and popularity when implemented */}
           </select>
         </div>
 
@@ -127,7 +145,10 @@ const ShoppingPage = () => {
                     <div className="mt-2">
                       <p className="text-sm">Stock: S({product.available_stock.S}), M({product.available_stock.M}), L({product.available_stock.L})</p>
                     </div>
-                    <button className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">
+                    <button
+                      onClick={() => addToCart(product._id)}
+                      className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+                    >
                       Add to Cart
                     </button>
                   </div>
