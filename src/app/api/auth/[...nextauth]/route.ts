@@ -57,18 +57,22 @@ export const authOptions: NextAuthOptions = {
                         name: user.username
                     };
                 } catch (error) {
-                    console.error("==== Authorization Error ====");
-                    console.error(error.message);
-                    if (error.message === 'USER_NOT_FOUND' || error.message === 'INCORRECT_PASSWORD') {
-                        throw new Error(error.message); // Rethrow to pass the error message back to the client.
-                    }
-                    return null;
+                    console.error('Auth Error:', error);
+                    throw error;
                 }
             },
         }),
     ],
+    session: {
+        strategy: 'jwt',
+        maxAge: 24 * 60 * 60, // 24 h
+        updateAge: 12 * 60 * 60, // 12 h
+    },
+    jwt: {
+        maxAge : 24 * 60 * 60, // 24 h
+    },
     callbacks: {
-        async jwt({ token, user }) {
+        async jwt({ token, user}) {
             if (user) {
                 token.role = user.role;
                 token.id = user.id;
@@ -83,10 +87,15 @@ export const authOptions: NextAuthOptions = {
     },
     pages: {
         signIn: '/auth/signin',
+        error: '/auth/error',
     },
-    session: {
-        maxAge: 24 * 60 * 60,
-        updateAge: 12 * 60 * 60,
+    events: {
+        async signIn({ user}) {
+            console.log('User signed in:', user.email);
+        },
+        async signOut({ session }) {
+            console.log('User signed out:', session?.user?.email);
+        },
     },
 };
 
