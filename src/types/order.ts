@@ -1,9 +1,8 @@
 import { ObjectId } from 'mongodb';
 
-// Define the Order interface for TypeScript
 export interface Order {
     _id: ObjectId;
-    products: Map<ObjectId, number>; // ID and quantity
+    products: Map<ObjectId, number>;
     user_id: ObjectId;
     address : string;
     completed: boolean;

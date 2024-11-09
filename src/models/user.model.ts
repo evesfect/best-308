@@ -8,10 +8,11 @@ const userSchema = new Schema<UserType>({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, required: true },
-    address:{type: String, required:true },
+    address: { type: String, required: true },
+    wishlist: [{ type: Schema.Types.ObjectId, ref: 'Product' }],  // Added wishlist field with reference to Product
 }, {
     timestamps: true
 });
 
-const User = model<UserType>('User', userSchema, "user");
+const User = model<UserType>('User', userSchema, 'user');
 export default User;

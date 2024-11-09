@@ -1,7 +1,6 @@
 import { Schema,model} from 'mongoose';
 import { Order as OrderType } from '../types/order';
 
-// Define the Mongoose Review schema
 const orderSchema = new Schema<OrderType>({
     products: { 
         type: Map,
