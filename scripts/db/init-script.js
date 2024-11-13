@@ -683,6 +683,55 @@ db.review.insertOne({
 });
 
 
+db.processedproduct.insertMany([
+    {
+        _id: ObjectId("622c6359345678f123456789"),
+        name: "Classic Oxford Shirt",
+        imageId: "192c6359345678f123456789",
+        salePrice: 39.99,
+        size: "M",
+        color: "Blue",
+        quantity: 1,
+        updatedAt: new Date()
+    },
+    {
+        _id: ObjectId("722c6359345678f123456789"),
+        name: "Athletic Running Shorts",
+        imageId: "292c6359345678f123456789",
+        salePrice: 29.99,
+        size: "L",
+        color: "Black",
+        quantity: 2,
+        updatedAt: new Date()
+    },
+    {
+        _id: ObjectId("822c6359345678f123456789"),
+        name: "Puffer Vest",
+        imageId: "392c6359345678f123456789",
+        salePrice: 59.99,
+        size: "M",
+        color: "Green",
+        quantity: 3,
+        updatedAt: new Date()
+    }
+]);
+
+
+
+
+db.shoppingcart.insertOne({
+    _id: ObjectId("912c6359345678f123456789"),
+    userId: ObjectId("412c6359345678f123456789"),
+    items: [
+        { processedProductId: ObjectId("622c6359345678f123456789") },
+        { processedProductId: ObjectId("722c6359345678f123456789") },
+        { processedProductId: ObjectId("822c6359345678f123456789") }
+    ],
+    updatedAt: new Date()
+});
+
+
+
 
 
 

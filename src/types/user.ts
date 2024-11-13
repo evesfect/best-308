@@ -1,3 +1,5 @@
+///best-308/src/types/user.ts
+
 import { ObjectId} from 'mongodb';
 import { Document, Types } from 'mongoose';
 import { Role } from './roles';
@@ -10,8 +12,6 @@ export interface User extends Document {
     password: string;
     role: string;
     address: string;
-    shoppingCart: Types.ObjectId[];
-    wishlist: Types.ObjectId[];
     createdAt?: Date;
     updatedAt?: Date;
   
