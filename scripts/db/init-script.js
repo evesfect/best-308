@@ -683,57 +683,51 @@ db.review.insertOne({
 });
 
 
-db.processedproduct.insertMany([
+const processed_products = [
     {
-        _id: ObjectId("622c6359345678f123456789"),
+        _id: new mongoose.Types.ObjectId("622c6359345678f123456789"),
         name: "Classic Oxford Shirt",
         imageId: "192c6359345678f123456789",
         salePrice: 39.99,
         size: "M",
         color: "Blue",
         quantity: 1,
-        updatedAt: new Date()
     },
     {
-        _id: ObjectId("722c6359345678f123456789"),
+        _id: new mongoose.Types.ObjectId("722c6359345678f123456789"),
         name: "Athletic Running Shorts",
         imageId: "292c6359345678f123456789",
         salePrice: 29.99,
         size: "L",
         color: "Black",
         quantity: 2,
-        updatedAt: new Date()
     },
     {
-        _id: ObjectId("822c6359345678f123456789"),
+        _id: new mongoose.Types.ObjectId("822c6359345678f123456789"),
         name: "Puffer Vest",
         imageId: "392c6359345678f123456789",
         salePrice: 59.99,
         size: "M",
         color: "Green",
         quantity: 3,
-        updatedAt: new Date()
-    }
-]);
+    },
+];
+
+ProcessedProduct.insertMany(processed_products)
+    .then(() => console.log("Processed products inserted"))
+    .catch((err) => console.error(err));
 
 
-
-
-db.shoppingcart.insertOne({
-    _id: ObjectId("912c6359345678f123456789"),
-    userId: ObjectId("412c6359345678f123456789"),
+const cart = {
+    _id: new mongoose.Types.ObjectId("912c6359345678f123456789"),
+    userId: new mongoose.Types.ObjectId("412c6359345678f123456789"),
     items: [
-        { processedProductId: ObjectId("622c6359345678f123456789") },
-        { processedProductId: ObjectId("722c6359345678f123456789") },
-        { processedProductId: ObjectId("822c6359345678f123456789") }
+        { processedProductId: new mongoose.Types.ObjectId("622c6359345678f123456789"), quantity: 1 },
+        { processedProductId: new mongoose.Types.ObjectId("722c6359345678f123456789"), quantity: 1 },
+        { processedProductId: new mongoose.Types.ObjectId("822c6359345678f123456789"), quantity: 1 },
     ],
-    updatedAt: new Date()
-});
+};
 
-
-
-
-
-
-
-
+ShoppingCart.create(cart)
+    .then(() => console.log("Shopping cart inserted"))
+    .catch((err) => console.error(err));
