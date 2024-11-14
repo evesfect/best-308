@@ -62,7 +62,11 @@ const SignUpPage = () => {
 
       router.push('/auth/signin');
     } catch (err) {
-      setError(err.message || 'Failed to sign up. Please try again.');
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Failed to sign up. Please try again.');
+      }
     }
   };
 

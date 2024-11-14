@@ -52,7 +52,11 @@ const ShoppingPage = () => {
       const response = await axios.get('/api/product', {
         params: { query, category, order },
       });
-      setProducts(response.data);
+      if (Array.isArray(response.data)) {
+        setProducts(response.data);
+      } else {
+        console.error('Invalid data format from API');
+      }
     } catch (error) {
       console.error('Error fetching products:', error);
     } finally {

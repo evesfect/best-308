@@ -9,6 +9,7 @@ export interface Product {
     category: string;
     costPrice: number;
     salePrice: number;
+    price?: number; // Added this line
     totalStock: Map<string, number>;
     availableStock: Map<string, number>;
     inStock: boolean;

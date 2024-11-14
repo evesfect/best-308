@@ -56,11 +56,13 @@ export const authOptions: NextAuthOptions = {
                         role: user.role,
                         name: user.username
                     };
-                } catch (error) {
+                } catch (error: unknown) {  // Type error as 'unknown'
                     console.error("==== Authorization Error ====");
-                    console.error(error.message);
-                    if (error.message === 'USER_NOT_FOUND' || error.message === 'INCORRECT_PASSWORD') {
-                        throw new Error(error.message); // Rethrow to pass the error message back to the client.
+                    console.error(error);
+                    if (error instanceof Error) {  // Check if the error is an instance of Error
+                        if (error.message === 'USER_NOT_FOUND' || error.message === 'INCORRECT_PASSWORD') {
+                            throw new Error(error.message); // Rethrow to pass the error message back to the client.
+                        }
                     }
                     return null;
                 }
