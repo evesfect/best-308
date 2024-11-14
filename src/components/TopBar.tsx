@@ -4,12 +4,14 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react'; // Import next-auth
 
 interface TopBarProps {
   scrollPosition: number;
 }
 
 const TopBar: React.FC<TopBarProps> = ({ scrollPosition }) => {
+  const { data: session } = useSession(); // Get session data
   const [showLoginDropdown, setShowLoginDropdown] = useState(false);
   const iconColor = scrollPosition > 0 ? 'black' : 'white';
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -33,9 +35,9 @@ const TopBar: React.FC<TopBarProps> = ({ scrollPosition }) => {
     router.push('/');
   };
 
-  const goToShoppingCart = () =>{
-    router.push('/shop/cart')
-  }
+  const goToShoppingCart = () => {
+    router.push('/shop/cart');
+  };
 
   const bgColorClass = scrollPosition > 0 ? 'bg-semi-transparent' : 'bg-transparent';
 
@@ -76,11 +78,11 @@ const TopBar: React.FC<TopBarProps> = ({ scrollPosition }) => {
             </button>
             <div className="relative flex items-center" ref={dropdownRef}>
               <button 
-                aria-label="Login" 
+                aria-label="User Account" 
                 className="flex items-center"
                 onMouseEnter={() => setShowLoginDropdown(true)}
               >
-                <Image src="/icons/user.svg" alt="Login" width={20} height={20} className={`transition-colors duration-300`} style={{ filter: `invert(${iconColor === 'white' ? 1 : 0})` }} />
+                <Image src="/icons/user.svg" alt="User Account" width={20} height={20} className={`transition-colors duration-300`} style={{ filter: `invert(${iconColor === 'white' ? 1 : 0})` }} />
               </button>
               {showLoginDropdown && (
                 <div 
@@ -88,11 +90,23 @@ const TopBar: React.FC<TopBarProps> = ({ scrollPosition }) => {
                   style={{ minWidth: '200px' }}
                   onMouseLeave={() => setShowLoginDropdown(false)}
                 >
-                  <div className="p-2">
-                    <Link href="/auth/signin" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded">Sign in</Link>
-                    <div className="px-4 py-2 text-sm text-gray-500">Don't have an account?</div>
-                    <Link href="/auth/signup" className="block px-4 py-2 text-sm text-blue-500 hover:bg-gray-100 rounded">Sign up</Link>
-                  </div>
+                  {session ? (
+                    <div className="p-2">
+                      <Link href="/account" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded">My Account</Link>
+                      <button 
+                        onClick={() => signOut()} 
+                        className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100 rounded"
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="p-2">
+                      <Link href="/auth/signin" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded">Sign in</Link>
+                      <div className="px-4 py-2 text-sm text-gray-500">Don't have an account?</div>
+                      <Link href="/auth/signup" className="block px-4 py-2 text-sm text-blue-500 hover:bg-gray-100 rounded">Sign up</Link>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
