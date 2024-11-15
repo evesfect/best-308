@@ -713,9 +713,7 @@ const processed_products = [
     },
 ];
 
-ProcessedProduct.insertMany(processed_products)
-    .then(() => console.log("Processed products inserted"))
-    .catch((err) => console.error(err));
+db.ProcessedProduct.insertMany(processed_products);
 
 
 const cart = {
@@ -728,6 +726,4 @@ const cart = {
     ],
 };
 
-ShoppingCart.create(cart)
-    .then(() => console.log("Shopping cart inserted"))
-    .catch((err) => console.error(err));
+db.ShoppingCart.insertOne(cart);

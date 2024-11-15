@@ -19,10 +19,12 @@ export async function GET(req: Request) {
     }
 
     // Convert userId to ObjectId using 'new'
-    const cart = await ShoppingCart.findOne({ userId: new mongoose.Types.ObjectId(userId) })
-      .populate('items.processedProductId', 'name imageId salePrice size color quantity')
-      .exec();
+    const userIdObjectId = new mongoose.Types.ObjectId(userId);
 
+    const cart = await ShoppingCart.findOne({ userId: userIdObjectId })
+      .populate('items.ProcessedProductId', 'name imageId salePrice size color quantity')
+      .exec();
+    
     console.log('Fetched cart:', cart); // Log the fetched cart
 
     if (!cart) {

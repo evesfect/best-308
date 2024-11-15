@@ -1,5 +1,7 @@
 // src/models/processed-product.model.ts
 import mongoose from 'mongoose';
+import { Schema, model, models } from 'mongoose';
+import { ProcessedProduct as ProcessedProductType } from '../types/processed-product';
 
 const processedProductSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -11,7 +13,6 @@ const processedProductSchema = new mongoose.Schema({
 }, { timestamps: true }); // Adds createdAt and updatedAt
 
 
-// Check if the model already exists to avoid redefinition
-const ProcessedProduct = mongoose.models.ProcessedProduct || mongoose.model('ProcessedProduct', processedProductSchema);
+const ProcessedProduct = models.ProcessedProduct || model<ProcessedProductType>('ProcessedProduct', processedProductSchema);
 
 export default ProcessedProduct;
