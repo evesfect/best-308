@@ -1,3 +1,4 @@
+import { signOut } from 'next-auth/react';
 import React, { useState } from 'react';
 
 interface SidebarProps {
@@ -35,9 +36,9 @@ const UserSidebar: React.FC<SidebarProps> = ({onItemClick}) => {
           </nav>
 
           {/* Logout Button */}
-          <button className="flex items-center space-x-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 mt-5">
+          <button className="flex items-center space-x-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 mt-5" onClick={() => signOut({ callbackUrl: "/" })} >
                 <img src="/icons/logout.svg" alt="icon" className="h-5 w-5" />
-                <span>Logout</span>
+                <span>Sign Out</span>
             </button>
         </div>
       );

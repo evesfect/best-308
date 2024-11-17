@@ -92,7 +92,7 @@ const TopBar: React.FC<TopBarProps> = ({ scrollPosition }) => {
                 >
                   {session ? (
                     <div className="p-2">
-                      <Link href="/account" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded">My Account</Link>
+                      <Link href="/user" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded">My Account</Link>
                       <button 
                         onClick={() => signOut()} 
                         className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100 rounded"
