@@ -23,7 +23,7 @@ const UserSidebar: React.FC<SidebarProps> = ({onItemClick}) => {
                 <button onClick={() => onItemClick('orders')} className="block text-gray-700">Orders</button>
               </li>
               <li className="py-2 hover:bg-gray-100 cursor-pointer rounded-lg">
-                <button onClick={() => onItemClick('favorites')} className="block text-gray-700">Favorites</button>
+                <button onClick={() => onItemClick('wishlist')} className="block text-gray-700">Wishlist</button>
               </li>
               <li className="py-2 hover:bg-gray-100 cursor-pointer rounded-lg">
                 <button onClick={() => onItemClick('comments')} className="block text-gray-700">Comments & Ratings</button>
