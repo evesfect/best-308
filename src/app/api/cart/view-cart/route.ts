@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
 import connectionPromise from '@/lib/mongodb';
-import ShoppingCart from '@/models/shoppingcart.model';
-import mongoose from 'mongoose';
+import ProcessedProduct from '@/models/processed-product.model';
+import ShoppingCart from '@/models/shopping-cart.model';
+import {ShoppingCart as ShoppingCartType} from '@/types/shopping-cart'
 
 export async function GET(req: Request) {
   try {
     // Ensure the database connection is established
-    console.log("Feetching cart...",Request);
+    console.log("Feetching cart...");
     await connectionPromise;
-
-    console.log("Feetching cart...",Request);
+    console.log('Model loaded:', ProcessedProduct);
 
     // Extract userId from the query parameters
     const { searchParams } = new URL(req.url);
@@ -19,25 +19,24 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'User ID not provided' }, { status: 400 });
     }
 
-    // Fetch the user's shopping cart
-    const cart = await ShoppingCart.findOne({ userId })
-      .populate('items.processedProductId', 'name imageId salePrice size color quantity') // Populate ProcessedProduct
+    const cart: ShoppingCartType = await ShoppingCart.findOne({ userId })
+      .populate('items.processedProductId') // Populate ProcessedProduct
       .exec();
 
     if (!cart) {
       return NextResponse.json({ error: 'Shopping cart not found for user' }, { status: 404 });
     }
 
-    // Format the cart items for the response
-    const formattedCart = cart.items.map((item: any) => ({
+    const formattedCart = cart.items.map((item: any) => {
+      return {
       productId: item.processedProductId._id,
       name: item.processedProductId.name,
       imageId: item.processedProductId.imageId,
       salePrice: item.processedProductId.salePrice,
       size: item.processedProductId.size,
       color: item.processedProductId.color,
-      quantity: item.processedProductId.quantity,
-    }));
+      quantity: item.processedProductId.quantity,}
+    });
 
     return NextResponse.json({ cart: formattedCart });
   } catch (error) {

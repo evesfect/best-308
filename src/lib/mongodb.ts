@@ -9,7 +9,6 @@ declare global {
     var _gridFSBucket: GridFSBucket | undefined;
 }
 
-let connectionPromise: Promise<Connection>;
 let gridFSBucket: GridFSBucket;
 
 if (!global._mongooseConnectionPromise) {
@@ -33,7 +32,7 @@ if (!global._mongooseConnectionPromise) {
 }
 
 // Assign the connection promise and bucket globally
-connectionPromise = global._mongooseConnectionPromise;
+const connectionPromise = global._mongooseConnectionPromise;
 gridFSBucket = global._gridFSBucket!;
 
 export { connectionPromise as default, gridFSBucket };
