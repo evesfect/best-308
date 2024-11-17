@@ -4,6 +4,7 @@ import TopBar from '../../../../components/StaticTopBar';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 interface Stock {
   S: number;
@@ -19,10 +20,15 @@ interface Product {
   price: string;
   total_stock: Stock;
   available_stock: Stock;
-  imageUrl: string; // Assume you have an image URL in your product data
+  imageUrl: string;
+  selectedSize: string;
+  selectedColor: string;
+  sizes: string[];
+  colors: string[];
 }
 
 const ShoppingPage = () => {
+  const { data: session, status } = useSession();
   const [products, setProducts] = useState<Product[]>([]);
   const [query, setQuery] = useState<string>('');
   const [category, setCategory] = useState<string>('');
@@ -44,13 +50,13 @@ const ShoppingPage = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [query, category,order]);
+  }, [query, category, order]);
 
   const fetchProducts = async () => {
     setLoading(true);
     try {
       const response = await axios.get('/api/product', {
-        params: { query, category, order },
+        params: { query, category, order, sex: 'male' },
       });
       setProducts(response.data);
     } catch (error) {
@@ -60,7 +66,34 @@ const ShoppingPage = () => {
     }
   };
 
-
+  const addToCart = async (productId: string, size: string, color: string) => {
+    if (!session || !session.user) {
+      console.error("User is not logged in.");
+      return;
+    }
+  
+    if (!size || !color) {
+      console.error("Size and color must be selected.");
+      return;
+    }
+  
+    try {
+      const userId = session.user.id;
+      const response = await axios.post('/api/cart/add-to-cart', {
+        userId,
+        productId,
+        size,
+        color,
+      });
+  
+      if (response.status === 200) {
+        console.log("Product added to cart successfully");
+      }
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+    }
+  };
+  
   return (
     <div className="min-h-screen bg-white">
       <TopBar />
@@ -85,10 +118,8 @@ const ShoppingPage = () => {
             <option value="jacket">Jacket</option>
             <option value="shirt">Shirt</option>
             <option value="shoes">Shoes</option>
-            {/* Add more categories here */}
           </select>
 
-          {/* Order By Dropdown */}
           <select
             value={order}
             onChange={(e) => setOrder(e.target.value)}
@@ -97,7 +128,6 @@ const ShoppingPage = () => {
             <option value="">Order By</option>
             <option value="asc">Price: Low to High</option>
             <option value="desc">Price: High to Low</option>
-            {/* Add options for reviews and popularity when implemented */}
           </select>
         </div>
 
@@ -122,10 +152,48 @@ const ShoppingPage = () => {
                     <p className="text-gray-500">{product.description}</p>
                     <p className="mt-2 text-gray-700 font-semibold">Category: {product.category}</p>
                     <p className="mt-1 text-xl font-bold text-blue-600">Price: ${product.price}</p>
+                    
+                    {/* Size Selection */}
                     <div className="mt-2">
-                      <p className="text-sm">Stock: S({product.available_stock.S}), M({product.available_stock.M}), L({product.available_stock.L})</p>
+                      <label htmlFor={`size-${product._id}`} className="block text-sm font-medium text-gray-700">
+                        Size
+                      </label>
+                      <select
+                        id={`size-${product._id}`}
+                        onChange={(e) => product.selectedSize = e.target.value}
+                        className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Select Size</option>
+                        {product.sizes && product.sizes.map((size: string) => (
+                          <option key={size} value={size}>
+                            {size}
+                          </option>
+                        ))}
+                      </select>
                     </div>
-                    <button className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">
+                    
+                    {/* Color Selection */}
+                    <div className="mt-2">
+                      <label htmlFor={`color-${product._id}`} className="block text-sm font-medium text-gray-700">
+                        Color
+                      </label>
+                      <select
+                        id={`color-${product._id}`}
+                        onChange={(e) => product.selectedColor = e.target.value}
+                        className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="">Select Color</option>
+                        {product.colors.map((color) => (
+                          <option key={color} value={color}>
+                            {color}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+              
+                    <button
+                      onClick={() => addToCart(product._id, product.selectedSize, product.selectedColor)}
+                      className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+                    >
                       Add to Cart
                     </button>
                   </div>

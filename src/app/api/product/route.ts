@@ -48,8 +48,9 @@ export async function GET(req: NextRequest) {
     const category = url.searchParams.get('category');
     const order = url.searchParams.get('order');
     const id = url.searchParams.get('id');
+    const sex = url.searchParams.get('sex'); // Get the sex parameter
 
-    console.log("Query parameters:", { query, category, order, id });
+    console.log("Query parameters:", { query, category, order, id, sex });
 
     let searchCriteria: any = {};
 
@@ -74,6 +75,13 @@ export async function GET(req: NextRequest) {
 
     if (category) {
       searchCriteria.category = category;
+    }
+
+    // Adjust filter for sex based on the query parameter
+    if (sex === 'male') {
+      searchCriteria.sex = { $in: ["male", "unisex"] };
+    } else if (sex === 'female') {
+      searchCriteria.sex = { $in: ["female", "unisex"] };
     }
 
     console.log("Search criteria:", searchCriteria);
@@ -112,3 +120,4 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: 'Error fetching products', error: error.toString() }, { status: 500 });
   }
 }
+

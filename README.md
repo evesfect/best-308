@@ -51,13 +51,14 @@ A base for boutique fashion market websites with ease of deployment
    chmod +x scripts/*.sh
    ```
 
-3. **Run the development server**:
+
+4. **Run the development server**:
 
    ```bash
    npm run dev
    ```
 
-4. **Access the application**:
+6. **Access the application**:
    Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Accessing MongoDB Express

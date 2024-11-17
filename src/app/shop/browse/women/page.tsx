@@ -19,6 +19,7 @@ interface Product {
   price: string;
   total_stock: Stock;
   available_stock: Stock;
+  sex : string; 
   imageUrl: string; // Assume you have an image URL in your product data
 }
 
@@ -50,7 +51,7 @@ const ShoppingPage = () => {
     setLoading(true);
     try {
       const response = await axios.get('/api/product', {
-        params: { query, category, order },
+        params: { query, category, order, sex: 'female' }, // Add sex: 'female' here
       });
       setProducts(response.data);
     } catch (error) {

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react'; // Import useSession from next-auth
 import TopBar from '../components/TopBar';
 import StaticTopBar from '@/components/StaticTopBar';
 import { Libre_Baskerville } from 'next/font/google'; // Import Libre Baskerville
@@ -16,6 +17,7 @@ const libreBaskerville = Libre_Baskerville({
 const Home = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [scrollPosition, setScrollPosition] = useState(0);
+  const { data: session, status } = useSession(); // Use session and status
   const router = useRouter();
 
   const carouselContent = [
@@ -63,6 +65,15 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-white">
       <TopBar scrollPosition={scrollPosition} />
+
+      {/* Welcome Message */}
+      {status === 'authenticated' && session?.user && (
+        <div className="fixed top-0 right-0 m-4 p-3 bg-blue-100 rounded-lg shadow-lg">
+          <p className={`text-sm font-bold text-blue-900 ${libreBaskerville.className}`}>
+            Welcome, {session.user.name || 'Guest'}!
+          </p>
+        </div>
+      )}
 
       {/* Image Carousel */}
       <div className="relative h-screen overflow-hidden">
@@ -172,11 +183,6 @@ const Home = () => {
                   objectFit="cover"
                   objectPosition="center"
                 />
-                <img 
-  src="/images/about-us.jpg" 
-  alt="About Us" 
-  className="w-full h-full object-cover"
-/>
               </Link>
             </div>
           </div>
