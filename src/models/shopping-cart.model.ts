@@ -1,16 +1,20 @@
-  import { Schema, model, Types, models } from 'mongoose';
-  import { ShoppingCart as ShoppingCartType } from '../types/shopping-cart';
+import { Schema, model, Types, models } from 'mongoose';
+import { ShoppingCart as ShoppingCartType } from '../types/shopping-cart';
 
-  const shoppingCartSchema = new Schema<ShoppingCartType>({
-    userId: { type: Types.ObjectId, required: true }, // Reference to User
+const shoppingCartSchema = new Schema<ShoppingCartType>(
+  {
+    userId: { type: Types.ObjectId, required: true },
     items: [
       {
-        processedProductId: { type: Types.ObjectId, ref: 'ProcessedProduct', required: true }, // Correct reference to ProcessedProduct
+        processedProductId: { type: Types.ObjectId, ref: 'ProcessedProduct', required: true },
+        quantity: { type: Number, required: true, default: 1 },
       },
     ],
-    updatedAt: { type: Date, default: Date.now } // Track the last update
-  });
+  },
+  {
+    timestamps: true, // Automatically add createdAt and updatedAt fields
+  }
+);
 
-  // Register the model correctly
-  const ShoppingCart = models.ShoppingCart || model<ShoppingCartType>('ShoppingCart', shoppingCartSchema, 'shoppingCart');
-  export default ShoppingCart;
+const ShoppingCart = models.ShoppingCart || model<ShoppingCartType>('ShoppingCart', shoppingCartSchema, 'shoppingCart');
+export default ShoppingCart;

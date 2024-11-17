@@ -11,6 +11,7 @@ interface CartItem {
   salePrice: string;
   quantity: number;
   imageId: string;
+  size: string; // Include size in cart item
 }
 
 const ShoppingCartPage = () => {
@@ -91,6 +92,7 @@ const ShoppingCartPage = () => {
                     <h3 className="text-lg font-semibold">{item.name}</h3>
                     <p className="text-gray-600">Price: ${item.salePrice}</p>
                     <p className="text-gray-500">Quantity: {item.quantity}</p>
+                    <p className="text-gray-500">Size: {item.size}</p> {/* Display the size */}
                   </div>
                 </div>
                 <button

@@ -7,7 +7,7 @@ const processedProductSchema = new Schema<ProcessedProductType>({
     salePrice: { type: Number, required: true },
     size: { type: String, required: true },
     color: { type: String, required: true },
-    quantity: { type: Number, required: true },
+    quantity: { type: Number, required: true, default: 1 },
     productId: {type: String, required: false}
 }, {
     timestamps: true
