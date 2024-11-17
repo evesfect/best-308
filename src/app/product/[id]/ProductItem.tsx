@@ -36,7 +36,7 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
             <div className={styles.detailsSection}>
                 <div className={styles.namePriceSection}>
                     <h1 className={styles.productName}>{formattedProductName}</h1>
-                    <p className={styles.productPrice}>${product.price}</p>
+                    <p className={styles.productPrice}>${product.salePrice}</p>
                     <hr className={styles.horizontalLine}/>
 
                     <div className={styles.colorSection}>
