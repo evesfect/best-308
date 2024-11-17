@@ -713,12 +713,16 @@ const processed_products = [
     },
 ];
 
-db.ProcessedProduct.insertMany(processed_products);
+db.processedProduct.insertMany(processed_products);
 
 
 const cart = {
     _id: ObjectId("912c6359345678f123456789"),
+<<<<<<< HEAD
     userId: ObjectId("412c6359345678f123456789"),
+=======
+    userId: new ObjectId("412c6359345678f123456789"),
+>>>>>>> a321bd89067b132c24ecfc0c46bf7a6d5443430c
     items: [
         { processedProductId: ObjectId("622c6359345678f123456789"), quantity: 1 },
         { processedProductId: ObjectId("722c6359345678f123456789"), quantity: 1 },
@@ -726,4 +730,4 @@ const cart = {
     ],
 };
 
-db.ShoppingCart.insertOne(cart);
+db.shoppingCart.insertOne(cart);

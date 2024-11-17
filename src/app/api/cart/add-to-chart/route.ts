@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import connectionPromise from '@/lib/mongodb';
 import Product from '@/models/product.model';
 import ProcessedProduct from '@/models/processed-product.model'; // Import the processed product model
-import ShoppingCart from '@/models/shoppingcart.model'; // Import the shopping cart model
+import ShoppingCart from '@/models/shopping-cart.model'; // Import the shopping cart model
 import mongoose from 'mongoose';
 
 export async function POST(req: Request) {
