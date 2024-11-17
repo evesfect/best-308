@@ -20,7 +20,7 @@ export async function GET(req: Request) {
     }
 
     const cart: ShoppingCartType = await ShoppingCart.findOne({ userId })
-      .populate('items.ProcessedProductId') // Populate ProcessedProduct
+      .populate('items.processedProductId') // Populate ProcessedProduct
       .exec();
 
     if (!cart) {
