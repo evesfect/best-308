@@ -12,6 +12,7 @@ export interface User extends Document {
     password: string;
     role: string;
     address: string;
+    wishlist: ObjectId[];
     createdAt?: Date;
     updatedAt?: Date;
   
