@@ -685,7 +685,7 @@ db.review.insertOne({
 
 const processed_products = [
     {
-        _id: new mongoose.Types.ObjectId("622c6359345678f123456789"),
+        _id: ObjectId("622c6359345678f123456789"),
         name: "Classic Oxford Shirt",
         imageId: "192c6359345678f123456789",
         salePrice: 39.99,
@@ -694,7 +694,7 @@ const processed_products = [
         quantity: 1,
     },
     {
-        _id: new mongoose.Types.ObjectId("722c6359345678f123456789"),
+        _id: ObjectId("722c6359345678f123456789"),
         name: "Athletic Running Shorts",
         imageId: "292c6359345678f123456789",
         salePrice: 29.99,
@@ -703,7 +703,7 @@ const processed_products = [
         quantity: 2,
     },
     {
-        _id: new mongoose.Types.ObjectId("822c6359345678f123456789"),
+        _id: ObjectId("822c6359345678f123456789"),
         name: "Puffer Vest",
         imageId: "392c6359345678f123456789",
         salePrice: 59.99,
@@ -717,12 +717,12 @@ db.ProcessedProduct.insertMany(processed_products);
 
 
 const cart = {
-    _id: new mongoose.Types.ObjectId("912c6359345678f123456789"),
-    userId: new mongoose.Types.ObjectId("412c6359345678f123456789"),
+    _id: ObjectId("912c6359345678f123456789"),
+    userId: ObjectId("412c6359345678f123456789"),
     items: [
-        { processedProductId: new mongoose.Types.ObjectId("622c6359345678f123456789"), quantity: 1 },
-        { processedProductId: new mongoose.Types.ObjectId("722c6359345678f123456789"), quantity: 1 },
-        { processedProductId: new mongoose.Types.ObjectId("822c6359345678f123456789"), quantity: 1 },
+        { processedProductId: ObjectId("622c6359345678f123456789"), quantity: 1 },
+        { processedProductId: ObjectId("722c6359345678f123456789"), quantity: 1 },
+        { processedProductId: ObjectId("822c6359345678f123456789"), quantity: 1 },
     ],
 };
 
