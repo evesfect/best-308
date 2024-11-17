@@ -1,18 +1,17 @@
-// src/models/processed-product.model.ts
-import mongoose from 'mongoose';
-import { Schema, model, models } from 'mongoose';
-import { ProcessedProduct as ProcessedProductType } from '../types/processed-product';
+import {Schema, model, models} from 'mongoose';
+import {ProcessedProductType } from '@/types/processed-product';
 
-const processedProductSchema = new mongoose.Schema({
+const processedProductSchema = new Schema<ProcessedProductType>({
     name: { type: String, required: true },
     imageId: { type: String, required: true },
     salePrice: { type: Number, required: true },
     size: { type: String, required: true },
     color: { type: String, required: true },
     quantity: { type: Number, required: true },
-}, { timestamps: true }); // Adds createdAt and updatedAt
+    productId: {type: String, required: false}
+}, {
+    timestamps: true
+});
 
-
-const ProcessedProduct = models.ProcessedProduct || model<ProcessedProductType>('ProcessedProduct', processedProductSchema);
-
+const ProcessedProduct = models.ProcessedProduct || model<ProcessedProductType>('ProcessedProduct', processedProductSchema,'processedProduct');
 export default ProcessedProduct;
