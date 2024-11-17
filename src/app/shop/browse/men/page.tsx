@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import Image from "next/image";
 
 interface Stock {
   S: number;
@@ -20,7 +21,7 @@ interface Product {
   price: string;
   total_stock: Stock;
   available_stock: Stock;
-  imageUrl: string;
+  imageId: string;
   selectedSize: string;
   selectedColor: string;
   sizes: string[];
@@ -142,10 +143,12 @@ const ShoppingPage = () => {
                   key={product._id}
                   className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow"
                 >
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className="w-full h-48 object-cover rounded-t-lg"
+                  <Image
+                      src={`/api/images/${product.imageId}`} // Use the image API route
+                      alt={product.name}
+                      width={300}
+                      height={300}
+                      className="w-full h-48 object-cover rounded-t-lg"
                   />
                   <div className="mt-4">
                     <h3 className="text-lg font-semibold">{product.name}</h3>
