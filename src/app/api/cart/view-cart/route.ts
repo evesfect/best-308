@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
 import connectionPromise from '@/lib/mongodb';
-import ShoppingCart from '@/models/shoppingcart.model';
-import ProcessedProduct from '@/models/processed-product.model'; // Ensure this path is correct
-import mongoose from 'mongoose';
+import ProcessedProduct from '@/models/processed-product.model';
+import ShoppingCart from '@/models/shopping-cart.model';
+import {ShoppingCart as ShoppingCartType} from '@/types/shopping-cart'
 
 export async function GET(req: Request) {
   try {
     // Ensure the database connection is established
-    console.log("Fetching cart...", req);
+    console.log("Fetching cart...");
     await connectionPromise;
+    console.log('Model loaded:', ProcessedProduct);
 
     // Extract userId from the query parameters
     const { searchParams } = new URL(req.url);
@@ -18,31 +19,25 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'User ID not provided' }, { status: 400 });
     }
 
-    // Convert userId to ObjectId using 'new'
-    const userIdObjectId = new mongoose.Types.ObjectId(userId);
-
-    const cart = await ShoppingCart.findOne({ userId: userIdObjectId })
-      .populate('items.ProcessedProductId', 'name imageId salePrice size color quantity')
+    const cart: ShoppingCartType = await ShoppingCart.findOne({ userId })
+      .populate('items.processedProductId') // Populate ProcessedProduct
       .exec();
-    
-    console.log('Fetched cart:', cart); // Log the fetched cart
 
     if (!cart) {
       console.error('Shopping cart not found for user:', userId); // Log the error more clearly
-      console.log('Cart:', cart);
       return NextResponse.json({ error: 'Shopping cart not found for user' }, { status: 404 });
     }
 
-    // Format the cart items for the response
-    const formattedCart = cart.items.map((item: any) => ({
+    const formattedCart = cart.items.map((item: any) => {
+      return {
       productId: item.processedProductId._id,
       name: item.processedProductId.name,
       imageId: item.processedProductId.imageId,
       salePrice: item.processedProductId.salePrice,
       size: item.processedProductId.size,
       color: item.processedProductId.color,
-      quantity: item.processedProductId.quantity,
-    }));
+      quantity: item.processedProductId.quantity,}
+    });
 
     return NextResponse.json({ cart: formattedCart });
   } catch (error) {

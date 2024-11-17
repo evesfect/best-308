@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 
 interface CartItem {
   _id: string;
   name: string;
-  price: string;
+  salePrice: string;
   quantity: number;
-  imageUrl: string;
+  imageId: string;
 }
 
 const ShoppingCartPage = () => {
@@ -79,10 +80,16 @@ const ShoppingCartPage = () => {
                 className="flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition"
               >
                 <div className="flex items-center space-x-4">
-                  <img src={item.imageUrl} alt={item.name} className="w-24 h-24 object-cover rounded-lg" />
+                  <Image
+                      src={`/api/images/${item.imageId}`} // Use the image API route
+                      alt={item.name}
+                      width={300}
+                      height={300}
+                      className="w-24 h-24 object-cover rounded-lg"
+                  />
                   <div>
                     <h3 className="text-lg font-semibold">{item.name}</h3>
-                    <p className="text-gray-600">Price: ${item.price}</p>
+                    <p className="text-gray-600">Price: ${item.salePrice}</p>
                     <p className="text-gray-500">Quantity: {item.quantity}</p>
                   </div>
                 </div>
