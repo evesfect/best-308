@@ -8,6 +8,7 @@ import TopBar from '../../../../components/StaticTopBar';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
+import Image from "next/image";
 
 interface Stock {
   S: number;
@@ -23,7 +24,9 @@ interface Product {
   salePrice: string;
   total_stock: Stock;
   available_stock: Stock;
-  imageUrl: string;
+  imageId: string;
+  selectedSize: string;
+  selectedColor: string;
   sizes: string[];
   colors: string[];
 }
@@ -107,9 +110,11 @@ const ShoppingPage = () => {
 
     return (
       <div key={product._id} className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-        <img
-          src={product.imageUrl}
+        <Image
+          src={`/api/images/${product.imageId}`} // Use the image API route
           alt={product.name}
+          width={300}
+          height={300}
           className="w-full h-48 object-cover rounded-t-lg"
         />
         <div className="mt-4">

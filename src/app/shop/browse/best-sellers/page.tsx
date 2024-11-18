@@ -4,6 +4,9 @@ import TopBar from '../../../../components/StaticTopBar';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import Image from "next/image";
+
 
 interface Stock {
   S: number;
@@ -19,10 +22,13 @@ interface Product {
   salePrice: string;
   total_stock: Stock;
   available_stock: Stock;
-  imageUrl: string;
+  imageId: string;
+  selectedSize: string;
+  selectedColor: string;
   sizes: string[];
   colors: string[];
 }
+
 
 const ShoppingPage = () => {
   const { data: session } = useSession();
