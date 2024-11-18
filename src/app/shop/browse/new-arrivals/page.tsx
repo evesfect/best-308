@@ -16,7 +16,7 @@ interface Product {
   name: string;
   description: string;
   category: string;
-  price: string;
+  salePrice: string;
   total_stock: Stock;
   available_stock: Stock;
   imageUrl: string;
@@ -33,7 +33,7 @@ const ShoppingPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: { size: string; color: string };
-  }>({}); // State to track selected size and color for each product
+  }>({});
 
   useEffect(() => {
     fetchProducts();
@@ -43,7 +43,7 @@ const ShoppingPage = () => {
     setLoading(true);
     try {
       const response = await axios.get('/api/product', {
-        params: { query, category, order },
+        params: { query, category, order, newArrivals: true },
       });
       setProducts(response.data);
     } catch (error) {
@@ -89,6 +89,7 @@ const ShoppingPage = () => {
       }
     } catch (error) {
       console.error('Error adding product to cart:', error);
+      alert('Failed to add product to cart. Please try again.');
     }
   };
 
@@ -106,7 +107,7 @@ const ShoppingPage = () => {
           <h3 className="text-lg font-semibold">{product.name}</h3>
           <p className="text-gray-500">{product.description}</p>
           <p className="mt-2 text-gray-700 font-semibold">Category: {product.category}</p>
-          <p className="mt-1 text-xl font-bold text-blue-600">Price: ${product.price}</p>
+          <p className="mt-1 text-xl font-bold text-blue-600">Price: ${product.salePrice}</p>
 
           {/* Size Selection */}
           <div className="mt-2">
@@ -183,6 +184,7 @@ const ShoppingPage = () => {
             <option value="jacket">Jacket</option>
             <option value="shirt">Shirt</option>
             <option value="shoes">Shoes</option>
+            <option value="pants">Pants</option>
           </select>
 
           <select

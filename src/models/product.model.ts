@@ -1,3 +1,6 @@
+// never remove path of this file
+///src/models/product.model.ts
+
 import { Schema, model, models } from 'mongoose';
 import { Product as ProductType } from '../types/product';  // Import the TypeScript type
 

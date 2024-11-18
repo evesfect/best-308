@@ -1,4 +1,7 @@
 
+// never remove path of this file
+// src/app/shop/browse/men/page.tsx
+
 "use client";
 
 import TopBar from '../../../../components/StaticTopBar';
@@ -17,7 +20,7 @@ interface Product {
   name: string;
   description: string;
   category: string;
-  price: string;
+  salePrice: string;
   total_stock: Stock;
   available_stock: Stock;
   imageUrl: string;
@@ -65,25 +68,19 @@ const ShoppingPage = () => {
   };
 
   const addToCart = async (productId: string) => {
-    console.log("Add to Cart Called for Product ID:", productId); // Debug: Log productId
-  
     if (!session || !session.user) {
-      console.error("User not logged in"); // Debug: Log user login issue
       alert('Please log in to add items to your cart.');
       return;
     }
   
     const selected = selectedOptions[productId];
     if (!selected || !selected.size || !selected.color) {
-      console.error("Missing size or color for Product ID:", productId, selected); // Debug: Log missing size/color
       alert('Please select a size and color before adding to cart.');
       return;
     }
   
     try {
       const userId = session.user.id;
-      console.log("Sending Request to API with Data:", { userId, productId, ...selected }); // Debug: Log request data
-  
       const response = await axios.post('/api/cart/add-to-cart', {
         userId,
         productId,
@@ -91,16 +88,17 @@ const ShoppingPage = () => {
         color: selected.color,
       });
   
-      console.log("API Response:", response.data); // Debug: Log API response
       if (response.status === 200) {
         alert('Product added to cart successfully!');
       } else {
-        console.error("Unexpected API Response Status:", response.status); // Debug: Log unexpected response
+        alert(`Failed to add to cart: ${response.data.error}`);
       }
     } catch (error) {
-      console.error("Error Adding Product to Cart:", error); // Debug: Log full error
+      console.error('Error adding to cart:', error);
+      alert('An error occurred while adding the product to the cart. Please try again.');
     }
   };
+  
   
   
 
@@ -118,7 +116,7 @@ const ShoppingPage = () => {
           <h3 className="text-lg font-semibold">{product.name}</h3>
           <p className="text-gray-500">{product.description}</p>
           <p className="mt-2 text-gray-700 font-semibold">Category: {product.category}</p>
-          <p className="mt-1 text-xl font-bold text-blue-600">Price: ${product.price}</p>
+          <p className="mt-1 text-xl font-bold text-blue-600">Price: ${product.salePrice}</p>
 
           {/* Size Selection */}
           <div className="mt-2">

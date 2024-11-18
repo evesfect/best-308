@@ -16,7 +16,7 @@ interface Product {
   name: string;
   description: string;
   category: string;
-  price: string;
+  salePrice: string;
   total_stock: Stock;
   available_stock: Stock;
   imageUrl: string;
@@ -33,7 +33,7 @@ const ShoppingPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: { size: string; color: string };
-  }>({}); // State to track selected size and color for each product
+  }>({});
 
   useEffect(() => {
     fetchProducts();
@@ -89,6 +89,7 @@ const ShoppingPage = () => {
       }
     } catch (error) {
       console.error('Error adding product to cart:', error);
+      alert('An error occurred while adding the product to your cart. Please try again.');
     }
   };
 
@@ -96,7 +97,10 @@ const ShoppingPage = () => {
     const selected = selectedOptions[product._id] || { size: '', color: '' };
 
     return (
-      <div key={product._id} className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+      <div
+        key={product._id}
+        className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+      >
         <img
           src={product.imageUrl}
           alt={product.name}
@@ -106,7 +110,7 @@ const ShoppingPage = () => {
           <h3 className="text-lg font-semibold">{product.name}</h3>
           <p className="text-gray-500">{product.description}</p>
           <p className="mt-2 text-gray-700 font-semibold">Category: {product.category}</p>
-          <p className="mt-1 text-xl font-bold text-blue-600">Price: ${product.price}</p>
+          <p className="mt-1 text-xl font-bold text-blue-600">Price: ${product.salePrice}</p>
 
           {/* Size Selection */}
           <div className="mt-2">
@@ -183,6 +187,7 @@ const ShoppingPage = () => {
             <option value="jacket">Jacket</option>
             <option value="shirt">Shirt</option>
             <option value="shoes">Shoes</option>
+            <option value="pants">Pants</option>
           </select>
 
           <select

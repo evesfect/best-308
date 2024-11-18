@@ -1,3 +1,6 @@
+// never remove path of this file
+///src/types/product.ts
+
 import { ObjectId } from 'mongodb';
 
 // Define the Product interface for TypeScript
