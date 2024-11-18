@@ -30,6 +30,8 @@ export async function POST(req: Request) {
     }
 
     const processedProduct = new ProcessedProduct({
+      //get the same id with the product
+      _id: product._id,
       name: product.name,
       imageId: product.imageId,
       salePrice: product.salePrice,

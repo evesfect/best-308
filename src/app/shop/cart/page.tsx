@@ -43,13 +43,24 @@ const ShoppingCartPage = () => {
 
   const removeFromCart = async (id: string) => {
     try {
+      console.log('Removing item with ID:', id); // Log the ID being removed
       setCartItems(cartItems.filter(item => item._id !== id));
-      await axios.delete(`/api/cart/remove-item`, { data: { userId: session?.user?.id, productId: id } });
+      await axios.delete(`/api/cart/remove-item`, {
+        data: { userId: session?.user?.id, processedProductId: id }, // Ensure this field matches your server's expectation
+        headers: { 'Content-Type': 'application/json' },
+      });
+      // log the user id and the processed product id
+      console.log('User ID:', session?.user?.id);
+      console.log('Processed Product ID:', id);
     } catch (error) {
       console.error("Error removing item from cart:", error);
       setError("Failed to remove item from cart. Please try again.");
     }
   };
+  
+  
+  
+  
 
   const handleOrder = async () => {
     try {
