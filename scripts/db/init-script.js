@@ -682,47 +682,66 @@ db.review.insertOne({
     product_id: "322c6359345678f123456798"
 });
 
-
 const processed_products = [
     {
         _id: ObjectId("622c6359345678f123456789"),
-        name: "Classic Oxford Shirt",
+        productId: ObjectId("122c6359345678f123456789"), // Tied to Oxford Shirt
+        name: "Oxford Shirt",
         imageId: "192c6359345678f123456789",
         salePrice: 39.99,
         size: "M",
         color: "Blue",
         quantity: 1,
+        stockAvailable: 24, // Based on available_stock in the Product collection
     },
     {
         _id: ObjectId("722c6359345678f123456789"),
+        productId: ObjectId("322c6359345678f123456793"), // Tied to Athletic Shorts
         name: "Athletic Running Shorts",
-        imageId: "292c6359345678f123456789",
+        imageId: "792c6359345678f123456793",
         salePrice: 29.99,
         size: "L",
         color: "Black",
         quantity: 2,
+        stockAvailable: 19,
     },
     {
         _id: ObjectId("822c6359345678f123456789"),
+        productId: ObjectId("322c6359345678f123456798"), // Tied to Puffer Vest
         name: "Puffer Vest",
-        imageId: "392c6359345678f123456789",
+        imageId: "292c6359345678f123456798",
         salePrice: 59.99,
         size: "M",
         color: "Green",
-        quantity: 3,
+        quantity: 1,
+        stockAvailable: 7,
     },
 ];
 
 db.processedProduct.insertMany(processed_products);
 
-
 const cart = {
     _id: ObjectId("912c6359345678f123456789"),
-    userId: ObjectId("412c6359345678f123456789"),
+    userId: ObjectId("412c6359345678f123456789"), // Tied to user Barış Pome
     items: [
-        { processedProductId: ObjectId("622c6359345678f123456789"), quantity: 1 },
-        { processedProductId: ObjectId("722c6359345678f123456789"), quantity: 1 },
-        { processedProductId: ObjectId("822c6359345678f123456789"), quantity: 1 },
+        {
+            processedProductId: ObjectId("622c6359345678f123456789"), // Oxford Shirt
+            size: "M",
+            color: "Blue",
+            quantity: 1,
+        },
+        {
+            processedProductId: ObjectId("722c6359345678f123456789"), // Athletic Shorts
+            size: "L",
+            color: "Black",
+            quantity: 2,
+        },
+        {
+            processedProductId: ObjectId("822c6359345678f123456789"), // Puffer Vest
+            size: "M",
+            color: "Green",
+            quantity: 1,
+        },
     ],
 };
 

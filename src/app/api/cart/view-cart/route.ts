@@ -1,17 +1,26 @@
 import { NextResponse } from 'next/server';
 import connectionPromise from '@/lib/mongodb';
-import ProcessedProduct from '@/models/processed-product.model';
 import ShoppingCart from '@/models/shopping-cart.model';
-import {ShoppingCart as ShoppingCartType} from '@/types/shopping-cart'
+import '@/models/processed-product.model';
+
+// Helper to format cart items
+const formatCartItems = (cart) =>
+  cart.items
+    .filter((item) => item.processedProductId) // Filter valid processed products
+    .map((item) => ({
+      _id: item.processedProductId?._id || null,
+      name: item.processedProductId?.name || '',
+      imageId: item.processedProductId?.imageId || '',
+      salePrice: item.processedProductId?.salePrice || 0,
+      size: item.processedProductId?.size || '',
+      color: item.processedProductId?.color || '',
+      quantity: item.quantity || 0,
+    }));
 
 export async function GET(req: Request) {
   try {
-    // Ensure the database connection is established
-    console.log("Fetching cart...");
     await connectionPromise;
-    console.log('Model loaded:', ProcessedProduct);
 
-    // Extract userId from the query parameters
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('userId');
 
@@ -19,31 +28,26 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'User ID not provided' }, { status: 400 });
     }
 
-    const cart: ShoppingCartType = await ShoppingCart.findOne({ userId })
-      .populate('items.processedProductId') // Populate ProcessedProduct
+    const cart = await ShoppingCart.findOne({ userId })
+      .populate('items.processedProductId')
       .exec();
 
     if (!cart) {
-      console.error('Shopping cart not found for user:', userId); // Log the error more clearly
-      return NextResponse.json({ error: 'Shopping cart not found for user' }, { status: 404 });
+      return NextResponse.json({ cart: [], totalPrice: 0 });
     }
 
-    const formattedCart = cart.items.map((item: any) => {
-      return {
-      productId: item.processedProductId._id,
-      name: item.processedProductId.name,
-      imageId: item.processedProductId.imageId,
-      salePrice: item.processedProductId.salePrice,
-      size: item.processedProductId.size,
-      color: item.processedProductId.color,
-      quantity: item.processedProductId.quantity,}
-    });
+    const formattedCart = formatCartItems(cart);
 
-    return NextResponse.json({ cart: formattedCart });
+    const totalPrice = formattedCart.reduce(
+      (sum, item) => sum + item.salePrice * item.quantity,
+      0
+    );
+
+    return NextResponse.json({ cart: formattedCart, totalPrice });
   } catch (error) {
     console.error('Error fetching cart:', error);
     return NextResponse.json(
-      { error: 'Failed to retrieve cart' },
+      { error: 'Failed to retrieve cart', details: error.message },
       { status: 500 }
     );
   }

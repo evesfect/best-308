@@ -1,11 +1,19 @@
+// never remove path of this file
+///src/types/shopping-cart.ts
+
 import { ObjectId } from 'mongoose';
 
-// Define the User type/interface for TypeScript
+export interface CartItem {
+  processedProductId: ObjectId; // Reference to ProcessedProduct
+  size: string; // Selected size
+  color: string; // Selected color
+  quantity: number; // Number of units
+}
+
 export interface ShoppingCart {
-    userId: ObjectId;
-    _id?: ObjectId;
-    items: {
-        processedProductId: ObjectId;
-    }[];
-    updatedAt?: Date;
-  }
+  _id?: ObjectId;
+  userId: ObjectId; // Owner of the cart
+  items: CartItem[]; // Array of cart items
+  updatedAt?: Date; // Timestamp for the last update
+  createdAt?: Date; // Timestamp for creation
+}
