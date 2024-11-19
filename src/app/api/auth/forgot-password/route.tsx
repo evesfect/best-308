@@ -46,13 +46,14 @@ export async function POST(req: Request) {
     const transporter = nodemailer.createTransport({
       service: 'Gmail', // Use your email provider
       auth: {
-        user: 'your-email@example.com',
-        pass: 'your-email-password',
+        user: 'ecommercebest308@gmail.com',
+        pass: 'heac mosf eurq nppd',
       },
     });
 
     // Construct reset URL
     const resetUrl = `http://localhost:3000/auth/reset-password?token=${resetToken}&email=${email}`;
+    
 
     // Send email
     await transporter.sendMail({
