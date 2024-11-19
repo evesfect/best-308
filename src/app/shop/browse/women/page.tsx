@@ -29,6 +29,29 @@ interface Product {
   colors: string[];
 }
 
+// Add Toast interface
+interface Toast {
+  message: string;
+  type: 'success' | 'error';
+}
+
+// Add Toast component
+const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div className={`fixed bottom-4 right-4 p-4 rounded-lg shadow-lg text-white transition-opacity duration-500
+      ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
+      {message}
+    </div>
+  );
+};
+
 
 const ShoppingPage = () => {
   const { data: session } = useSession();
@@ -40,6 +63,7 @@ const ShoppingPage = () => {
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: { size: string; color: string };
   }>({});
+  const [toast, setToast] = useState<Toast | null>(null);
 
   useEffect(() => {
     fetchProducts();
@@ -71,13 +95,13 @@ const ShoppingPage = () => {
 
   const addToCart = async (productId: string) => {
     if (!session || !session.user) {
-      alert('Please log in to add items to your cart.');
+      setToast({ message: 'Please log in to add items to your cart.', type: 'error' });
       return;
     }
 
     const selected = selectedOptions[productId];
     if (!selected || !selected.size || !selected.color) {
-      alert('Please select a size and color before adding to cart.');
+      setToast({ message: 'Please select a size and color before adding to cart.', type: 'error' });
       return;
     }
 
@@ -91,11 +115,11 @@ const ShoppingPage = () => {
       });
 
       if (response.status === 200) {
-        alert('Product added to cart successfully!');
+        setToast({ message: 'Product added to cart successfully!', type: 'success' });
       }
     } catch (error) {
       console.error('Error adding product to cart:', error);
-      alert('An error occurred while adding the product to your cart. Please try again.');
+      setToast({ message: 'An error occurred while adding the product to your cart. Please try again.', type: 'error' });
     }
   };
 
@@ -222,6 +246,13 @@ const ShoppingPage = () => {
           </div>
         )}
       </div>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 };
