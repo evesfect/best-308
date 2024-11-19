@@ -1,3 +1,5 @@
+// /shop/browse/men
+
 "use client";
 
 import TopBar from '../../../../components/StaticTopBar';
@@ -91,44 +93,61 @@ const ShoppingPage = () => {
     }));
   };
 
-  const addToCart = async (productId: string) => {
-    if (!session || !session.user) {
-      setToast({ message: 'Please log in to add items to your cart.', type: 'error' });
-      return;
-    }
-  
+  const addToCart = async (productId: string, size: string, color: string) => {
     const selected = selectedOptions[productId];
-    if (!selected || !selected.size || !selected.color) {
-      setToast({ message: 'Please select a size and color before adding to cart.', type: 'error' });
+  
+    if (!selected || !size || !color) {
+      setToast({ message: "Please select a size and color before adding to cart.", type: "error" });
       return;
     }
   
+    if (!session || !session.user) {
+      // Handle non-logged-in user cart
+      const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
+      // i want to see in command line the localCart
+      console.log(localCart);
+
+    
+      const existingItemIndex = localCart.findIndex(
+        (item: any) => item.productId === productId && item.size === size && item.color === color 
+      );
+  
+      if (existingItemIndex > -1) {
+        localCart[existingItemIndex].quantity += 1;
+      } else {
+        localCart.push({ productId, size, color, quantity: 1 });
+      }
+  
+      localStorage.setItem('cart', JSON.stringify(localCart));
+      setToast({ message: "Item added to cart.", type: "success" });
+      return;
+    }
+  
+    // Handle logged-in user cart
     try {
       const userId = session.user.id;
       const response = await axios.post('/api/cart/add-to-cart', {
         userId,
         productId,
-        size: selected.size,
-        color: selected.color,
+        size,
+        color,
       });
   
       if (response.status === 200) {
-        setToast({ message: 'Product added to cart successfully!', type: 'success' });
+        setToast({ message: "Product added to cart successfully!", type: "success" });
       } else {
-        setToast({ message: `Failed to add to cart: ${response.data.error}`, type: 'error' });
+        setToast({ message: `Failed to add to cart: ${response.data.error}`, type: "error" });
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
-      setToast({ message: 'An error occurred while adding the product to the cart. Please try again.', type: 'error' });
+      setToast({ message: "An error occurred while adding the product to the cart. Please try again.", type: "error" });
     }
   };
-  
-  
   
 
   const renderProduct = (product: Product) => {
     const selected = selectedOptions[product._id] || { size: '', color: '' };
-
+  
     return (
       <div key={product._id} className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
         <Image
@@ -143,7 +162,7 @@ const ShoppingPage = () => {
           <p className="text-gray-500">{product.description}</p>
           <p className="mt-2 text-gray-700 font-semibold">Category: {product.category}</p>
           <p className="mt-1 text-xl font-bold text-blue-600">Price: ${product.salePrice}</p>
-
+  
           {/* Size Selection */}
           <div className="mt-2">
             <label 
@@ -164,7 +183,7 @@ const ShoppingPage = () => {
               ))}
             </select>
           </div>
-
+  
           {/* Color Selection */}
           <div className="mt-2">
             <label 
@@ -185,9 +204,9 @@ const ShoppingPage = () => {
               ))}
             </select>
           </div>
-
+  
           <button
-            onClick={() => addToCart(product._id)}
+            onClick={() => addToCart(product._id, selected.size, selected.color)}
             className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
           >
             Add to Cart
@@ -196,6 +215,7 @@ const ShoppingPage = () => {
       </div>
     );
   };
+  
 
   return (
     <div className="min-h-screen bg-white">

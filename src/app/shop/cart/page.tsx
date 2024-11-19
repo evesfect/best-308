@@ -1,9 +1,13 @@
+// /shop/cart
+
 "use client";
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import router from 'next/router';
 
 // Define the Toast interface
 interface Toast {
@@ -19,6 +23,7 @@ interface CartItem {
   quantity: number;
   imageId: string;
   size: string; // Include size in cart item
+  color: string; // Include color in cart item
 }
 
 // Toast component
@@ -48,25 +53,35 @@ const ShoppingCartPage = () => {
 
   useEffect(() => {
     const fetchCartItems = async () => {
-      if (!session || !session.user || !session.user.id) return;
-
-      try {
-        setLoading(true);
-        setError(null);
-        const userId = session.user.id;
-        const response = await axios.get(`/api/cart/view-cart?userId=${userId}`);
+      if (!session || !session.user) {
+        // Handle non-logged-in users
+        const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const response = await axios.post('/api/cart/view-cart', { localCart });
+        console.log(response.data); // Contains cart items and total price
         setCartItems(response.data.cart);
-        calculateTotalPrice(response.data.cart); // Update total price
+        calculateTotalPrice(response.data.cart);
+        return;
+      }
+  
+      // Handle logged-in users
+      try {
+        const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const userId = session.user.id;
+        const response = await axios.post('/api/cart/view-cart', { userId, localCart });
+        console.log(response.data); // Contains cart items and total price
+        setCartItems(response.data.cart);
+        calculateTotalPrice(response.data.cart);
+        console.log(response.data.cart);
       } catch (error) {
-        console.error("Error fetching cart items:", error);
-        setError("Failed to load cart items. Please try again later.");
-      } finally {
-        setLoading(false);
+        console.error('Error fetching cart items:', error);
+        setError('Failed to load cart items. Please try again later.');
+        
       }
     };
-
+  
     fetchCartItems();
   }, [session]);
+  
 
   // Function to calculate total price
   const calculateTotalPrice = (items: CartItem[]) => {
@@ -74,71 +89,159 @@ const ShoppingCartPage = () => {
     setTotalPrice(total);
   };
 
-  // Function to remove item from cart
-  const removeFromCart = async (itemId: string) => {
-    try {
-      setCartItems((prevItems) =>
-        prevItems.filter((item) => item._id !== itemId)
-      );
-      calculateTotalPrice(
-        cartItems.filter((item) => item._id !== itemId)
-      );
+  
 
-      await axios.delete('/api/cart/remove-item', {
-        data: { userId: session?.user?.id, processedProductId: itemId },
-        headers: { 'Content-Type': 'application/json' },
-      });
-      setToast({ message: "Item removed from cart.", type: 'success' }); // Show success toast
+  // Function to remove item from cart
+  const removeFromCart = (productId: string, size: string, color: string) => {
+    if (!session || !session.user) {
+      // Handle non-logged-in users using localStorage
+      const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+  
+      const updatedCart = localCart.filter(
+        (item: any) => !(item.productId === productId && item.size === size && item.color === color)
+      );
+  
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      setCartItems(updatedCart); // Update UI with new local cart
+      setToast({ message: "Item removed from local cart.", type: "success" });
+      return;
+    }
+  
+    // Handle logged-in users via API
+    (async () => {
+      try {
+        const response = await axios.delete("/api/cart/remove-item", {
+          data: { userId: session.user.id, processedProductId: productId },
+        });
+    
+        if (response.status === 200) {
+        setCartItems((prevItems) =>
+          prevItems.filter((item) => item._id !== productId)
+        );
+        setToast({ message: "Item removed from server cart.", type: "success" });
+      }
     } catch (error) {
       console.error("Error removing item from cart:", error);
-      setToast({ message: "Failed to remove item from cart. Please try again.", type: 'error' });
-    }
+      setToast({ message: "Failed to remove item from cart. Please try again.", type: "error" });
+      }
+    })();
   };
+  
 
   // Function to handle quantity update
-  const updateQuantity = async (itemId: string, change: number) => {
-    const updatedItems = cartItems.map((item) =>
-      item._id === itemId
-        ? { ...item, quantity: item.quantity + change }
-        : item
-    );
-
-    const updatedItem = updatedItems.find((item) => item._id === itemId);
-
-    if (updatedItem && updatedItem.quantity <= 0) {
-      await removeFromCart(itemId); // Call remove endpoint if quantity becomes 0
-    } else {
-      setCartItems(updatedItems);
-      calculateTotalPrice(updatedItems);
-
-      try {
-        await axios.post('/api/cart/update-quantity', {
-          userId: session?.user?.id,
-          processedProductId: itemId,
-          quantity: updatedItem?.quantity,
-        });
-        setToast({ message: "Quantity updated successfully.", type: 'success' }); // Show success toast
-      } catch (error) {
-        console.error("Error updating quantity:", error);
-        setToast({ message: "Failed to update quantity. Please try again.", type: 'error' });
+  const updateQuantity = async (productId: string, size: string, color: string, change: number) => {
+    if (!session || !session.user) {
+      const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+  
+      // Log cart before update
+      console.log("Before update:", localCart);
+  
+      const updatedCart = localCart
+        .map((item: any) => {
+          if (item._id === productId && item.size === size && item.color === color) {
+            const updatedQuantity = Math.max(item.quantity + change, 0); // Prevent negative quantity
+            console.log(`Updating ${productId}: ${item.quantity} -> ${updatedQuantity}`);
+            return { ...item, quantity: updatedQuantity };
+          }
+          return item;
+        })
+        .filter((item: any) => item.quantity > 0); // Remove items with quantity <= 0
+  
+      // Log cart after update
+      console.log("After update:", updatedCart);
+  
+      localStorage.setItem("cart", JSON.stringify(updatedCart)); // Save the updated cart
+      setCartItems(updatedCart); // Reflect changes in the UI
+      calculateTotalPrice(updatedCart); // Recalculate total price
+      setToast({ message: "Quantity updated in local cart.", type: "success" });
+      return;
+    }
+  
+    // Handle logged-in users via API
+    try {
+      const currentItem = cartItems.find(
+        (item) => item._id === productId && item.size === size && item.color === color
+      );
+  
+      if (!currentItem) {
+        setToast({ message: "Item not found in cart.", type: "error" });
+        return;
       }
+  
+      const newQuantity = Math.max(currentItem.quantity + change, 0); // Increment or decrement
+  
+      const response = await axios.post("/api/cart/update-quantity", {
+        userId: session.user.id,
+        processedProductId: productId,
+        quantity: newQuantity,
+      });
+  
+      if (response.status === 200) {
+        const updatedCart = cartItems.map((item) =>
+          item._id === productId ? { ...item, quantity: newQuantity } : item
+        );
+  
+        setCartItems(updatedCart.filter((item) => item.quantity > 0)); // Remove items with quantity <= 0
+        calculateTotalPrice(updatedCart); // Update total price
+        setToast({ message: "Quantity updated successfully in server cart.", type: "success" });
+      }
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+      setToast({ message: "Failed to update quantity. Please try again.", type: "error" });
     }
   };
+  
+  
+  
+  
+
+  const handleOrderNow = async () => {
+    if (!session || !session.user) {
+      // Save the current cart to localStorage to persist it across login
+      localStorage.setItem("redirectCart", JSON.stringify(cartItems));
+  
+      // Navigate to the login page with a redirect parameter
+      router.push("/auth/login?redirect=/shop/cart");
+      return;
+    }
+  
+    // Merge localStorage cart with the server-side cart after login
+    const localCart = JSON.parse(localStorage.getItem("redirectCart") || "[]");
+  
+    if (localCart.length > 0) {
+      try {
+        await axios.post("/api/cart/merge-cart", {
+          userId: session.user.id,
+          items: localCart,
+        });
+  
+        // Clear the local cart after merging
+        localStorage.removeItem("redirectCart");
+  
+        // Refresh the cart page after successful merge
+        router.push("/shop/cart");
+      } catch (error) {
+        console.error("Error merging cart:", error);
+        setToast({ message: "Failed to merge your cart. Please try again.", type: "error" });
+        return;
+      }
+    }
+  
+    // Navigate to the checkout page for logged-in users
+    router.push("/shop/checkout");
+  };
+
+
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center items-center">
+    <div className="min-h-screen bg-gray-100 flex justify-center items-center"> 
+
       <div className="container mx-auto py-12 px-6 bg-white shadow-md rounded-lg">
         <h1 className="text-3xl font-bold text-center mb-8 text-blue-600">
           Your Shopping Cart
-        </h1>
+        </h1> 
 
-        {status === 'loading' ? (
-          <p className="text-center text-xl text-gray-500">Loading session...</p>
-        ) : loading ? (
-          <p className="text-center text-xl text-gray-500">Loading your cart...</p>
-        ) : error ? (
-          <p className="text-center text-xl text-red-500">{error}</p>
-        ) : cartItems.length > 0 ? (
+        {cartItems.length > 0 ? (
           <>
             <div className="space-y-6">
               {cartItems.map((item) => (
@@ -158,19 +261,20 @@ const ShoppingCartPage = () => {
                       <h3 className="text-lg font-semibold">{item.name}</h3>
                       <p className="text-gray-600">Price: ${item.salePrice}</p>
                       <p className="text-gray-500">Size: {item.size}</p>
+                      <p className="text-gray-500">Color: {item.color}</p>
                     </div>
                   </div>
                   {/* Quantity Controls */}
                   <div className="flex items-center space-x-4">
                     <button
-                      onClick={() => updateQuantity(item._id, -1)}
+                      onClick={() => updateQuantity(item._id, item.size, item.color, -1)}
                       className="bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition"
                     >
                       -
                     </button>
                     <p className="text-gray-500 font-bold">{item.quantity}</p>
                     <button
-                      onClick={() => updateQuantity(item._id, 1)}
+                      onClick={() => updateQuantity(item._id, item.size, item.color, 1)}
                       className="bg-green-500 text-white px-3 py-2 rounded-lg hover:bg-green-600 transition"
                     >
                       +
@@ -186,7 +290,7 @@ const ShoppingCartPage = () => {
                 </div>
                 <button 
                   className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center space-x-2"
-                  onClick={() => setToast({ message: 'Order functionality coming soon!', type: 'success' })}
+                  onClick={handleOrderNow}
                 >
                   <span>Order Now</span>
                   <svg 

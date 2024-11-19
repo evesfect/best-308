@@ -4,13 +4,17 @@ import ShoppingCart from '@/models/shopping-cart.model';
 import Product from '@/models/product.model';
 import ProcessedProduct from '@/models/processed-product.model';
 
-
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { userId, productId, size, color } = body;
+    const { userId, productId, size, color, quantity = 1 } = body;
 
-    if (!userId || !productId || !size || !color) {
+    // If userId is not provided, return a message for the client to handle local cart
+    if (!userId) {
+      return NextResponse.json({ error: "User not logged in. Use local cart for non-authenticated users." }, { status: 401 });
+    }
+
+    if (!productId || !size || !color) {
       console.error("Missing fields in request:", { userId, productId, size, color });
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
@@ -35,18 +39,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid size or color" }, { status: 400 });
     }
 
-    // Validate stock availability
-    const availableStock = product.available_stock?.[size];
-    console.log("Validating stock:", {
-      size,
-      availableStock,
-    });
-
-    if (!availableStock || availableStock <= 0) {
-      console.error("Insufficient stock:", { availableStock });
-      return NextResponse.json({ error: "Insufficient stock or size unavailable" }, { status: 400 });
-    }
-
     // Find or create ProcessedProduct
     let processedProduct = await ProcessedProduct.findOne({
       productId,
@@ -62,8 +54,8 @@ export async function POST(req: Request) {
         salePrice: product.salePrice,
         size,
         color,
-        quantity: 1,
-        stockAvailable: availableStock,
+        quantity: 1, // Initial quantity set as 1
+        stockAvailable: 0, // Placeholder; stock updates will be handled in the future
       });
       await processedProduct.save();
     }
@@ -82,28 +74,17 @@ export async function POST(req: Request) {
     );
 
     if (existingItem) {
-      existingItem.quantity += 1;
-
-      // Validate stock for incremented quantity
-      if (existingItem.quantity > processedProduct.stockAvailable) {
-        return NextResponse.json({ error: "Insufficient stock for this quantity" }, { status: 400 });
-      }
+      existingItem.quantity += quantity;
     } else {
       cart.items.push({
         processedProductId: processedProduct._id,
         size,
         color,
-        quantity: 1,
+        quantity,
       });
     }
 
     await cart.save();
-
-    // Update available stock in Product
-    product.available_stock[size] -= 1;
-    await Product.findByIdAndUpdate(productId, {
-      available_stock: product.available_stock,
-    });
 
     return NextResponse.json({ message: "Item added to cart successfully." });
   } catch (error) {
@@ -111,4 +92,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Internal Server Error", details: error.message }, { status: 500 });
   }
 }
-

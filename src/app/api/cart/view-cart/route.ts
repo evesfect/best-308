@@ -17,17 +17,31 @@ const formatCartItems = (cart) =>
       quantity: item.quantity || 0,
     }));
 
-export async function GET(req: Request) {
+export async function POST(req: Request) {
   try {
-    await connectionPromise;
+    const body = await req.json();
+    const { userId, localCart } = body;
 
-    const { searchParams } = new URL(req.url);
-    const userId = searchParams.get('userId');
-
-    if (!userId) {
-      return NextResponse.json({ error: 'User ID not provided' }, { status: 400 });
+    // Validate localCart
+    if (!Array.isArray(localCart)) {
+      return NextResponse.json(
+        { error: 'Invalid local cart format' },
+        { status: 400 }
+      );
     }
 
+    await connectionPromise;
+
+    // Handle case where user is not logged in
+    if (!userId) {
+      console.log('User not logged in. Returning local cart.');
+      return NextResponse.json({
+        cart: localCart,
+        totalPrice: calculateTotalPrice(localCart),
+      });
+    }
+
+    // Fetch the cart for the logged-in user
     const cart = await ShoppingCart.findOne({ userId })
       .populate('items.processedProductId')
       .exec();
@@ -52,3 +66,7 @@ export async function GET(req: Request) {
     );
   }
 }
+
+// Helper function to calculate total price
+const calculateTotalPrice = (cart) =>
+  cart.reduce((sum, item) => sum + item.salePrice * item.quantity, 0);

@@ -92,57 +92,78 @@ const ShoppingPage = () => {
     }));
   };
 
-  const addToCart = async (productId: string) => {
-    if (!session || !session.user) {
-      setToast({ message: 'Please log in to add items to your cart.', type: 'error' });
-      return;
-    }
-
+  const addToCart = async (productId: string, size: string, color: string) => {
     const selected = selectedOptions[productId];
-    if (!selected || !selected.size || !selected.color) {
-      setToast({ message: 'Please select a size and color before adding to cart.', type: 'error' });
+  
+    if (!selected || !size || !color) {
+      setToast({ message: "Please select a size and color before adding to cart.", type: "error" });
       return;
     }
-
+  
+    if (!session || !session.user) {
+      // Handle non-logged-in user cart
+      const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+      const existingItemIndex = localCart.findIndex(
+        (item: any) => item.productId === productId && item.size === size && item.color === color
+      );
+  
+      if (existingItemIndex > -1) {
+        localCart[existingItemIndex].quantity += 1;
+      } else {
+        localCart.push({ productId, size, color, quantity: 1 });
+      }
+  
+      localStorage.setItem("cart", JSON.stringify(localCart));
+      setToast({ message: "Item added to cart.", type: "success" });
+      return;
+    }
+  
+    // Handle logged-in user cart (existing logic)
     try {
       const userId = session.user.id;
-      const response = await axios.post('/api/cart/add-to-cart', {
+      const response = await axios.post("/api/cart/add-to-cart", {
         userId,
         productId,
-        size: selected.size,
-        color: selected.color,
+        size,
+        color,
       });
-
+  
       if (response.status === 200) {
-        setToast({ message: 'Product added to cart successfully!', type: 'success' });
+        setToast({ message: "Product added to cart successfully!", type: "success" });
+      } else {
+        setToast({ message: `Failed to add to cart: ${response.data.error}`, type: "error" });
       }
     } catch (error) {
-      console.error('Error adding product to cart:', error);
-      setToast({ message: 'Failed to add product to cart. Please try again.', type: 'error' });
+      console.error("Error adding to cart:", error);
+      setToast({ message: "An error occurred while adding the product to the cart. Please try again.", type: "error" });
     }
   };
+  
 
   const renderProduct = (product: Product) => {
     const selected = selectedOptions[product._id] || { size: '', color: '' };
-
+  
     return (
       <div key={product._id} className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
         <Image
-            src={`/api/images/${product.imageId}`} // Use the image API route
-            alt={product.name}
-            width={300}
-            height={300}
-            className="w-full h-48 object-cover rounded-t-lg"
+          src={`/api/images/${product.imageId}`} // Use the image API route
+          alt={product.name}
+          width={300}
+          height={300}
+          className="w-full h-48 object-cover rounded-t-lg"
         />
         <div className="mt-4">
           <h3 className="text-lg font-semibold">{product.name}</h3>
           <p className="text-gray-500">{product.description}</p>
           <p className="mt-2 text-gray-700 font-semibold">Category: {product.category}</p>
           <p className="mt-1 text-xl font-bold text-blue-600">Price: ${product.salePrice}</p>
-
+  
           {/* Size Selection */}
           <div className="mt-2">
-            <label htmlFor={`size-${product._id}`} className="block text-sm font-medium text-gray-700">
+            <label 
+              htmlFor={`size-${product._id}`} 
+              className="block text-sm font-medium text-gray-700"
+            >
               Size
             </label>
             <select
@@ -153,16 +174,17 @@ const ShoppingPage = () => {
             >
               <option value="">Select Size</option>
               {product.sizes.map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
+                <option key={size} value={size}>{size}</option>
               ))}
             </select>
           </div>
-
+  
           {/* Color Selection */}
           <div className="mt-2">
-            <label htmlFor={`color-${product._id}`} className="block text-sm font-medium text-gray-700">
+            <label 
+              htmlFor={`color-${product._id}`} 
+              className="block text-sm font-medium text-gray-700"
+            >
               Color
             </label>
             <select
@@ -173,15 +195,13 @@ const ShoppingPage = () => {
             >
               <option value="">Select Color</option>
               {product.colors.map((color) => (
-                <option key={color} value={color}>
-                  {color}
-                </option>
+                <option key={color} value={color}>{color}</option>
               ))}
             </select>
           </div>
-
+  
           <button
-            onClick={() => addToCart(product._id)}
+            onClick={() => addToCart(product._id, selected.size, selected.color)}
             className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
           >
             Add to Cart
@@ -190,6 +210,7 @@ const ShoppingPage = () => {
       </div>
     );
   };
+  
 
   return (
     <div className="min-h-screen bg-white">
