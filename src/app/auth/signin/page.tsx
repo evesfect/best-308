@@ -1,3 +1,5 @@
+// src/app/auth/signin/page.tsx
+
 "use client";
 
 import { useState, useRef } from 'react';
@@ -19,7 +21,6 @@ const SignInPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const message = searchParams.get('message');
-
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,6 +61,10 @@ const SignInPage = () => {
 
   const goToSignUpPage = () => {
     router.push('/auth/signup');
+  };
+
+  const goToForgotPasswordPage = () => {
+    router.push('/auth/forgot-password');
   };
 
   return (
@@ -115,6 +120,15 @@ const SignInPage = () => {
             Sign Up
           </button>
         </form>
+        <div className="mt-4 text-center">
+          <button
+            type="button"
+            onClick={goToForgotPasswordPage}
+            className="text-blue-600 hover:underline"
+          >
+            Forgot your password?
+          </button>
+        </div>
       </div>
     </div>
   );

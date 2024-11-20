@@ -8,6 +8,7 @@ export async function POST(req: Request) {
     const { userId, processedProductId, quantity } = body;
 
     if (!userId || !processedProductId || quantity === undefined) {
+      console.error("Missing fields in request:", { userId, processedProductId, quantity });
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -16,6 +17,7 @@ export async function POST(req: Request) {
     const cart = await ShoppingCart.findOne({ userId });
 
     if (!cart) {
+      console.error("Cart not found for user:", userId);
       return NextResponse.json({ error: "Cart not found" }, { status: 404 });
     }
 
@@ -24,22 +26,26 @@ export async function POST(req: Request) {
     );
 
     if (!item) {
+      console.error("Item not found in cart:", processedProductId);
       return NextResponse.json({ error: "Item not found in cart" }, { status: 404 });
     }
 
     if (quantity <= 0) {
       // Remove the item if quantity is <= 0
+      console.log(`Removing item: ${processedProductId}`);
       cart.items = cart.items.filter(
         (item) => item.processedProductId.toString() !== processedProductId
       );
     } else {
       // Update the quantity
+      console.log(`Updating item quantity: ${processedProductId}, new quantity: ${quantity}`);
       item.quantity = quantity;
     }
 
     await cart.save();
 
-    return NextResponse.json({ message: "Cart updated successfully" });
+    console.log("Cart updated successfully:", cart);
+    return NextResponse.json({ message: "Cart updated successfully." });
   } catch (error) {
     console.error("Error updating cart:", error);
     return NextResponse.json(

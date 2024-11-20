@@ -1,6 +1,4 @@
-
-// never remove path of this file
-// src/app/shop/browse/men/page.tsx
+// /shop/browse/men
 
 "use client";
 
@@ -8,6 +6,7 @@ import TopBar from '../../../../components/StaticTopBar';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import Image from "next/image";
 
 interface Stock {
@@ -31,6 +30,30 @@ interface Product {
   colors: string[];
 }
 
+// Add Toast interface
+interface Toast {
+  message: string;
+  type: 'success' | 'error';
+}
+
+// Add Toast component
+const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div className={`fixed bottom-4 right-4 p-4 rounded-lg shadow-lg text-white transition-opacity duration-500
+      ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
+      {message}
+    </div>
+  );
+};
+
+
 const ShoppingPage = () => {
   const { data: session } = useSession();
   const [products, setProducts] = useState<Product[]>([]);
@@ -40,8 +63,8 @@ const ShoppingPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: { size: string; color: string };
-  }>({}); // State to track selected size and color for each product
-
+  }>({}); 
+  const [toast, setToast] = useState<Toast | null>(null);
   useEffect(() => {
     fetchProducts();
   }, [query, category, order]);
@@ -70,44 +93,65 @@ const ShoppingPage = () => {
     }));
   };
 
-  const addToCart = async (productId: string) => {
-    if (!session || !session.user) {
-      alert('Please log in to add items to your cart.');
-      return;
-    }
-  
+  const addToCart = async (productId: string, size: string, color: string) => {
     const selected = selectedOptions[productId];
-    if (!selected || !selected.size || !selected.color) {
-      alert('Please select a size and color before adding to cart.');
+  
+    if (!selected || !size || !color) {
+      setToast({ message: "Please select a size and color before adding to cart.", type: "error" });
       return;
     }
   
+    if (!session || !session.user) {
+      // Handle non-logged-in user cart
+      const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
+      // i want to see in command line the localCart
+      console.log(localCart);
+
+    
+      const existingItemIndex = localCart.findIndex(
+        (item: any) => item.productId === productId && item.size === size && item.color === color 
+      );
+
+      // get the sale price of the product
+      const product = products.find((p) => p._id === productId);
+      const salePrice = product?.salePrice;
+  
+      if (existingItemIndex > -1) {
+        localCart[existingItemIndex].quantity += 1;
+      } else {
+        localCart.push({ productId, size, color, quantity: 1, salePrice });
+      }
+  
+      localStorage.setItem('cart', JSON.stringify(localCart));
+      setToast({ message: "Item added to cart.", type: "success" });
+      return;
+    }
+  
+    // Handle logged-in user cart
     try {
       const userId = session.user.id;
       const response = await axios.post('/api/cart/add-to-cart', {
         userId,
         productId,
-        size: selected.size,
-        color: selected.color,
+        size,
+        color,
       });
   
       if (response.status === 200) {
-        alert('Product added to cart successfully!');
+        setToast({ message: "Product added to cart successfully!", type: "success" });
       } else {
-        alert(`Failed to add to cart: ${response.data.error}`);
+        setToast({ message: `Failed to add to cart: ${response.data.error}`, type: "error" });
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
-      alert('An error occurred while adding the product to the cart. Please try again.');
+      setToast({ message: "An error occurred while adding the product to the cart. Please try again.", type: "error" });
     }
   };
-  
-  
   
 
   const renderProduct = (product: Product) => {
     const selected = selectedOptions[product._id] || { size: '', color: '' };
-
+  
     return (
       <div key={product._id} className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
         <Image
@@ -122,7 +166,7 @@ const ShoppingPage = () => {
           <p className="text-gray-500">{product.description}</p>
           <p className="mt-2 text-gray-700 font-semibold">Category: {product.category}</p>
           <p className="mt-1 text-xl font-bold text-blue-600">Price: ${product.salePrice}</p>
-
+  
           {/* Size Selection */}
           <div className="mt-2">
             <label 
@@ -143,7 +187,7 @@ const ShoppingPage = () => {
               ))}
             </select>
           </div>
-
+  
           {/* Color Selection */}
           <div className="mt-2">
             <label 
@@ -164,9 +208,9 @@ const ShoppingPage = () => {
               ))}
             </select>
           </div>
-
+  
           <button
-            onClick={() => addToCart(product._id)}
+            onClick={() => addToCart(product._id, selected.size, selected.color)}
             className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
           >
             Add to Cart
@@ -175,6 +219,7 @@ const ShoppingPage = () => {
       </div>
     );
   };
+  
 
   return (
     <div className="min-h-screen bg-white">
@@ -226,6 +271,13 @@ const ShoppingPage = () => {
           </div>
         )}
       </div>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 };

@@ -1,9 +1,9 @@
-// src/app/auth/signup/page.tsx
+// src/app/auth/reset-password/page.tsx
 
 "use client";
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Libre_Baskerville } from 'next/font/google';
 
@@ -12,59 +12,49 @@ const libreBaskerville = Libre_Baskerville({
   subsets: ['latin'],
 });
 
-const SignUpPage = () => {
-  const [email, setEmail] = useState('');
+const ResetPasswordPage = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token');
+  const email = searchParams.get('email');
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setMessage('');
 
-    // Check if all fields are filled
-    if (!email || !password || !confirmPassword) {
-      setError('Please fill in all fields.');
+    if (!password || !confirmPassword) {
+      setError('Please fill in both password fields.');
       return;
     }
 
-    // Check if passwords match
     if (password !== confirmPassword) {
       setError("Passwords don't match.");
       return;
     }
 
-    // Simple email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError('Invalid email format.');
-      return;
-    }
-
-    // Password validation: at least 8 characters, one uppercase, one lowercase, one number, and one special character
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!passwordRegex.test(password)) {
-      setError('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');
-      return;
-    }
-
     try {
-      const response = await fetch('/api/auth/signup', {
+      const response = await fetch('/api/auth/reset-password', {
         method: 'POST',
-        body: JSON.stringify({ email, password, username: email }),
+        body: JSON.stringify({ token, email, password }),
         headers: { 'Content-Type': 'application/json' },
       });
 
       const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to sign up.');
+        throw new Error(data.message || 'Failed to reset password.');
       }
 
-      router.push('/auth/signin');
+      setMessage('Password reset successful! Redirecting to login...');
+      setTimeout(() => {
+        router.push('/auth/signin');
+      }, 3000);
     } catch (err) {
-      setError(err.message || 'Failed to sign up. Please try again.');
+      setError(err.message || 'Failed to reset password.');
     }
   };
 
@@ -73,7 +63,7 @@ const SignUpPage = () => {
       <div className="relative w-full h-[600px]">
         <Image
           src="/images/signin-signup.jpg"
-          alt="Sign Up Background"
+          alt="Reset Password Background"
           layout="fill"
           objectFit="cover"
           objectPosition="center"
@@ -83,22 +73,13 @@ const SignUpPage = () => {
 
       <div className="absolute w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
         <h1 className={`text-4xl font-bold text-center mb-6 text-gray-900 ${libreBaskerville.className}`}>
-          Sign Up
+          Reset Password
         </h1>
-        {error && <p className="text-red-600 mb-4">{error}</p>}
-        <form onSubmit={handleSignUp} className="space-y-4">
+        {error && <p className="text-red-600 mb-4 text-center">{error}</p>}
+        {message && <p className="text-green-600 mb-4 text-center">{message}</p>}
+        <form onSubmit={handleResetPassword} className="space-y-4">
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">Password:</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">New Password:</label>
             <input
               type="password"
               value={password}
@@ -119,9 +100,9 @@ const SignUpPage = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition duration-300"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-300"
           >
-            Sign Up
+            Reset Password
           </button>
         </form>
       </div>
@@ -129,4 +110,4 @@ const SignUpPage = () => {
   );
 };
 
-export default SignUpPage;
+export default ResetPasswordPage;
