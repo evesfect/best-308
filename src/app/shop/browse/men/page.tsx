@@ -111,11 +111,15 @@ const ShoppingPage = () => {
       const existingItemIndex = localCart.findIndex(
         (item: any) => item.productId === productId && item.size === size && item.color === color 
       );
+
+      // get the sale price of the product
+      const product = products.find((p) => p._id === productId);
+      const salePrice = product?.salePrice;
   
       if (existingItemIndex > -1) {
         localCart[existingItemIndex].quantity += 1;
       } else {
-        localCart.push({ productId, size, color, quantity: 1 });
+        localCart.push({ productId, size, color, quantity: 1, salePrice });
       }
   
       localStorage.setItem('cart', JSON.stringify(localCart));
