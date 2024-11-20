@@ -1,6 +1,6 @@
 //best-308/src/models/user.model.ts
 
-import { Schema, model } from 'mongoose';
+import {Schema, model, models} from 'mongoose';
 import { User as UserType } from '../types/user';
 
 // Define the User schema
@@ -25,5 +25,5 @@ const userSchema = new Schema<UserType>({
   timestamps: true,
 });
 
-const User = model<UserType>('User', userSchema, 'user');
+const User = models.User || model<UserType>('User', userSchema, 'user');
 export default User;

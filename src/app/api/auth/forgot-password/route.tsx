@@ -2,6 +2,8 @@ import { MongoClient } from 'mongodb';
 import nodemailer from 'nodemailer';
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
+import connectionPromise from '@/lib/mongodb'
+import User from '@/models/user.model'
 
 let client: MongoClient;
 
@@ -16,6 +18,7 @@ async function connectToDatabase() {
 
 export async function POST(req: Request) {
   try {
+
     const { email } = await req.json();
 
     // Validate email
@@ -23,11 +26,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Email is required.' }, { status: 400 });
     }
 
-    const db = await connectToDatabase();
-    const usersCollection = db.collection('user');
+    await connectionPromise;
+    console.log("Using Model",User);
 
     // Find the user by email
-    const user = await usersCollection.findOne({ email });
+    const user = await User.findOne({ email });
     if (!user) {
       return NextResponse.json({ message: 'No user found with this email address.' }, { status: 404 });
     }
@@ -37,7 +40,7 @@ export async function POST(req: Request) {
     const tokenExpiration = new Date(Date.now() + 1000 * 60 * 60); // Token expires in 1 hour
 
     // Update user with reset token and expiration
-    await usersCollection.updateOne(
+    await User.updateOne(
       { email },
       { $set: { resetToken, tokenExpiration } }
     );
