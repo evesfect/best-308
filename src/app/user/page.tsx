@@ -83,7 +83,14 @@ const UserPanel: React.FC = () => {
             <TopBar />
             <div {...handleTabClick} className="flex mt-20 gap-10 p-20 px-20 h-[calc(100vh-96px)]">
                 <UserSidebar onItemClick={setActiveItem} />
-                {userData && <MainContent activeItem={activeItem} userData={userData} />}
+                {userData ? (
+                    <MainContent activeItem={activeItem} userData={userData} />
+                ) : (
+                    <div className="flex justify-center items-center w-full">
+                        <div className="w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mr-4"></div>
+                        <p className="text-lg font-semibold">Loading account information...</p>
+                    </div>
+                )}
             </div>
         </div>
     );
