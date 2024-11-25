@@ -1,9 +1,9 @@
-// Page.tsx
 "use client";
 import { useEffect, useState } from 'react';
 import ProductItem from './ProductItem';
 import { Product } from '@/types/product';
 import styles from '../../../styles/ProductItem.module.css';
+import StaticTopBar from '@/components/StaticTopBar';
 
 export default function Page({ params }: { params: { id: string } }) {
     const [product, setProduct] = useState<Product | null>(null);
@@ -47,8 +47,12 @@ export default function Page({ params }: { params: { id: string } }) {
     if (!product) return <div>Product not found</div>;
 
     return (
-        <div className={styles.container}>
-            <ProductItem product={product} />
-        </div>
+        <>
+            <StaticTopBar />
+            <div style={{ height: '150px' }} />
+            <div className={styles.container}>
+                <ProductItem product={product} />
+            </div>
+        </>
     );
 }

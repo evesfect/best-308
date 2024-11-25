@@ -5,52 +5,55 @@ import connectionPromise from '@/lib/mongodb';
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
-    try {
-      // Ensure the database is connected
+  try {
       await connectionPromise;
-      console.log("Database connected successfully");
-  
-      // Log the current database and collections
       const db = mongoose.connection.db;
-      if (db) {
-        console.log("Current database:", db.databaseName);
-      } else {
-        console.error("Database connection is undefined");
-        return NextResponse.json({ message: 'Database connection error' }, { status: 500 });
+      
+      if (!db) {
+          console.error("Database connection is undefined");
+          return NextResponse.json({ message: 'Database connection error' }, { status: 500 });
       }
-    
 
-        const collections = await db.listCollections().toArray();
-        console.log("Collections:", collections.map(c => c.name));
+      const url = new URL(req.url);
+      const productId = url.searchParams.get('product_id');
 
-        const requiredCollections = ['review'];
-        requiredCollections.forEach((collection) => {
-        if (!collections.some(c => c.name === collection)) {
-          console.error(`The '${collection}' collection does not exist in the database`);
-          return NextResponse.json({ message: `${collection.charAt(0).toUpperCase() + collection.slice(1)} collection not found` }, { status: 500 });
-        }
-        });
+      if (!productId) {
+          return NextResponse.json({ message: 'Product ID is required' }, { status: 400 });
+      }
 
-        const url = new URL(req.url);
-        const productId = url.searchParams.get('product_id');
+      // Create an OR query to match both string and ObjectId formats
+      const searchCriteria = {
+          $or: [
+              { product_id: productId }, // String format
+              { product_id: new mongoose.Types.ObjectId(productId) }, // ObjectId format
+              { "product_id.$oid": productId } // Embedded ObjectId format
+          ]
+      };
 
-        let searchCriteria: any = {};
+      const comments = await db.collection('review').find(searchCriteria).toArray();
+      
+      // Transform the comments to ensure consistent format
+      const formattedComments = comments.map(comment => ({
+          ...comment,
+          // Ensure product_id is consistently an ObjectId
+          product_id: typeof comment.product_id === 'string' 
+              ? new mongoose.Types.ObjectId(comment.product_id) 
+              : comment.product_id,
+          // Ensure user_id is consistently an ObjectId
+          user_id: typeof comment.user_id === 'string' 
+              ? new mongoose.Types.ObjectId(comment.user_id) 
+              : comment.user_id
+      }));
 
-        if (productId) {
-            searchCriteria = { product_id: new mongoose.Types.ObjectId(productId) };
-        }
-
-        const comments = await db.collection('review').find(searchCriteria).toArray();
-        
-        // Return the array of comments as JSON
-        return NextResponse.json(comments, { status: 200 });
-
-
-    }
-    catch (error: any) {
-        console.error("Error fetching stats:", error);
-        return NextResponse.json({ message: 'Error fetching stats', error: error.toString() }, { status: 500 });
-    }
+      return NextResponse.json(formattedComments, { status: 200 });
+  }
+  catch (error: any) {
+      console.error("Error fetching comments:", error);
+      return NextResponse.json({ 
+          message: 'Error fetching comments', 
+          error: error.toString() 
+      }, { status: 500 });
+  }
 }
 
 export async function DELETE(req: Request) {
