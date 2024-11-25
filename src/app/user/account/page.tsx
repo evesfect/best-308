@@ -9,39 +9,157 @@ interface AccountSettingsProps{
 
 const AccountSettings: React.FC<AccountSettingsProps> = ({ useData }) => {
 
-    // Directly access properties with optional chaining
-    const username = useData?.username ?? "N/A";
-    const email = useData?.email ?? "N/A";
-    const address = useData?.address ?? "N/A";
-    const role = useData?.role ?? "N/A";
+    // initial data that is stoder in the backend
+    const [initialData, setInitialData] = useState({
+        firstName: useData.firstName || "",
+        lastName: useData.lastName || "",
+        email: useData.email,
+        phoneNumber: useData.phoneNumber || "",
+        address: useData.address || "",
+      });
 
-    // Helper function to render each field
-    const RenderObject = (label: string, value: string) => (
+    const [isFormEditable,setIsFormEditable] = useState(false);
+    const [isChanged,setIsChanged] = useState(false);
+    const [currentData, setCurrentData] = useState(initialData); // current data entering by the user
+    const [errorMessage, setErrorMessage] = useState('');
+
+    // Function for revent saving if a previously non-empty field is now empty.
+    const hasInvalidFields = (): boolean => {
+        return Object.keys(initialData).some((key) => {
+            const initialValue = initialData[key as keyof typeof initialData];
+            const currentValue = currentData[key as keyof typeof currentData];
+            if (initialValue !== "" && currentValue === "") {
+                return true;
+            }
+            return false;
+        });
+    };
+
+    // Dynamic rendering object for each field in the form
+    const RenderObject = (label: string, value: string, fieldName: string, editableObject: boolean = true, placeholder: string = `Enter your ${label}`) => (
         <div className="mb-3">
             <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                 {label}
             </label>
-            <p className="text-gray-900 dark:text-white">{value}</p>
+            {isFormEditable && editableObject ? (
+                <input
+                    value={value}
+                    placeholder={placeholder}
+                    onChange={(e) => setCurrentData((prev) => ({
+                        ...prev,
+                        [fieldName]: e.target.value, // Updating the field dynamically
+                      }))
+                    }
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                ></input>
+            ) : (
+                <p className="text-gray-900 dark:text-white">{value}</p>
+            )}
         </div>
     );
 
+    const toggleEdit = () => setIsFormEditable(!isFormEditable);
+
+    // tracking changes made by user
+    useEffect(() => {
+        const isDataChanged = Object.keys(initialData).some((key) => {
+            return (
+                currentData[key as keyof typeof currentData] !== initialData[key as keyof typeof initialData]
+            );
+        });
+        setIsChanged(isDataChanged  && !hasInvalidFields());
+    }, [currentData]);
+
+    // submit function that handles saving new information and server communication
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+    
+        try {
+            const response = await fetch(`/api/users?_id=${useData._id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(currentData),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setCurrentData(initialData);
+                throw new Error(data.message || "An error occurred while saving changes.");
+            }
+    
+            alert("Changes saved successfully!");
+            setInitialData(currentData); // Updating initial data after saving
+            toggleEdit(); // Exit edit mode
+            setErrorMessage('');
+
+        } catch (error: any) {
+            setErrorMessage(error.message || "An unexpected error occurred. Please try again.");
+        }
+    };
+    
+
     return (
         <div>
+            {/* Header and Edit Button */}
             <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-bold">Account Settings</h1>
+                <button
+                    onClick={() => {
+                        if(isFormEditable){
+                            setCurrentData(initialData);
+                        }
+                        toggleEdit();
+                    }}
+                    className="text-blue-700 hover:text-blue-900 font-medium mt-2"
+                >
+                    {isFormEditable ? 'Cancel' : 'Edit'}
+                </button>
             </div>
+
+            {/* The Form */}
             <div className="mt-12">
-                <form>
+                <form onSubmit={handleSubmit}>
+                    {/* User Information Objects */}
                     <div className="grid gap-6 mb-6 md:grid-cols-2">
-                        {RenderObject("User Name", username)}
-                        {RenderObject("E-Mail", email)}
-                        {RenderObject("Home Address", address)}
-                        {RenderObject("User Role", role)}
+                        {RenderObject("Name", currentData.firstName, "firstName")}
+                        {RenderObject("Surname", currentData.lastName, "lastName")}
+                        {RenderObject("E-Mail", currentData.email, "email", false)}
+                        {RenderObject("Phone Number", currentData.phoneNumber, "phoneNumber", true, "Enter your Phone Number (5xxxxxxxxx)")}
+                        {RenderObject("Address", currentData.address, "address")}
                     </div>
+
+                    {/* Save and Cancel Buttons */}
+                    {isFormEditable && (
+                        <div className="flex justify-end mt-9">
+                            {errorMessage && <p className="text-red-600 mr-4">{errorMessage}</p>}
+                            <button
+                                type="submit"
+                                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2
+                                            disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-400"
+                                disabled={!isChanged}
+                            >
+                                Save
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    toggleEdit();
+                                    setCurrentData(initialData);
+                                }}
+                                className="text-gray-700 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    )}
                 </form>
             </div>
+
         </div>
-    );
+    )
 };
 
 export default AccountSettings;

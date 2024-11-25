@@ -7,12 +7,15 @@ import { User as UserType } from '../types/user';
 const userSchema = new Schema<UserType>({
   _id: { type: Schema.Types.ObjectId, required: true },
   username: { type: String, required: true, unique: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
   email: {
     type: String,
     required: true,
     unique: true,
     match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address.'],
   },
+  phoneNumber: {type: String, required: true, unique: true },
   password: { type: String, required: true, minlength: 8 },
   role: { type: String, required: true },
   address: { type: String, required: true },
