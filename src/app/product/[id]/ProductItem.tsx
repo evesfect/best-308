@@ -1,9 +1,12 @@
 // File: ProductItem.tsx
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Product } from '@/types/product';
 import Image from 'next/image';
 import { Button } from 'primereact/button';
 import styles from '../../../styles/ProductItem.module.css';
+import { Toast } from 'primereact/toast';
+import { useSession } from 'next-auth/react';
+import axios from 'axios';
 
 interface ProductItemProps {
     product: Product;
@@ -15,11 +18,60 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
     const [selectedColor, setSelectedColor] = useState<string | null>(null);
     const [hoveredColor, setHoveredColor] = useState<string | null>(null);
     const [quantity, setQuantity] = useState(1);
+    const toast = useRef<Toast>(null);
+    const { data: session } = useSession();
 
     const formattedProductName = product.name
         .split(' ')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
+
+    const addToCart = async () => {
+        if (!selectedSize || !selectedColor) {
+            toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Please select a size and color before adding to cart.' });
+            return;
+        }
+
+        if (!session || !session.user) {
+            // Handle non-logged-in user cart
+            const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
+            console.log(localCart);
+
+            const existingItemIndex = localCart.findIndex(
+                (item: any) => item.productId === product._id && item.size === selectedSize && item.color === selectedColor
+            );
+
+            if (existingItemIndex > -1) {
+                localCart[existingItemIndex].quantity += quantity;
+            } else {
+                localCart.push({ productId: product._id, size: selectedSize, color: selectedColor, quantity, salePrice: product.salePrice, name: product.name, imageId: product.imageId });
+            }
+
+            localStorage.setItem('cart', JSON.stringify(localCart));
+            toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Item added to cart.' });
+            return;
+        }
+
+        // Handle logged-in user cart
+        try {
+            const userId = session.user.id;
+            const response = await axios.post('/api/cart/add-to-cart', {
+                userId,
+                productId: product._id,
+                size: selectedSize,
+                color: selectedColor,
+            });
+
+            if (response.status === 200) {
+                toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Product added to cart successfully!' });
+            } else {
+                toast.current?.show({ severity: 'error', summary: 'Error', detail: `Failed to add to cart: ${response.data.error}` });
+            }
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            toast.current?.show({ severity: 'error', summary: 'Error', detail: 'An error occurred while adding the product to the cart. Please try again.' });
+        }
+    };
 
     return (
         <div className={styles.productContainer}>
@@ -86,9 +138,9 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
                     <div className={styles.sizeDropdownSection}>
                         <h3>Size</h3>
                         <button className={styles.sizeButton} onClick={() => setShowSizeDropdown(!showSizeDropdown)}>
-        <span className={styles.sizeButtonText}>
-            {selectedSize ? `Size: ${selectedSize}` : "Please select size"}
-        </span>
+                            <span className={styles.sizeButtonText}>
+                                {selectedSize ? `Size: ${selectedSize}` : "Please select size"}
+                            </span>
                             <svg
                                 className={`${styles.caretIcon} ${showSizeDropdown ? styles.caretIconUp : ''}`}
                                 width="12"
@@ -141,8 +193,7 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
                     <Button
                         label="ADD TO CART"
                         className={styles.addToCartButton}
-                        onClick={() => { /* Handle add to cart logic */
-                        }}
+                        onClick={addToCart}
                     />
                 </div>
             </div>
@@ -172,6 +223,8 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
                         information.</p>
                 </div>
             </div>
+
+            <Toast ref={toast} />
         </div>
     );
 };
