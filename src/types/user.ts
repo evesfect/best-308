@@ -6,7 +6,10 @@ import { Product } from './product'; // Assuming you have a `product.ts` type de
 export interface User extends Document {
   _id: Types.ObjectId;
   username: string;
+  firstName: string;
+  lastName: string;
   email: string;
+  phoneNumber: string;
   password: string;
   role: string;
   address: string;

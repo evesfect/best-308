@@ -51,5 +51,5 @@ export async function middleware(req: NextRequest) {
 
 // Apply the middleware to the specified routes and all their subroutes
 export const config = {
-  matcher: ['/product-mgr/:path*', '/sales-mgr/:path*', '/admin/:path*'], // Ensures all subpaths are matched
+  matcher: ['/product-mgr/:path*', '/sales-mgr/:path*', '/admin/:path*', '/user/:path*'], // Ensures all subpaths are matched
 };
