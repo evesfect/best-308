@@ -12,8 +12,8 @@ export interface Product {
     category: string;
     costPrice: number;
     salePrice: number;
-    totalStock: Map<string, number>;
-    availableStock: Map<string, number>;
+    total_stock: Map<string, number>;
+    available_stock: Map<string, number>;
     inStock: boolean;
     quantity: number;
     imageId: string;

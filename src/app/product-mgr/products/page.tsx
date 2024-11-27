@@ -29,6 +29,7 @@ const AdminProducts: React.FC = () => {
     total_stock: { S: 0, M: 0, L: 0 },
     available_stock: { S: 0, M: 0, L: 0 },
   });
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -113,8 +114,48 @@ const AdminProducts: React.FC = () => {
     }
   };
 
-  // Type-safe helper functions
-  const updateTotalStock = (size: keyof Product['total_stock'], value: number) => {
+  const handleUpdateStock = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+  
+    setLoading(true);
+    setError(null);
+  
+    try {
+      const response = await fetch('/api/admin/product/updatestock', {
+        method: 'POST', // Changed from PUT to POST
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          _id: editingProduct._id,
+          total_stock: editingProduct.total_stock,
+          available_stock: editingProduct.available_stock
+        }),
+      });
+  
+      const data = await response.json();
+      if (response.ok) {
+        // Update the product in the list
+        setProducts((prevProducts) => 
+          prevProducts.map(product => 
+            product._id === editingProduct._id ? data.product : product
+          )
+        );
+        // Reset editing state
+        setEditingProduct(null);
+      } else {
+        setError(data.message || 'Error updating stock');
+      }
+    } catch (error) {
+      setError('An error occurred while updating stock');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Type-safe helper functions for new product
+  const updateNewProductTotalStock = (size: keyof Product['total_stock'], value: number) => {
     setNewProduct((prev) => ({
       ...prev,
       total_stock: {
@@ -124,7 +165,7 @@ const AdminProducts: React.FC = () => {
     }));
   };
 
-  const updateAvailableStock = (size: keyof Product['available_stock'], value: number) => {
+  const updateNewProductAvailableStock = (size: keyof Product['available_stock'], value: number) => {
     setNewProduct((prev) => ({
       ...prev,
       available_stock: {
@@ -132,6 +173,27 @@ const AdminProducts: React.FC = () => {
         [size]: value
       }
     }));
+  };
+
+  // Type-safe helper functions for editing product
+  const updateEditingProductTotalStock = (size: keyof Product['total_stock'], value: number) => {
+    setEditingProduct((prev) => prev ? {
+      ...prev,
+      total_stock: {
+        ...prev.total_stock,
+        [size]: value
+      }
+    } : null);
+  };
+
+  const updateEditingProductAvailableStock = (size: keyof Product['available_stock'], value: number) => {
+    setEditingProduct((prev) => prev ? {
+      ...prev,
+      available_stock: {
+        ...prev.available_stock,
+        [size]: value
+      }
+    } : null);
   };
 
   return (
@@ -146,17 +208,32 @@ const AdminProducts: React.FC = () => {
         {products.length > 0 ? (
           <ul className="space-y-4">
             {products.map((product) => (
-              <li key={product._id} className="flex justify-between items-center border-b py-2">
-                <div>
-                  <h3 className="text-lg font-medium">{product.name}</h3>
-                  <p className="text-gray-600">ID: {product._id}</p>
+              <li key={product._id} className="border-b py-2">
+                <div className="flex justify-between items-center mb-2">
+                  <div>
+                    <h3 className="text-lg font-medium">{product.name}</h3>
+                    <p className="text-gray-600">ID: {product._id}</p>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => setEditingProduct(product)}
+                      className="text-blue-500 hover:text-blue-700"
+                    >
+                      Edit Stock
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProduct(product._id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
-                <button
-                  onClick={() => handleDeleteProduct(product._id)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  Delete
-                </button>
+                <div className="text-sm text-gray-600">
+                  Total Stock: S:{product.total_stock.S} M:{product.total_stock.M} L:{product.total_stock.L}
+                  <br />
+                  Available Stock: S:{product.available_stock.S} M:{product.available_stock.M} L:{product.available_stock.L}
+                </div>
               </li>
             ))}
           </ul>
@@ -164,6 +241,54 @@ const AdminProducts: React.FC = () => {
           <p className="text-gray-500">No products available.</p>
         )}
       </div>
+
+      {/* Stock Editing Modal/Form */}
+      {editingProduct && (
+        <form onSubmit={handleUpdateStock} className="bg-white rounded-lg shadow p-4 mt-4">
+          <h2 className="text-xl font-semibold mb-2">Edit Stock for {editingProduct.name}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {(['S', 'M', 'L'] as const).map((size) => (
+              <React.Fragment key={size}>
+                <div>
+                  <label className="block text-sm font-medium">Total Stock ({size})</label>
+                  <input
+                    type="number"
+                    value={editingProduct.total_stock[size]}
+                    onChange={(e) => updateEditingProductTotalStock(size, parseInt(e.target.value) || 0)}
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium">Available Stock ({size})</label>
+                  <input
+                    type="number"
+                    value={editingProduct.available_stock[size]}
+                    onChange={(e) => updateEditingProductAvailableStock(size, parseInt(e.target.value) || 0)}
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                    required
+                  />
+                </div>
+              </React.Fragment>
+            ))}
+          </div>
+          <div className="flex space-x-2 mt-4">
+            <button 
+              type="submit" 
+              className="bg-blue-500 text-white rounded-md py-2 px-4 hover:bg-blue-600"
+            >
+              Update Stock
+            </button>
+            <button 
+              type="button"
+              onClick={() => setEditingProduct(null)}
+              className="bg-gray-300 text-gray-700 rounded-md py-2 px-4 hover:bg-gray-400"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
 
       <form onSubmit={handleAddProduct} className="bg-white rounded-lg shadow p-4">
         <h2 className="text-xl font-semibold mb-2">Add New Product</h2>
@@ -229,7 +354,7 @@ const AdminProducts: React.FC = () => {
                 <input
                   type="number"
                   value={newProduct.total_stock[size]}
-                  onChange={(e) => updateTotalStock(size, parseInt(e.target.value) || 0)}
+                  onChange={(e) => updateNewProductTotalStock(size, parseInt(e.target.value) || 0)}
                   className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                   required
                 />
@@ -239,7 +364,7 @@ const AdminProducts: React.FC = () => {
                 <input
                   type="number"
                   value={newProduct.available_stock[size]}
-                  onChange={(e) => updateAvailableStock(size, parseInt(e.target.value) || 0)}
+                  onChange={(e) => updateNewProductAvailableStock(size, parseInt(e.target.value) || 0)}
                   className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                   required
                 />

@@ -76,7 +76,7 @@ const ProductMgrMainPage = () => {
           onClick={goToProducts}
           className="p-10 bg-purple-500 text-white rounded shadow w-48 text-lg font-bold" // Set a fixed width
         >
-         Products
+         Product/Stock
         </button>
       </div>
     </div>

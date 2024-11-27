@@ -10,7 +10,8 @@ const orderSchema = new Schema<OrderType>({
     user_id: { type: Schema.Types.ObjectId, required: true },
     address: { type: String, required: true },
     completed: {type: Boolean, required: true},
-    date: {type: Date,required: true}
+    date: {type: Date,required: true},
+    status: {type: String, required: true},
 },{
     timestamps : true
 });
