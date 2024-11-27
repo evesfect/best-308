@@ -7,4 +7,5 @@ export interface Order {
     address : string;
     completed: boolean;
     date: Date;
+    status: string;
 }

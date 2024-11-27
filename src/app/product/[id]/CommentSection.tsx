@@ -10,6 +10,7 @@ interface Comment {
   product_id: string;
   username?: string;
   createdAt: string;
+  approved: boolean;
 }
 
 interface CommentSectionProps {
@@ -89,6 +90,8 @@ const CommentSection = ({ productId, initialComments = [] }: CommentSectionProps
     }
   };
 
+  const approvedComments = comments.filter((comment) => comment.approved);
+
   return (
     <div className="mt-8 max-w-4xl mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
@@ -131,8 +134,8 @@ const CommentSection = ({ productId, initialComments = [] }: CommentSectionProps
           <p className="text-gray-500">Loading comments...</p>
         ) : error ? (
           <p className="text-red-500">{error}</p>
-        ) : comments.length > 0 ? (
-          comments.map((comment) => (
+        ) : approvedComments.length > 0 ? (
+          approvedComments.map((comment) => (
             <div key={comment._id} className="bg-white p-4 rounded-lg shadow">
               <div className="flex items-center mb-2">
                 <StarRating rating={comment.rating} readonly />
