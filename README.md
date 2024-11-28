@@ -17,7 +17,7 @@ A base for boutique fashion market websites with ease of deployment
 
    To access mongosh aka mongo shell enter this command in the command line
 
-  ```sudo docker exec -it mongodb mongosh "mongodb+srv://cluster0.rz8bd.mongodb.net/" --apiVersion 1 --username root
+  sudo docker exec -it mongodb mongosh "mongodb+srv://cluster0.rz8bd.mongodb.net/" --apiVersion 1 --username root
 
   The password is rpassword
 
