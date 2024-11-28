@@ -34,6 +34,10 @@ const ProductMgrMainPage = () => {
     router.push('/product-mgr/products')
   }
 
+  const goToCategories = () =>{
+    router.push('product-mgr/categories')
+  }
+
   return (
     <div className="min-h-screen p-8 bg-gray-100 space-y-20">
       <h1 className="text-3xl font-bold mb-6">Product Dashboard</h1>
@@ -76,7 +80,13 @@ const ProductMgrMainPage = () => {
           onClick={goToProducts}
           className="p-10 bg-purple-500 text-white rounded shadow w-48 text-lg font-bold" // Set a fixed width
         >
-         Product/Stock
+         Products
+        </button>
+        <button
+          onClick={goToCategories}
+          className="p-10 bg-red-500 text-white rounded shadow w-48 text-lg font-bold" // Set a fixed width
+        >
+         Categories
         </button>
       </div>
     </div>

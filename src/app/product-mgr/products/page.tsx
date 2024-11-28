@@ -12,7 +12,11 @@ interface Product {
   available_stock: { S: number; M: number; L: number };
 }
 
-// Define a type for the initial state that ensures stock objects are fully initialized
+interface Category {
+  _id: string;
+  name: string;
+}
+
 type InitialProductState = Omit<Partial<Product>, 'total_stock' | 'available_stock'> & {
   total_stock: { S: number; M: number; L: number };
   available_stock: { S: number; M: number; L: number };
@@ -20,11 +24,12 @@ type InitialProductState = Omit<Partial<Product>, 'total_stock' | 'available_sto
 
 const AdminProducts: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]); // State for categories
   const [newProduct, setNewProduct] = useState<InitialProductState>({
     name: '',
     description: '',
     sex: '',
-    category: '',
+    category: '', // This will now be the category id
     price: 0,
     total_stock: { S: 0, M: 0, L: 0 },
     available_stock: { S: 0, M: 0, L: 0 },
@@ -34,25 +39,29 @@ const AdminProducts: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchProductsAndCategories = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch('/api/product');
-        const data = await response.json();
-        if (response.ok) {
-          setProducts(data);
+        const productsResponse = await fetch('/api/product');
+        const productsData = await productsResponse.json();
+        const categoriesResponse = await fetch('/api/product/category'); // Endpoint to fetch categories
+        const categoriesData = await categoriesResponse.json();
+
+        if (productsResponse.ok && categoriesResponse.ok) {
+          setProducts(productsData);
+          setCategories(categoriesData); // Set categories
         } else {
-          setError(data.message || 'Error fetching products');
+          setError('Error fetching products or categories');
         }
       } catch (error) {
-        setError('An error occurred while fetching products');
+        setError('An error occurred while fetching products or categories');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProducts();
+    fetchProductsAndCategories();
   }, []);
 
   const handleAddProduct = async (e: React.FormEvent) => {
@@ -77,7 +86,7 @@ const AdminProducts: React.FC = () => {
           name: '',
           description: '',
           sex: '',
-          category: '',
+          category: '', // Reset category
           price: 0,
           total_stock: { S: 0, M: 0, L: 0 },
           available_stock: { S: 0, M: 0, L: 0 },
@@ -154,7 +163,6 @@ const AdminProducts: React.FC = () => {
     }
   };
 
-  // Type-safe helper functions for new product
   const updateNewProductTotalStock = (size: keyof Product['total_stock'], value: number) => {
     setNewProduct((prev) => ({
       ...prev,
@@ -175,7 +183,6 @@ const AdminProducts: React.FC = () => {
     }));
   };
 
-  // Type-safe helper functions for editing product
   const updateEditingProductTotalStock = (size: keyof Product['total_stock'], value: number) => {
     setEditingProduct((prev) => prev ? {
       ...prev,
@@ -198,13 +205,13 @@ const AdminProducts: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <h1 className="text-3xl font-bold mb-4">Admin Products Management</h1>
+      <h1 className="text-3xl font-bold mb-4">Products Management</h1>
 
       {loading && <p className="text-gray-500">Loading...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
       <div className="bg-white rounded-lg shadow p-4">
-        <h2 className="text-xl font-semibold mb-2">Existing Products</h2>
+        <h2 className="text-xl font-semibold mb-2">Current Products</h2>
         {products.length > 0 ? (
           <ul className="space-y-4">
             {products.map((product) => (
@@ -249,134 +256,129 @@ const AdminProducts: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {(['S', 'M', 'L'] as const).map((size) => (
               <React.Fragment key={size}>
-                <div>
-                  <label className="block text-sm font-medium">Total Stock ({size})</label>
+                <div className="flex items-center">
+                  <label className="w-32">{size} Size:</label>
                   <input
                     type="number"
                     value={editingProduct.total_stock[size]}
-                    onChange={(e) => updateEditingProductTotalStock(size, parseInt(e.target.value) || 0)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                    required
+                    onChange={(e) => updateEditingProductTotalStock(size, Number(e.target.value))}
+                    className="border p-2 w-20"
                   />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">Available Stock ({size})</label>
+                  <span className="ml-2">Total</span>
                   <input
                     type="number"
                     value={editingProduct.available_stock[size]}
-                    onChange={(e) => updateEditingProductAvailableStock(size, parseInt(e.target.value) || 0)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                    required
+                    onChange={(e) => updateEditingProductAvailableStock(size, Number(e.target.value))}
+                    className="border p-2 w-20 ml-4"
                   />
+                  <span className="ml-2">Available</span>
                 </div>
               </React.Fragment>
             ))}
           </div>
-          <div className="flex space-x-2 mt-4">
-            <button 
-              type="submit" 
-              className="bg-blue-500 text-white rounded-md py-2 px-4 hover:bg-blue-600"
-            >
-              Update Stock
-            </button>
-            <button 
-              type="button"
-              onClick={() => setEditingProduct(null)}
-              className="bg-gray-300 text-gray-700 rounded-md py-2 px-4 hover:bg-gray-400"
-            >
-              Cancel
-            </button>
-          </div>
+          <button
+            type="submit"
+            className="mt-4 bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+          >
+            Update Stock
+          </button>
         </form>
       )}
 
-      <form onSubmit={handleAddProduct} className="bg-white rounded-lg shadow p-4">
+      <div className="bg-white rounded-lg shadow p-4">
         <h2 className="text-xl font-semibold mb-2">Add New Product</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium">Name</label>
-            <input
-              type="text"
-              value={newProduct.name}
-              onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-              required
-            />
+        <form onSubmit={handleAddProduct}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col">
+              <label className="mb-2">Name</label>
+              <input
+                type="text"
+                value={newProduct.name}
+                onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+                className="border p-2"
+                required
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="mb-2">Description</label>
+              <textarea
+                value={newProduct.description}
+                onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+                className="border p-2"
+                required
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="mb-2">Price</label>
+              <input
+                type="number"
+                value={newProduct.price}
+                onChange={(e) => setNewProduct({ ...newProduct, price: Number(e.target.value) })}
+                className="border p-2"
+                required
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="mb-2">Sex</label>
+              <select
+                value={newProduct.sex}
+                onChange={(e) => setNewProduct({ ...newProduct, sex: e.target.value })}
+                className="border p-2"
+                required
+              >
+                <option value="">Select Sex</option>
+                <option value="unisex">Unisex</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+            <div className="flex flex-col">
+              <label className="mb-2">Category</label>
+              <select
+                value={newProduct.category}
+                onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+                className="border p-2"
+                required
+              >
+                <option value="">Select Category</option>
+                {categories.map((category) => (
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium">Description</label>
-            <input
-              type="text"
-              value={newProduct.description}
-              onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Sex</label>
-            <input
-              type="text"
-              value={newProduct.sex}
-              onChange={(e) => setNewProduct({ ...newProduct, sex: e.target.value })}
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Category</label>
-            <input
-              type="text"
-              value={newProduct.category}
-              onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Price</label>
-            <input
-              type="number"
-              value={newProduct.price}
-              onChange={(e) => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })}
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-              required
-            />
-          </div>
-        </div>
-
-        <h3 className="mt-4 text-lg font-semibold">Stock Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {(['S', 'M', 'L'] as const).map((size) => (
-            <React.Fragment key={size}>
-              <div>
-                <label className="block text-sm font-medium">Total Stock ({size})</label>
+          <div className="flex gap-4 mt-4">
+            {(['S', 'M', 'L'] as const).map((size) => (
+              <div key={size} className="flex flex-col w-32">
+                <label className="mb-2">{size} Size Total Stock</label>
                 <input
                   type="number"
                   value={newProduct.total_stock[size]}
-                  onChange={(e) => updateNewProductTotalStock(size, parseInt(e.target.value) || 0)}
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                  onChange={(e) => updateNewProductTotalStock(size, Number(e.target.value))}
+                  className="border p-2"
                   required
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Available Stock ({size})</label>
+                <label className="mt-2">{size} Size Available Stock</label>
                 <input
                   type="number"
                   value={newProduct.available_stock[size]}
-                  onChange={(e) => updateNewProductAvailableStock(size, parseInt(e.target.value) || 0)}
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                  onChange={(e) => updateNewProductAvailableStock(size, Number(e.target.value))}
+                  className="border p-2"
                   required
                 />
               </div>
-            </React.Fragment>
-          ))}
-        </div>
-
-        <button type="submit" className="mt-4 bg-blue-500 text-white rounded-md py-2 px-4 hover:bg-blue-600">
-          Add Product
-        </button>
-      </form>
+            ))}
+          </div>
+          <button
+            type="submit"
+            className="mt-4 bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600"
+          >
+            Add Product
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
