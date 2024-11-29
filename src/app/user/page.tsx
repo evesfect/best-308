@@ -7,6 +7,7 @@ import UserSidebar from "@/components/UserSidebar";
 import { User } from "@/types/user";
 import axios from "axios";
 import { useSession } from "next-auth/react";
+import UserOrders from "./order/page";
 
 interface MainContentProps {
     activeItem: string;
@@ -24,8 +25,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeItem, userData }) => {
         )}
         {activeItem === 'orders' && (
           <div>
-            <h1 className="text-2xl font-bold">Orders</h1>
-            <p>Here you can view and manage your orders.</p>
+            <UserOrders userId={userData._id}/>
           </div>
         )}
         {activeItem === 'wishlist' && (
