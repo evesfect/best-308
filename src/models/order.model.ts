@@ -1,11 +1,11 @@
-import { Schema,model} from 'mongoose';
+import { Schema, model, models } from 'mongoose';
 import { Order as OrderType } from '../types/order';
 
 const orderSchema = new Schema<OrderType>({
-    products: { 
+    products: {
         type: Map,
         of: Number,
-        required: true
+        required: true,
     },
     user_id: { type: Schema.Types.ObjectId, required: true },
     address: { type: String, required: true },
@@ -16,6 +16,6 @@ const orderSchema = new Schema<OrderType>({
     timestamps : true
 });
 
-
-export const Order = model<OrderType>('Order', orderSchema, 'order');
+// Use the existing model if it exists, otherwise compile a new one
+export const Order = models.Order || model<OrderType>('Order', orderSchema, 'order');
 export default Order;

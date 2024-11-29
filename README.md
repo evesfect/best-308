@@ -12,45 +12,14 @@ A base for boutique fashion market websites with ease of deployment
 
 2. **Database Management**:
 
-   We have several scripts to manage the MongoDB database:
+   We switched to MongoAtlas so you can check the database from the site:
+   https://cloud.mongodb.com/v2/6744638557a77e6a1612f338#/overview
 
-   - Start the database:
+   To access mongosh aka mongo shell enter this command in the command line
 
-     ```bash
-     ./scripts/start_db.sh
-     ```
+  sudo docker exec -it mongodb mongosh "mongodb+srv://cluster0.rz8bd.mongodb.net/" --apiVersion 1 --username root
 
-   - Seed the database with initial data:
-
-     ```bash
-     ./scripts/seed_db.sh
-     ./scripts/seed_db.bat
-     ```
-
-   - Reset the database (remove all data and restart):
-
-     ```bash
-     ./scripts/reset_db.sh
-     ```
-
-   - Stop the database:
-
-     ```bash
-     ./scripts/stop_db.sh
-     ```
-
-   - Remove the database container and volume:
-
-     ```bash
-     ./scripts/remove_db.sh
-     ```
-
-   Note: Make sure the scripts are executable. If not, run:
-
-   ```bash
-   chmod +x scripts/*.sh
-   ```
-
+  The password is rpassword
 
 4. **Run the development server**:
 

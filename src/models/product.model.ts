@@ -11,12 +11,12 @@ const productSchema = new Schema<ProductType>({
     category: { type: String, required: true },
     costPrice: { type: Number, required: true },
     salePrice: { type: Number, required: true },
-    totalStock: {
+    total_stock: {
         type: Map,
         of: Number,
         required: true
     },
-    availableStock: {
+    available_stock: {
         type: Map,
         of: Number,
         required: true
