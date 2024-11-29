@@ -16,7 +16,7 @@ interface MainContentProps {
 
 const MainContent: React.FC<MainContentProps> = ({ activeItem, userData }) => {
     return (
-      <div className="flex-1 p-6 bg-white rounded-lg overflow-y-auto overflow-x-hidden hide-scrollbar">
+      <div className="flex-1 p-6 bg-white rounded-lg overflow-y-auto overflow-x-auto hide-scrollbar">
         {/* Rendering according to the active sidebar item */}
         {activeItem === 'accountSettings' && (
           <div>

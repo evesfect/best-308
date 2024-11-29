@@ -37,12 +37,17 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, orderedProducts }) =
         </div>
         <span
           className={`px-3 py-1 rounded text-lg font-medium ${
-            order.completed
-              ? "bg-green-100 text-green-600"
-              : "bg-red-100 text-red-600"
-          }`}
+            order.status === "processing" ? "bg-red-100 text-red-600"
+              : order.status === "in-transit" ? "bg-yellow-100 text-yellow-600"
+              : order.status === "delivered" ? "bg-green-100 text-green-600"
+              : "bg-gray-100 text-gray-100"
+            }`}
         >
-          {order.completed ? "Completed" : "Pending"}
+          {order.status === "processing" ? "Processing" 
+            : order.status === "in-transit" ? "In-Transit"
+            : order.status === "delivered" ? "Delivered"
+            : "Unknown"
+          }
         </span>
       </div>
 

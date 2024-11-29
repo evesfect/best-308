@@ -66,7 +66,7 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
 
   return (
     <div className="flex w-full">
-      {orderData.length === 0 ? (
+      {!loading && orderData.length === 0 ? (
         <div className="flex flex-col justify-center items-center w-full">
           {/* Updated Icon */}
           <img
