@@ -7,22 +7,12 @@ import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { CartItem } from '@/types/cart';
 
 // Define the Toast interface
 interface Toast {
   message: string;
   type: 'success' | 'error';
-}
-
-// Define the CartItem interface
-interface CartItem {
-  _id: string;
-  name: string;
-  salePrice: string;
-  quantity: number;
-  imageId: string;
-  size: string; // Include size in cart item
-  color: string; // Include color in cart item
 }
 
 // Toast component
@@ -209,8 +199,35 @@ const ShoppingCartPage = () => {
       return;
     }
   
-    // Navigate to the checkout page for logged-in users
-    router.push("/shop/checkout");
+    try {
+      // Generate and download invoice
+      const invoiceResponse = await axios.post("/api/invoice/generate", {
+        items: cartItems,
+        totalAmount: totalPrice,
+        customerDetails: {
+          name: session.user.name,
+          email: session.user.email,
+        }
+      }, { responseType: 'blob' });
+  
+      // Create download link for invoice
+      const url = window.URL.createObjectURL(new Blob([invoiceResponse.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'invoice.pdf');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+  
+      // Navigate to checkout
+      router.push("/shop/checkout");
+    } catch (error) {
+      console.error("Error generating invoice:", error);
+      setToast({ 
+        message: "Failed to generate invoice. Please try again.", 
+        type: "error" 
+      });
+    }
   };
 
 
