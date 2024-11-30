@@ -73,6 +73,11 @@ export async function POST(req: Request) {
           </ul>
           <p>Total Amount: $${totalAmount.toFixed(2)}</p>
         `,
+        attachments: [{
+          filename: `invoice-${invoiceNumber}.pdf`,
+          content: pdfBuffer,
+          contentType: 'application/pdf'
+        }]
       });
       console.log('Email sent successfully');
 
