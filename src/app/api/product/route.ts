@@ -1,14 +1,12 @@
-
 // File: src/app/api/product/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import connectionPromise from '@/lib/mongodb';
 
-
 const productSchema = new mongoose.Schema({
   name: String,
   description: String,
-  category: String,
+  category: mongoose.Schema.Types.ObjectId, // Change to ObjectId to reference the Category
   price: Number,
   total_stock: {
     S: Number,
@@ -74,7 +72,26 @@ export async function GET(req: NextRequest) {
     }
 
     if (category) {
-      searchCriteria.category = category;
+      try {
+        // Log the raw category value
+        console.log("Raw category value:", category);
+        
+        // Validate the category is a valid ObjectId
+        if (!mongoose.Types.ObjectId.isValid(category)) {
+          console.error("Invalid category ObjectId:", category);
+          return NextResponse.json({ message: 'Invalid category ID' }, { status: 400 });
+        }
+    
+        // Convert the category string to ObjectId before searching
+        const categoryId = new mongoose.Types.ObjectId(category);
+        console.log("Converted category ObjectId:", categoryId);
+        
+        searchCriteria.category = categoryId;
+        console.log("Search criteria after category filter:", searchCriteria);
+      } catch (error) {
+        console.error("Error processing category filter:", error);
+        return NextResponse.json({ message: 'Error processing category filter', error: (error as Error).toString() }, { status: 500 });
+      }
     }
 
     // Adjust filter for sex based on the query parameter
@@ -120,4 +137,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: 'Error fetching products', error: error.toString() }, { status: 500 });
   }
 }
-

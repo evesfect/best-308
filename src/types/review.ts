@@ -8,4 +8,5 @@ export interface Review {
     product_id: ObjectId;
     createdAt?: Date;
     updatedAt?: Date;
+    approved: boolean;
 }

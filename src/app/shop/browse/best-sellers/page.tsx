@@ -36,6 +36,11 @@ interface Toast {
   type: 'success' | 'error';
 }
 
+interface Category {
+  _id: string;
+  name: string;
+}
+
 // Add Toast component
 const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) => {
   useEffect(() => {
@@ -56,6 +61,7 @@ const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 
 const ShoppingPage = () => {
   const { data: session } = useSession();
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [query, setQuery] = useState<string>('');
   const [category, setCategory] = useState<string>('');
   const [order, setOrder] = useState<string>('');
@@ -67,7 +73,21 @@ const ShoppingPage = () => {
 
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, [query, category, order]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get('/api/product/category');
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      setToast({ 
+        message: "Failed to load categories", 
+        type: "error" 
+      });
+    }
+  };
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -242,10 +262,11 @@ const ShoppingPage = () => {
             className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
           >
             <option value="">All Categories</option>
-            <option value="jacket">Jacket</option>
-            <option value="shirt">Shirt</option>
-            <option value="shoes">Shoes</option>
-            <option value="pants">Pants</option>
+            {categories.map((cat) => (
+              <option key={cat._id} value={cat._id}>
+                {cat.name}
+              </option>
+            ))}
           </select>
 
           <select

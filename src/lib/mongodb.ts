@@ -1,38 +1,23 @@
-// lib/mongodb.ts
-import mongoose, { Connection } from 'mongoose';
-import { Db, GridFSBucket } from 'mongodb';
+import mongoose from 'mongoose';
 
-const MONGO_URI = 'mongodb://root:rpassword@localhost:27017/e-commerce?authSource=admin';
+const MONGO_URI = "mongodb+srv://root:rpassword@cluster0.rz8bd.mongodb.net/e-commerce?retryWrites=true&w=majority";
+
+if (!process.env.MONGO_URI) {
+  throw new Error('Please define the MONGO_URI environment variable');
+}
 
 declare global {
-    var _mongooseConnectionPromise: Promise<Connection> | undefined;
-    var _gridFSBucket: GridFSBucket | undefined;
+  var mongooseConnection: Promise<typeof mongoose> | undefined;
 }
 
-let gridFSBucket: GridFSBucket;
-
-if (!global._mongooseConnectionPromise) {
-    global._mongooseConnectionPromise = mongoose.connect(MONGO_URI).then((mongooseInstance) => {
-        console.log('Connected to MongoDB');
-
-        // Initialize GridFSBucket
-        gridFSBucket = new mongoose.mongo.GridFSBucket(mongooseInstance.connection.db as Db, {
-            bucketName: 'product_images',
-        });
-        global._gridFSBucket = gridFSBucket;
-
-        return mongooseInstance.connection;
-    }).catch((err) => {
-        console.error('MongoDB connection error:', err);
-        if (process.env.NODE_ENV === 'production') {
-            process.exit(1);
-        }
-        throw err;
-    });
+if (!global.mongooseConnection) {
+  global.mongooseConnection = mongoose.connect(MONGO_URI).then((mongooseInstance) => {
+    console.log("MongoDB connected successfully");
+    return mongooseInstance;
+  }).catch((err) => {
+    console.error("Error connecting to MongoDB:", err);
+    throw err;
+  });
 }
 
-// Assign the connection promise and bucket globally
-const connectionPromise = global._mongooseConnectionPromise;
-gridFSBucket = global._gridFSBucket!;
-
-export { connectionPromise as default, gridFSBucket };
+export default global.mongooseConnection;
