@@ -7,7 +7,6 @@ import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import router from 'next/router';
 
 // Define the Toast interface
 interface Toast {
@@ -50,6 +49,7 @@ const ShoppingCartPage = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -198,33 +198,15 @@ const ShoppingCartPage = () => {
   const handleOrderNow = async () => {
     if (!session || !session.user) {
       // Save the current cart to localStorage to persist it across login
+      console.log("Saving cart to localStorage:", cartItems);
+      console.log("Cart items:", cartItems);
+      console.log("moving on to login");
+    
       localStorage.setItem("redirectCart", JSON.stringify(cartItems));
   
-      // Navigate to the login page with a redirect parameter
-      router.push("/auth/login?redirect=/shop/cart");
+      // Use the router instance from useRouter hook
+      router.push("/auth/signin?redirect=/shop/cart");
       return;
-    }
-  
-    // Merge localStorage cart with the server-side cart after login
-    const localCart = JSON.parse(localStorage.getItem("redirectCart") || "[]");
-  
-    if (localCart.length > 0) {
-      try {
-        await axios.post("/api/cart/merge-cart", {
-          userId: session.user.id,
-          items: localCart,
-        });
-  
-        // Clear the local cart after merging
-        localStorage.removeItem("redirectCart");
-  
-        // Refresh the cart page after successful merge
-        router.push("/shop/cart");
-      } catch (error) {
-        console.error("Error merging cart:", error);
-        setToast({ message: "Failed to merge your cart. Please try again.", type: "error" });
-        return;
-      }
     }
   
     // Navigate to the checkout page for logged-in users
