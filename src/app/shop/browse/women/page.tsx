@@ -1,6 +1,6 @@
 "use client";
 
-
+import Link from 'next/link';
 import TopBar from '../../../../components/StaticTopBar';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -111,11 +111,13 @@ const ShoppingPage = () => {
       // get the sale price of the product
       const product = products.find((p) => p._id === productId);
       const salePrice = product?.salePrice;
+      const name = product?.name;
+      const imageId = product?.imageId;
   
       if (existingItemIndex > -1) {
         localCart[existingItemIndex].quantity += 1;
       } else {
-        localCart.push({ productId, size, color, quantity: 1, salePrice });
+        localCart.push({ productId, size, color, quantity: 1, salePrice, name, imageId });
       }
   
       localStorage.setItem("cart", JSON.stringify(localCart));
@@ -150,68 +152,70 @@ const ShoppingPage = () => {
   
     return (
       <div key={product._id} className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-        <Image
-          src={`/api/images/${product.imageId}`} // Use the image API route
-          alt={product.name}
-          width={300}
-          height={300}
-          className="w-full h-48 object-cover rounded-t-lg"
-        />
-        <div className="mt-4">
-          <h3 className="text-lg font-semibold">{product.name}</h3>
-          <p className="text-gray-500">{product.description}</p>
-          <p className="mt-2 text-gray-700 font-semibold">Category: {product.category}</p>
-          <p className="mt-1 text-xl font-bold text-blue-600">Price: ${product.salePrice}</p>
-  
-          {/* Size Selection */}
-          <div className="mt-2">
-            <label 
-              htmlFor={`size-${product._id}`} 
-              className="block text-sm font-medium text-gray-700"
-            >
-              Size
-            </label>
-            <select
-              id={`size-${product._id}`}
-              value={selected.size}
-              onChange={(e) => handleSelectionChange(product._id, 'size', e.target.value)}
-              className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Select Size</option>
-              {product.sizes.map((size) => (
-                <option key={size} value={size}>{size}</option>
-              ))}
-            </select>
+        <Link href={`/product/${product._id}`} className="cursor-pointer">
+          <Image
+            src={`/api/images/${product.imageId}`}
+            alt={product.name}
+            width={300}
+            height={300}
+            className="w-full h-48 object-cover rounded-t-lg"
+          />
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold hover:text-blue-600 transition">{product.name}</h3>
+            <p className="text-gray-500">{product.description}</p>
+            <p className="mt-2 text-gray-700 font-semibold">Category: {product.category}</p>
+            <p className="mt-1 text-xl font-bold text-blue-600">Price: ${product.salePrice}</p>
           </div>
-  
-          {/* Color Selection */}
-          <div className="mt-2">
-            <label 
-              htmlFor={`color-${product._id}`} 
-              className="block text-sm font-medium text-gray-700"
-            >
-              Color
-            </label>
-            <select
-              id={`color-${product._id}`}
-              value={selected.color}
-              onChange={(e) => handleSelectionChange(product._id, 'color', e.target.value)}
-              className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Select Color</option>
-              {product.colors.map((color) => (
-                <option key={color} value={color}>{color}</option>
-              ))}
-            </select>
-          </div>
-  
-          <button
-            onClick={() => addToCart(product._id, selected.size, selected.color)}
-            className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+        </Link>
+
+        {/* Size Selection */}
+        <div className="mt-2">
+          <label 
+            htmlFor={`size-${product._id}`} 
+            className="block text-sm font-medium text-gray-700"
           >
-            Add to Cart
-          </button>
+            Size
+          </label>
+          <select
+            id={`size-${product._id}`}
+            value={selected.size}
+            onChange={(e) => handleSelectionChange(product._id, 'size', e.target.value)}
+            className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Select Size</option>
+            {product.sizes.map((size) => (
+              <option key={size} value={size}>{size}</option>
+            ))}
+          </select>
         </div>
+  
+        {/* Color Selection */}
+        <div className="mt-2">
+          <label 
+            htmlFor={`color-${product._id}`} 
+            className="block text-sm font-medium text-gray-700"
+          >
+            Color
+          </label>
+          <select
+            id={`color-${product._id}`}
+            value={selected.color}
+            onChange={(e) => handleSelectionChange(product._id, 'color', e.target.value)}
+            className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Select Color</option>
+            {product.colors.map((color) => (
+              <option key={color} value={color}>{color}</option>
+            ))}
+          </select>
+        </div>
+  
+        <button
+          onClick={() => addToCart(product._id, selected.size, selected.color)}
+          className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+        >
+          Add to Cart
+        </button>
       </div>
     );
   };
