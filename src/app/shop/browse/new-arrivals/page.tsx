@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
 
+
 interface Stock {
   S: number;
   M: number;
@@ -34,6 +35,11 @@ interface Toast {
   type: 'success' | 'error';
 }
 
+interface Category {
+  _id: string;
+  name: string;
+}
+
 // Add Toast component
 const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) => {
   useEffect(() => {
@@ -51,10 +57,10 @@ const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 
   );
 };
 
-
 const ShoppingPage = () => {
   const { data: session } = useSession();
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [query, setQuery] = useState<string>('');
   const [category, setCategory] = useState<string>('');
   const [order, setOrder] = useState<string>('');
@@ -66,13 +72,27 @@ const ShoppingPage = () => {
 
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, [query, category, order]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get('/api/product/category');
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      setToast({ 
+        message: "Failed to load categories", 
+        type: "error" 
+      });
+    }
+  };
 
   const fetchProducts = async () => {
     setLoading(true);
     try {
       const response = await axios.get('/api/product', {
-        params: { query, category, order, newArrivals: true },
+        params: { query, category, order, bestSellers: true },
       });
       setProducts(response.data);
     } catch (error) {
@@ -219,7 +239,7 @@ const ShoppingPage = () => {
   return (
     <div className="min-h-screen bg-white">
       <TopBar />
-      <div style={{ height: '120px' }} />
+      <div style={{ height: '150px' }} />
 
       {/* Search and Filter Section */}
       <div className="container mx-auto py-8 px-4">
@@ -233,15 +253,17 @@ const ShoppingPage = () => {
           />
           <select
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={(e) => setCategory(e.target.value)} // Set the category name instead of ID
             className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          >
-            <option value="">All Categories</option>
-            <option value="jacket">Jacket</option>
-            <option value="shirt">Shirt</option>
-            <option value="shoes">Shoes</option>
-            <option value="pants">Pants</option>
+            >
+          <option value="">All Categories</option>
+            {categories.map((cat) => (
+            <option key={cat._id} value={cat.name}> {/* Use category name as value */}
+              {cat.name}
+            </option>
+          ))}
           </select>
+
 
           <select
             value={order}

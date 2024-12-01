@@ -16,6 +16,7 @@ interface Comment {
   product_id: string;
   user_id: string;
   approved: boolean;
+  productName?: string;
 }
 
 const ProductSearch: React.FC = () => {
@@ -76,24 +77,42 @@ const ProductSearch: React.FC = () => {
     try {
       const response = await fetch("/api/admin/product/comments");
       const data = await response.json();
-
+      
       if (response.ok) {
         const unapproved = data.filter((comment: Comment) => !comment.approved);
-        setUnapprovedComments(unapproved);
+      
+        interface CommentWithProductName extends Comment {
+          productName: string;
+        }
+      
+        // Fetch product details for each comment
+        const unapprovedWithProductNames: CommentWithProductName[] = await Promise.all(
+          unapproved.map(async (comment: Comment): Promise<CommentWithProductName> => {
+        const productResponse: Response = await fetch(`/api/product?id=${comment.product_id}`);
+        const product: Product = await productResponse.json();
+        return {
+          ...comment,
+          productName: product?.name || "Unknown Product",
+        };
+          })
+        );
+      
+        setUnapprovedComments(unapprovedWithProductNames);
       } else {
         setError(data.message || "Error fetching comments");
       }
-    } catch (error) {
+        } catch (error) {
       setError("An error occurred while fetching comments");
-    } finally {
+        } finally {
       setLoading(false);
-    }
-  };
+        }
+      };
+      
 
-  // Handle approving a comment
-  const approveComment = async (commentId: string) => {
-    setLoading(true);
-    setError(null);
+      // Handle approving a comment
+      const approveComment = async (commentId: string): Promise<void> => {
+        setLoading(true);
+        setError(null);
     try {
       const response = await fetch(`/api/admin/product/comments`, {
         method: "POST",
@@ -241,29 +260,33 @@ const ProductSearch: React.FC = () => {
           {error && <p className="text-red-500">{error}</p>}
 
           {unapprovedComments.length > 0 ? (
-            <ul className="space-y-4">
-              {unapprovedComments.map((comment) => (
-                <li key={comment._id} className="p-3 bg-gray-50 border border-gray-200 rounded-md">
-                  <p className="text-gray-800">{comment.comment}</p>
-                  <p className="text-gray-600 text-sm">Rating: {comment.rating}</p>
-                  <button
-                    onClick={() => approveComment(comment._id)}
-                    className="mt-2 px-3 py-1 text-sm bg-green-500 text-white rounded"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => deleteComment(comment._id)}
-                    className="mt-2 px-3 py-1 text-sm bg-red-500 text-white rounded ml-2"
-                  >
-                    Delete
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500">No unapproved comments</p>
-          )}
+  <ul className="space-y-4">
+    {unapprovedComments.map((comment) => (
+      <li key={comment._id} className="p-3 bg-gray-50 border border-gray-200 rounded-md">
+        <p className="text-gray-800">{comment.comment}</p>
+        <p className="text-gray-600 text-sm">Rating: {comment.rating}</p>
+        <p className="text-gray-500 text-sm">
+          Product: <span className="font-semibold">{comment.productName}</span>
+        </p>
+        <button
+          onClick={() => approveComment(comment._id)}
+          className="mt-2 px-3 py-1 text-sm bg-green-500 text-white rounded"
+        >
+          Approve
+        </button>
+        <button
+          onClick={() => deleteComment(comment._id)}
+          className="mt-2 px-3 py-1 text-sm bg-red-500 text-white rounded ml-2"
+        >
+          Delete
+        </button>
+      </li>
+    ))}
+  </ul>
+) : (
+  <p className="text-gray-500">No unapproved comments</p>
+)}
+
         </div>
       )}
     </div>

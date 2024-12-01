@@ -6,7 +6,7 @@ import connectionPromise from '@/lib/mongodb';
 const productSchema = new mongoose.Schema({
   name: String,
   description: String,
-  category: mongoose.Schema.Types.ObjectId, // Change to ObjectId to reference the Category
+  category: String, 
   price: Number,
   total_stock: {
     S: Number,
@@ -76,23 +76,15 @@ export async function GET(req: NextRequest) {
         // Log the raw category value
         console.log("Raw category value:", category);
         
-        // Validate the category is a valid ObjectId
-        if (!mongoose.Types.ObjectId.isValid(category)) {
-          console.error("Invalid category ObjectId:", category);
-          return NextResponse.json({ message: 'Invalid category ID' }, { status: 400 });
-        }
-    
-        // Convert the category string to ObjectId before searching
-        const categoryId = new mongoose.Types.ObjectId(category);
-        console.log("Converted category ObjectId:", categoryId);
-        
-        searchCriteria.category = categoryId;
+        // Use the category name directly for filtering
+        searchCriteria.category = category;
         console.log("Search criteria after category filter:", searchCriteria);
       } catch (error) {
         console.error("Error processing category filter:", error);
         return NextResponse.json({ message: 'Error processing category filter', error: (error as Error).toString() }, { status: 500 });
       }
     }
+    
 
     // Adjust filter for sex based on the query parameter
     if (sex === 'male') {
