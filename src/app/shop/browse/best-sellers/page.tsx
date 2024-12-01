@@ -224,8 +224,26 @@ const ShoppingPage = () => {
             className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Select Color</option>
-            {product.colors.map((color) => (
-              <option key={color} value={color}>{color}</option>
+            {product.available_stock &&
+                Object.entries(product.available_stock).map(([size, stock]) => (
+              <option
+                  key={size}
+                  value={size}
+                  disabled={stock === 0}
+                  className={`
+                    ${stock === 0 ? 'text-gray-400' : ''}
+                    ${stock <= 5 && stock > 0 ? 'text-red-500' : ''}
+                    ${stock > 5 ? 'text-black' : ''}
+                  `}
+                >
+                  {`${size} ${
+                    stock === 0
+                    ? '(Out of Stock)'
+                    : stock <= 5
+                    ? `(Low Stock: ${stock})`
+                    : `(In Stock: ${stock})`  
+                  }`}
+                </option>
             ))}
           </select>
         </div>
