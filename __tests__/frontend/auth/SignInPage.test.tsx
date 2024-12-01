@@ -1,18 +1,18 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
 import SignInPage from '@/app/auth/signin/page';
-import { signIn } from 'next-auth/react';
+import { useSession, signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 // Mock next-auth
 jest.mock('next-auth/react', () => ({
-  signIn: jest.fn()
+  signIn: jest.fn(),
+  useSession: jest.fn(),
 }));
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
-  useSearchParams: jest.fn()
+  useSearchParams: jest.fn(),
 }));
 
 describe('SignInPage', () => {
@@ -22,12 +22,12 @@ describe('SignInPage', () => {
   beforeEach(() => {
     // Setup router mock
     (useRouter as jest.Mock).mockImplementation(() => ({
-      push: mockPush
+      push: mockPush,
     }));
 
     // Setup searchParams mock
     (useSearchParams as jest.Mock).mockImplementation(() => ({
-      get: mockGet
+      get: mockGet,
     }));
 
     // Clear mocks
@@ -35,8 +35,13 @@ describe('SignInPage', () => {
   });
 
   it('renders sign in form', () => {
+    (useSession as jest.Mock).mockReturnValue({
+      data: null,
+      status: 'unauthenticated',
+    });
+
     render(<SignInPage />);
-    
+
     expect(screen.getByRole('heading', { name: /sign in/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/email:/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password:/i)).toBeInTheDocument();
@@ -45,12 +50,10 @@ describe('SignInPage', () => {
 
   it('shows error when submitting empty form', async () => {
     render(<SignInPage />);
-    
+
     const submitButton = screen.getByRole('button', { name: /sign in/i });
-    
     fireEvent.click(submitButton);
 
-    // Wait for the error message to appear without using act
     const errorMessage = await screen.findByRole('alert');
     expect(errorMessage).toHaveTextContent('Please fill in both email and password fields.');
   });
@@ -58,7 +61,7 @@ describe('SignInPage', () => {
   it('handles successful sign in', async () => {
     (signIn as jest.Mock).mockResolvedValueOnce({
       error: null,
-      url: '/'
+      url: '/',
     });
 
     render(<SignInPage />);
@@ -76,7 +79,7 @@ describe('SignInPage', () => {
         redirect: false,
         email: 'test@example.com',
         password: 'password123',
-        callbackUrl: '/'
+        callbackUrl: '/',
       });
     });
   });
@@ -84,29 +87,29 @@ describe('SignInPage', () => {
   it('handles sign in error', async () => {
     (signIn as jest.Mock).mockResolvedValueOnce({
       error: 'INCORRECT_PASSWORD',
-      url: null
+      url: null,
     });
 
     render(<SignInPage />);
 
-    // Fill in the form
-    const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/password/i);
+    const emailInput = screen.getByLabelText(/email:/i);
+    const passwordInput = screen.getByLabelText(/password:/i);
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
     fireEvent.change(passwordInput, { target: { value: 'wrongpassword' } });
 
-    // Submit the form
     const submitButton = screen.getByRole('button', { name: /sign in/i });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText('The password you entered is incorrect. Please try again.')).toBeInTheDocument();
+      expect(
+          screen.getByText('The password you entered is incorrect. Please try again.')
+      ).toBeInTheDocument();
     });
   });
 
   it('navigates to sign up page', () => {
     render(<SignInPage />);
-    
+
     const signUpButton = screen.getByRole('button', { name: /sign up/i });
     fireEvent.click(signUpButton);
 
@@ -115,7 +118,7 @@ describe('SignInPage', () => {
 
   it('navigates to forgot password page', () => {
     render(<SignInPage />);
-    
+
     const forgotPasswordButton = screen.getByRole('button', { name: /forgot your password/i });
     fireEvent.click(forgotPasswordButton);
 
@@ -131,4 +134,4 @@ describe('SignInPage', () => {
     expect(mockAlert).toHaveBeenCalledWith('You need to log in to access this page.');
     mockAlert.mockRestore();
   });
-}); 
+});
