@@ -1,4 +1,4 @@
-// src/app/auth/forgot-password/page.tsx
+// ForgotPasswordPage.tsx
 
 "use client";
 
@@ -46,9 +46,8 @@ const ForgotPasswordPage = () => {
         <Image
           src="/images/signin-signup.jpg"
           alt="Forgot Password Background"
-          layout="fill"
-          objectFit="cover"
-          objectPosition="center"
+          fill
+          style={{ objectFit: 'cover', objectPosition: 'center' }}
         />
         <div className="absolute inset-0 bg-black opacity-50"></div>
       </div>
@@ -61,8 +60,11 @@ const ForgotPasswordPage = () => {
         {message && <p className="text-green-600 mb-4 text-center">{message}</p>}
         <form onSubmit={handleForgotPassword} className="space-y-4">
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">Email Address:</label>
+            <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
+              Email Address:
+            </label>
             <input
+              id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}

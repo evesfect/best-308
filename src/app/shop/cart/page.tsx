@@ -7,7 +7,9 @@ import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import router from 'next/router';
+
+
+
 
 // Define the Toast interface
 interface Toast {
@@ -50,6 +52,7 @@ const ShoppingCartPage = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -57,7 +60,6 @@ const ShoppingCartPage = () => {
         // Handle non-logged-in users
         const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
         const response = await axios.post('/api/cart/view-cart', { localCart });
-        console.log(response.data); // Contains cart items and total price
         setCartItems(response.data.cart);
         calculateTotalPrice(response.data.cart);
         return;
@@ -68,10 +70,9 @@ const ShoppingCartPage = () => {
         const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
         const userId = session.user.id;
         const response = await axios.post('/api/cart/view-cart', { userId, localCart });
-        console.log(response.data); // Contains cart items and total price
         setCartItems(response.data.cart);
         calculateTotalPrice(response.data.cart);
-        console.log(response.data.cart);
+      
       } catch (error) {
         console.error('Error fetching cart items:', error);
         setError('Failed to load cart items. Please try again later.');
@@ -133,22 +134,18 @@ const ShoppingCartPage = () => {
     if (!session || !session.user) {
       const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
   
-      // Log cart before update
-      console.log("Before update:", localCart);
+      
   
       const updatedCart = localCart
         .map((item: any) => {
           if (item._id === productId && item.size === size && item.color === color) {
             const updatedQuantity = Math.max(item.quantity + change, 0); // Prevent negative quantity
-            console.log(`Updating ${productId}: ${item.quantity} -> ${updatedQuantity}`);
             return { ...item, quantity: updatedQuantity };
           }
           return item;
         })
         .filter((item: any) => item.quantity > 0); // Remove items with quantity <= 0
   
-      // Log cart after update
-      console.log("After update:", updatedCart);
   
       localStorage.setItem("cart", JSON.stringify(updatedCart)); // Save the updated cart
       setCartItems(updatedCart); // Reflect changes in the UI
@@ -198,33 +195,19 @@ const ShoppingCartPage = () => {
   const handleOrderNow = async () => {
     if (!session || !session.user) {
       // Save the current cart to localStorage to persist it across login
+      console.log("Saving cart to localStorage:", cartItems);
+      console.log("Cart items:", cartItems);
+      console.log("moving on to login");
+    
       localStorage.setItem("redirectCart", JSON.stringify(cartItems));
   
+
       // Navigate to the login page with a redirect parameter
-      router.push("/auth/login?redirect=/shop/cart");
+
+      // Use the router instance from useRouter hook
+
+      router.push("/auth/signin?redirect=/shop/cart");
       return;
-    }
-  
-    // Merge localStorage cart with the server-side cart after login
-    const localCart = JSON.parse(localStorage.getItem("redirectCart") || "[]");
-  
-    if (localCart.length > 0) {
-      try {
-        await axios.post("/api/cart/merge-cart", {
-          userId: session.user.id,
-          items: localCart,
-        });
-  
-        // Clear the local cart after merging
-        localStorage.removeItem("redirectCart");
-  
-        // Refresh the cart page after successful merge
-        router.push("/shop/cart");
-      } catch (error) {
-        console.error("Error merging cart:", error);
-        setToast({ message: "Failed to merge your cart. Please try again.", type: "error" });
-        return;
-      }
     }
   
     // Navigate to the checkout page for logged-in users
