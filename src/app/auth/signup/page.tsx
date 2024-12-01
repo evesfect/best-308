@@ -74,9 +74,9 @@ const SignUpPage = () => {
         <Image
           src="/images/signin-signup.jpg"
           alt="Sign Up Background"
-          layout="fill"
-          objectFit="cover"
-          objectPosition="center"
+          fill
+          sizes="100vw"
+          style={{ objectFit: 'cover', objectPosition: 'center' }}
         />
         <div className="absolute inset-0 bg-black opacity-50"></div>
       </div>
@@ -85,35 +85,50 @@ const SignUpPage = () => {
         <h1 className={`text-4xl font-bold text-center mb-6 text-gray-900 ${libreBaskerville.className}`}>
           Sign Up
         </h1>
-        {error && <p className="text-red-600 mb-4">{error}</p>}
-        <form onSubmit={handleSignUp} className="space-y-4">
+        {error && <p className="text-red-600 mb-4" role="alert">{error}</p>}
+        <form onSubmit={handleSignUp} className="space-y-4" noValidate>
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">Email:</label>
+            <label 
+              htmlFor="email"
+              className="block text-gray-700 text-sm font-bold mb-2"
+            >
+              Email:
+            </label>
             <input
+              id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">Password:</label>
+            <label
+              htmlFor="password"
+              className="block text-gray-700 text-sm font-bold mb-2"
+            >
+              Password:
+            </label>
             <input
+              id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">Confirm Password:</label>
+            <label
+              htmlFor="confirmPassword"
+              className="block text-gray-700 text-sm font-bold mb-2"
+            >
+              Confirm Password:
+            </label>
             <input
+              id="confirmPassword"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
