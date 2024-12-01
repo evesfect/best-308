@@ -201,7 +201,6 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
                                         ))
                                     ) : (
                                         <div>No sizes available</div>
-                                        <div>No sizes available</div>
                                     )}
                                 </div>
                             )}
