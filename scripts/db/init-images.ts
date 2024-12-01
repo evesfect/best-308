@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { MongoClient, GridFSBucket, ObjectId } from 'mongodb';
 
-const MONGO_URI = 'mongodb://root:rpassword@localhost:27017/e-commerce?authSource=admin';
+const MONGO_URI = 'mongodb+srv://root:rpassword@cluster0.rz8bd.mongodb.net/e-commerce?retryWrites=true&w=majority';
 const imageDirectory = path.join(__dirname, 'images');
 
 // Set custom _id for each image manually
