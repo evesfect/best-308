@@ -75,13 +75,18 @@ export async function GET(req: NextRequest) {
       try {
         // Log the raw category value
         console.log("Raw category value:", category);
+
         
         // Use the category name directly for filtering
         searchCriteria.category = category;
+
         console.log("Search criteria after category filter:", searchCriteria);
       } catch (error) {
         console.error("Error processing category filter:", error);
-        return NextResponse.json({ message: 'Error processing category filter', error: (error as Error).toString() }, { status: 500 });
+        return NextResponse.json(
+          { message: "Error processing category filter", error: (error as Error).toString() },
+          { status: 500 }
+        );
       }
     }
     

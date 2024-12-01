@@ -126,11 +126,9 @@ const ShoppingPage = () => {
 
       // Handle non-logged-in user cart
       const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
-
       const existingItemIndex = localCart.findIndex(
         (item: any) => item.productId === productId && item.size === size && item.color === color
       );
-
   
       // get the sale price of the product
 
@@ -187,12 +185,12 @@ const ShoppingPage = () => {
           />
           <div className="mt-4">
             <h3 className="text-lg font-semibold hover:text-blue-600 transition">{product.name}</h3>
-            <p className="text-gray-500">{product.description}</p>
+            <p className="text-gray-500 h-[120px] overflow-y-auto">{product.description}</p>
             <p className="mt-2 text-gray-700 font-semibold">Category: {product.category}</p>
             <p className="mt-1 text-xl font-bold text-blue-600">Price: ${product.salePrice}</p>
           </div>
         </Link>
-  
+
         {/* Size Selection */}
         <div className="mt-2">
           <label 
@@ -265,6 +263,7 @@ const ShoppingPage = () => {
             value={category}
             onChange={(e) => setCategory(e.target.value)} // Set the category name instead of ID
             className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+
             >
           <option value="">All Categories</option>
             {categories.map((cat) => (
@@ -272,7 +271,7 @@ const ShoppingPage = () => {
               {cat.name}
             </option>
           ))}
-          </select>
+
 
 
           <select
