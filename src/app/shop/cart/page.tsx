@@ -187,47 +187,20 @@ const ShoppingCartPage = () => {
 
   const handleOrderNow = async () => {
     if (!session || !session.user) {
-      // Save the current cart to localStorage to persist it across login
       console.log("Saving cart to localStorage:", cartItems);
       console.log("Cart items:", cartItems);
       console.log("moving on to login");
     
       localStorage.setItem("redirectCart", JSON.stringify(cartItems));
-  
-      // Use the router instance from useRouter hook
       router.push("/auth/signin?redirect=/shop/cart");
       return;
     }
   
-    try {
-      // Generate and download invoice
-      const invoiceResponse = await axios.post("/api/invoice/generate", {
-        items: cartItems,
-        totalAmount: totalPrice,
-        customerDetails: {
-          name: session.user.name,
-          email: session.user.email,
-        }
-      }, { responseType: 'blob' });
-  
-      // Create download link for invoice
-      const url = window.URL.createObjectURL(new Blob([invoiceResponse.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'invoice.pdf');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-  
-      // Navigate to checkout
-      router.push("/shop/checkout");
-    } catch (error) {
-      console.error("Error generating invoice:", error);
-      setToast({ 
-        message: "Failed to generate invoice. Please try again.", 
-        type: "error" 
-      });
-    }
+    // Store cart data before navigation
+    localStorage.setItem("checkoutCart", JSON.stringify(cartItems));
+    localStorage.setItem("checkoutTotal", totalPrice.toString());
+    
+    router.push("/shop/payment");
   };
 
 
