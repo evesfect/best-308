@@ -61,7 +61,7 @@ const PaymentPage = () => {
     }
 
     try {
-      // Generate and download invoice
+      // Generate invoice first
       const invoiceResponse = await axios.post("/api/invoice/generate", {
         items: cartItems,
         totalAmount: totalAmount,
@@ -74,22 +74,32 @@ const PaymentPage = () => {
 
       // Create URL for invoice preview
       const invoiceUrl = URL.createObjectURL(new Blob([invoiceResponse.data]));
-      setInvoice(invoiceUrl);
 
-      // Create download link for invoice
-      const link = document.createElement('a');
-      link.href = invoiceUrl;
-      link.setAttribute('download', 'invoice.pdf');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      // Remove each item from cart if user is logged in
+      if (session?.user?.id) {
+        for (const item of cartItems) {
+          try {
+            await axios.delete("/api/cart/remove-item", {
+              data: {
+                userId: session.user.id,
+                processedProductId: item._id
+              }
+            });
+          } catch (error) {
+            console.error(`Error removing item ${item._id} from cart:`, error);
+          }
+        }
+      }
 
-      // Clear cart data
+      // Clear local storage
       localStorage.removeItem('checkoutCart');
       localStorage.removeItem('checkoutTotal');
       localStorage.removeItem('cart');
+      localStorage.removeItem('redirectCart');
 
-      // Show success message or redirect to confirmation page
+      // Store invoice URL for confirmation page
+      localStorage.setItem('invoiceUrl', invoiceUrl);
+
       router.push('/shop/confirmation');
     } catch (error) {
       console.error('Error processing payment:', error);
