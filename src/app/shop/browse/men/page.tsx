@@ -1,5 +1,3 @@
-// /shop/browse/men
-
 "use client";
 
 import TopBar from '../../../../components/StaticTopBar';
@@ -38,6 +36,11 @@ interface Toast {
   type: 'success' | 'error';
 }
 
+interface Category {
+  _id: string;
+  name: string;
+}
+
 // Add Toast component
 const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) => {
   useEffect(() => {
@@ -55,27 +58,42 @@ const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 
   );
 };
 
-
 const ShoppingPage = () => {
   const { data: session } = useSession();
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [query, setQuery] = useState<string>('');
   const [category, setCategory] = useState<string>('');
   const [order, setOrder] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: { size: string; color: string };
-  }>({}); 
+  }>({});
   const [toast, setToast] = useState<Toast | null>(null);
+
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, [query, category, order]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get('/api/product/category');
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      setToast({ 
+        message: "Failed to load categories", 
+        type: "error" 
+      });
+    }
+  };
 
   const fetchProducts = async () => {
     setLoading(true);
     try {
       const response = await axios.get('/api/product', {
-        params: { query, category, order, sex: 'male' },
+        params: { query, category, order, bestSellers: true },
       });
       setProducts(response.data);
     } catch (error) {
@@ -104,12 +122,13 @@ const ShoppingPage = () => {
     }
   
     if (!session || !session.user) {
-      const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
+      // Handle non-logged-in user cart
+      const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
       const existingItemIndex = localCart.findIndex(
-        (item: any) => item.productId === productId && item.size === size && item.color === color 
+        (item: any) => item.productId === productId && item.size === size && item.color === color
       );
-
-      // get the name and image of the product
+  
+      // get the sale price of the product
       const product = products.find((p) => p._id === productId);
       const salePrice = product?.salePrice;
       const name = product?.name;
@@ -121,15 +140,15 @@ const ShoppingPage = () => {
         localCart.push({ productId, size, color, quantity: 1, salePrice, name, imageId });
       }
   
-      localStorage.setItem('cart', JSON.stringify(localCart));
+      localStorage.setItem("cart", JSON.stringify(localCart));
       setToast({ message: "Item added to cart.", type: "success" });
       return;
     }
   
-    // Handle logged-in user cart
+    // Handle logged-in user cart (existing logic)
     try {
       const userId = session.user.id;
-      const response = await axios.post('/api/cart/add-to-cart', {
+      const response = await axios.post("/api/cart/add-to-cart", {
         userId,
         productId,
         size,
@@ -142,7 +161,7 @@ const ShoppingPage = () => {
         setToast({ message: `Failed to add to cart: ${response.data.error}`, type: "error" });
       }
     } catch (error) {
-      console.error('Error adding to cart:', error);
+      console.error("Error adding to cart:", error);
       setToast({ message: "An error occurred while adding the product to the cart. Please try again.", type: "error" });
     }
   };
@@ -168,7 +187,7 @@ const ShoppingPage = () => {
             <p className="mt-1 text-xl font-bold text-blue-600">Price: ${product.salePrice}</p>
           </div>
         </Link>
-  
+
         {/* Size Selection */}
         <div className="mt-2">
           <label 
@@ -225,7 +244,7 @@ const ShoppingPage = () => {
   return (
     <div className="min-h-screen bg-white">
       <TopBar />
-      <div style={{ height: '120px' }} />
+      <div style={{ height: '150px' }} />
 
       {/* Search and Filter Section */}
       <div className="container mx-auto py-8 px-4">
@@ -243,9 +262,11 @@ const ShoppingPage = () => {
             className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
           >
             <option value="">All Categories</option>
-            <option value="jacket">Jacket</option>
-            <option value="shirt">Shirt</option>
-            <option value="shoes">Shoes</option>
+            {categories.map((cat) => (
+              <option key={cat.name} value={cat.name}>
+                {cat.name}
+              </option>
+            ))}
           </select>
 
           <select

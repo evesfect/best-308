@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import Link from 'next/link';
 
+
 interface Stock {
   S: number;
   M: number;
@@ -35,6 +36,11 @@ interface Toast {
   type: 'success' | 'error';
 }
 
+interface Category {
+  _id: string;
+  name: string;
+}
+
 // Add Toast component
 const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) => {
   useEffect(() => {
@@ -52,10 +58,10 @@ const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 
   );
 };
 
-
 const ShoppingPage = () => {
   const { data: session } = useSession();
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [query, setQuery] = useState<string>('');
   const [category, setCategory] = useState<string>('');
   const [order, setOrder] = useState<string>('');
@@ -67,13 +73,27 @@ const ShoppingPage = () => {
 
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, [query, category, order]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get('/api/product/category');
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      setToast({ 
+        message: "Failed to load categories", 
+        type: "error" 
+      });
+    }
+  };
 
   const fetchProducts = async () => {
     setLoading(true);
     try {
       const response = await axios.get('/api/product', {
-        params: { query, category, order, newArrivals: true },
+        params: { query, category, order, bestSellers: true },
       });
       setProducts(response.data);
     } catch (error) {
@@ -165,57 +185,57 @@ const ShoppingPage = () => {
             <p className="text-gray-500 h-[120px] overflow-y-auto">{product.description}</p>
             <p className="mt-2 text-gray-700 font-semibold">Category: {product.category}</p>
             <p className="mt-1 text-xl font-bold text-blue-600">Price: ${product.salePrice}</p>
-  
-            {/* Size Selection */}
-            <div className="mt-2">
-              <label 
-                htmlFor={`size-${product._id}`} 
-                className="block text-sm font-medium text-gray-700"
-              >
-                Size
-              </label>
-              <select
-                id={`size-${product._id}`}
-                value={selected.size}
-                onChange={(e) => handleSelectionChange(product._id, 'size', e.target.value)}
-                className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Select Size</option>
-                {product.sizes.map((size) => (
-                  <option key={size} value={size}>{size}</option>
-                ))}
-              </select>
-            </div>
-  
-            {/* Color Selection */}
-            <div className="mt-2">
-              <label 
-                htmlFor={`color-${product._id}`} 
-                className="block text-sm font-medium text-gray-700"
-              >
-                Color
-              </label>
-              <select
-                id={`color-${product._id}`}
-                value={selected.color}
-                onChange={(e) => handleSelectionChange(product._id, 'color', e.target.value)}
-                className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Select Color</option>
-                {product.colors.map((color) => (
-                  <option key={color} value={color}>{color}</option>
-                ))}
-              </select>
-            </div>
-  
-            <button
-              onClick={() => addToCart(product._id, selected.size, selected.color)}
-              className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
-            >
-              Add to Cart
-            </button>
           </div>
         </Link>
+
+        {/* Size Selection */}
+        <div className="mt-2">
+          <label 
+            htmlFor={`size-${product._id}`} 
+            className="block text-sm font-medium text-gray-700"
+          >
+            Size
+          </label>
+          <select
+            id={`size-${product._id}`}
+            value={selected.size}
+            onChange={(e) => handleSelectionChange(product._id, 'size', e.target.value)}
+            className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Select Size</option>
+            {product.sizes.map((size) => (
+              <option key={size} value={size}>{size}</option>
+            ))}
+          </select>
+        </div>
+  
+        {/* Color Selection */}
+        <div className="mt-2">
+          <label 
+            htmlFor={`color-${product._id}`} 
+            className="block text-sm font-medium text-gray-700"
+          >
+            Color
+          </label>
+          <select
+            id={`color-${product._id}`}
+            value={selected.color}
+            onChange={(e) => handleSelectionChange(product._id, 'color', e.target.value)}
+            className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Select Color</option>
+            {product.colors.map((color) => (
+              <option key={color} value={color}>{color}</option>
+            ))}
+          </select>
+        </div>
+  
+        <button
+          onClick={() => addToCart(product._id, selected.size, selected.color)}
+          className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+        >
+          Add to Cart
+        </button>
       </div>
     );
   };
@@ -224,7 +244,7 @@ const ShoppingPage = () => {
   return (
     <div className="min-h-screen bg-white">
       <TopBar />
-      <div style={{ height: '120px' }} />
+      <div style={{ height: '150px' }} />
 
       {/* Search and Filter Section */}
       <div className="container mx-auto py-8 px-4">
@@ -237,20 +257,19 @@ const ShoppingPage = () => {
             className="w-1/2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
           <select
-            aria-label="All Categories"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
           >
             <option value="">All Categories</option>
-            <option value="jacket">Jacket</option>
-            <option value="shirt">Shirt</option>
-            <option value="shoes">Shoes</option>
-            <option value="pants">Pants</option>
+            {categories.map((cat) => (
+              <option key={cat.name} value={cat.name}>
+                {cat.name}
+              </option>
+            ))}
           </select>
 
           <select
-            aria-label="Order By"
             value={order}
             onChange={(e) => setOrder(e.target.value)}
             className="ml-4 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"

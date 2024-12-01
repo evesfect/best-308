@@ -263,7 +263,7 @@ const ShoppingPage = () => {
           >
             <option value="">All Categories</option>
             {categories.map((cat) => (
-              <option key={cat._id} value={cat._id}>
+              <option key={cat.name} value={cat.name}>
                 {cat.name}
               </option>
             ))}
