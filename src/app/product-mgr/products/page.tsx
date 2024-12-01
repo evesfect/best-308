@@ -7,9 +7,11 @@ interface Product {
   description: string;
   sex: string;
   category: string;
-  price: number;
+  salePrice: number;
   total_stock: { S: number; M: number; L: number };
   available_stock: { S: number; M: number; L: number };
+  sizes:string[];
+  colors:string[];
 }
 
 interface Category {
@@ -20,6 +22,8 @@ interface Category {
 type InitialProductState = Omit<Partial<Product>, 'total_stock' | 'available_stock'> & {
   total_stock: { S: number; M: number; L: number };
   available_stock: { S: number; M: number; L: number };
+  sizes: string[]; // Fixed array with S, M, L
+  colors: string[]; // Dynamic array provided by the user
 };
 
 const AdminProducts: React.FC = () => {
@@ -30,9 +34,11 @@ const AdminProducts: React.FC = () => {
     description: '',
     sex: '',
     category: '', // This will now be the category id
-    price: 0,
+    salePrice: 0,
     total_stock: { S: 0, M: 0, L: 0 },
     available_stock: { S: 0, M: 0, L: 0 },
+    sizes: ['S', 'M', 'L'], // Fixed sizes
+    colors: [], // User-defined colors
   });
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -87,9 +93,11 @@ const AdminProducts: React.FC = () => {
           description: '',
           sex: '',
           category: '', // Reset category
-          price: 0,
+          salePrice: 0,
           total_stock: { S: 0, M: 0, L: 0 },
           available_stock: { S: 0, M: 0, L: 0 },
+          sizes: ['S', 'M', 'L'],
+          colors: [],
         });
       } else {
         setError(data.message || 'Error adding product');
@@ -99,6 +107,20 @@ const AdminProducts: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAddColor = (color: string) => {
+    setNewProduct((prev) => ({
+      ...prev,
+      colors: [...prev.colors, color],
+    }));
+  };
+
+  const handleRemoveColor = (index: number) => {
+    setNewProduct((prev) => ({
+      ...prev,
+      colors: prev.colors.filter((_, i) => i !== index),
+    }));
   };
 
   const handleDeleteProduct = async (productId: string) => {
@@ -312,8 +334,8 @@ const AdminProducts: React.FC = () => {
               <label className="mb-2">Price</label>
               <input
                 type="number"
-                value={newProduct.price}
-                onChange={(e) => setNewProduct({ ...newProduct, price: Number(e.target.value) })}
+                value={newProduct.salePrice}
+                onChange={(e) => setNewProduct({ ...newProduct, salePrice: Number(e.target.value) })}
                 className="border p-2"
                 required
               />
@@ -348,6 +370,36 @@ const AdminProducts: React.FC = () => {
                 ))}
               </select>
             </div>
+          </div>
+          
+          <div className="flex flex-col mt-4">
+            <label className="mb-2">Colors</label>
+            <div className="flex flex-wrap items-center gap-2">
+              {newProduct.colors.map((color, index) => (
+                <div key={index} className="flex items-center gap-1">
+                  <span className="bg-gray-200 px-3 py-1 rounded">{color}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveColor(index)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+            <input
+              type="text"
+              placeholder="Enter a color and press Enter"
+              className="border p-2 mt-2"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                  e.preventDefault();
+                  handleAddColor(e.currentTarget.value.trim());
+                  e.currentTarget.value = '';
+                }
+              }}
+            />
           </div>
           <div className="flex gap-4 mt-4">
             {(['S', 'M', 'L'] as const).map((size) => (
