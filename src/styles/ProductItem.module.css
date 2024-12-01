@@ -90,7 +90,7 @@
     margin-top: 10px; /* Add some spacing below the button */
     font-size: 1rem; /* Standard font size */
     color: #333; /* Default text color */
-    text-align: center; /* Center the message */
+    text-align: left; /* Center the message */
     font-weight: bold; /* Highlight the message */
 }
 

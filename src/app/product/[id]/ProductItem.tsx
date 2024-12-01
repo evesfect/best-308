@@ -204,6 +204,23 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
                                     )}
                                 </div>
                             )}
+                            {product.available_stock && (
+                                <p
+                                    className={`${styles.stockMessage} ${
+                                    totalStock === 0
+                                        ? styles.outOfStock
+                                        : totalStock < 10
+                                        ? styles.lowStock
+                                        : ''
+                                    }`}
+                                >
+                                {totalStock === 0
+                                    ? 'Sorry, this product is currently out of stock!'
+                                    : totalStock < 10
+                                    ? `Hurry! Only ${totalStock} items left in stock!`
+                                    : `${totalStock} items currently available in stock.`}
+                                </p>
+                            )}
                         </div>
                         <hr className={styles.horizontalLine}/>
 
@@ -213,23 +230,6 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
                             onClick={addToCart}
                         />
                     </div>
-                        {product.available_stock && (
-                            <p
-                                className={`${styles.stockMessage} ${
-                                totalStock === 0
-                                    ? styles.outOfStock
-                                    : totalStock < 10
-                                    ? styles.lowStock
-                                    : ''
-                                }`}
-                            >
-                            {totalStock === 0
-                                ? 'Sorry, this product is currently out of stock!'
-                                : totalStock < 10
-                                ? `Hurry! Only ${totalStock} items left in stock!`
-                                : `${totalStock} items currently available in stock.`}
-                            </p>
-                        )}
                 </div>
             </div>
 
