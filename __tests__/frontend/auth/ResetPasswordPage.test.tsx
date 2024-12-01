@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ResetPasswordPage from "@/app/auth/reset-password/page";
 import { useRouter } from 'next/navigation';
+import { getSession } from 'next-auth/react';
 
 // Mock the next/navigation module
 jest.mock('next/navigation', () => ({
@@ -14,6 +15,11 @@ jest.mock('next/navigation', () => ({
   }))
 }));
 
+// Mock the next-auth/react module
+jest.mock('next-auth/react', () => ({
+  getSession: jest.fn(),
+}));
+
 describe("ResetPasswordPage", () => {
   const mockPush = jest.fn();
 
@@ -23,12 +29,18 @@ describe("ResetPasswordPage", () => {
       push: mockPush
     }));
 
+    // Setup getSession mock to return a mock session
+    (getSession as jest.Mock).mockResolvedValue({
+      user: { email: 'test@example.com' },
+      error: null
+    });
+
     // Mock fetch globally
     global.fetch = jest.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ message: 'Password reset successful' })
-      })
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ message: 'Password reset successful' })
+        })
     ) as jest.Mock;
   });
 
