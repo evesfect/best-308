@@ -7,7 +7,7 @@ import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import router from 'next/router';
+
 
 // Define the Toast interface
 interface Toast {
@@ -50,14 +50,13 @@ const ShoppingCartPage = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
-
+  const router = useRouter();
   useEffect(() => {
     const fetchCartItems = async () => {
       if (!session || !session.user) {
         // Handle non-logged-in users
         const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
         const response = await axios.post('/api/cart/view-cart', { localCart });
-        console.log(response.data); // Contains cart items and total price
         setCartItems(response.data.cart);
         calculateTotalPrice(response.data.cart);
         return;
@@ -68,10 +67,9 @@ const ShoppingCartPage = () => {
         const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
         const userId = session.user.id;
         const response = await axios.post('/api/cart/view-cart', { userId, localCart });
-        console.log(response.data); // Contains cart items and total price
         setCartItems(response.data.cart);
         calculateTotalPrice(response.data.cart);
-        console.log(response.data.cart);
+      
       } catch (error) {
         console.error('Error fetching cart items:', error);
         setError('Failed to load cart items. Please try again later.');
@@ -133,22 +131,18 @@ const ShoppingCartPage = () => {
     if (!session || !session.user) {
       const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
   
-      // Log cart before update
-      console.log("Before update:", localCart);
+      
   
       const updatedCart = localCart
         .map((item: any) => {
           if (item._id === productId && item.size === size && item.color === color) {
             const updatedQuantity = Math.max(item.quantity + change, 0); // Prevent negative quantity
-            console.log(`Updating ${productId}: ${item.quantity} -> ${updatedQuantity}`);
             return { ...item, quantity: updatedQuantity };
           }
           return item;
         })
         .filter((item: any) => item.quantity > 0); // Remove items with quantity <= 0
   
-      // Log cart after update
-      console.log("After update:", updatedCart);
   
       localStorage.setItem("cart", JSON.stringify(updatedCart)); // Save the updated cart
       setCartItems(updatedCart); // Reflect changes in the UI
@@ -201,7 +195,7 @@ const ShoppingCartPage = () => {
       localStorage.setItem("redirectCart", JSON.stringify(cartItems));
   
       // Navigate to the login page with a redirect parameter
-      router.push("/auth/login?redirect=/shop/cart");
+      router.push("/auth/signin?redirect=/shop/cart");
       return;
     }
   

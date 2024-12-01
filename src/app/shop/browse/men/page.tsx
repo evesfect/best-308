@@ -102,12 +102,7 @@ const ShoppingPage = () => {
     }
   
     if (!session || !session.user) {
-      // Handle non-logged-in user cart
       const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
-      // i want to see in command line the localCart
-      console.log(localCart);
-
-    
       const existingItemIndex = localCart.findIndex(
         (item: any) => item.productId === productId && item.size === size && item.color === color 
       );
