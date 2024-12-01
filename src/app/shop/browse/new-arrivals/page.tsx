@@ -237,6 +237,7 @@ const ShoppingPage = () => {
             className="w-1/2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
           <select
+            aria-label="All Categories"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -249,6 +250,7 @@ const ShoppingPage = () => {
           </select>
 
           <select
+            aria-label="Order By"
             value={order}
             onChange={(e) => setOrder(e.target.value)}
             className="ml-4 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
