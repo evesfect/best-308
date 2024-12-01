@@ -8,7 +8,8 @@ async function findImageById(id: string) {
     }
 
     const imageId = new ObjectId(id);
-    const files = await gridFSBucket.find({ _id: imageId }).toArray();
+    const files = await gridFSBucket!.find({ _id: imageId }).toArray();
+    console.log("found image: ",files);
     if (files.length === 0) {
         throw new Error('Image not found');
     }
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         const contentType = file.contentType || 'image/jpeg';
         const headers = new Headers({ 'Content-Type': contentType });
 
-        const downloadStream = gridFSBucket.openDownloadStream(file._id);
+        const downloadStream = gridFSBucket!.openDownloadStream(file._id);
         const stream = new ReadableStream({
             start(controller) {
                 downloadStream.on('data', (chunk) => controller.enqueue(chunk));
@@ -35,7 +36,13 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
         return new NextResponse(stream, { headers });
     } catch (error) {
-        const status = error.message === 'Image not found' ? 404 : 400;
-        return NextResponse.json({ error: error.message }, { status });
+        const status =
+            error instanceof Error && error.message === 'Image not found'
+                ? 404
+                : 400;
+        return NextResponse.json(
+            { error: error instanceof Error ? error.message : 'An unknown error occurred' },
+            { status }
+        );
     }
 }
