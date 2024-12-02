@@ -22,6 +22,10 @@ const productSchema = new mongoose.Schema({
 }, { collection: 'product' });
 
 const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
+const Review = mongoose.models.Review || mongoose.model('Review', new mongoose.Schema({
+  product_id: mongoose.Types.ObjectId,
+  approved: Boolean,
+}, { collection: 'review' }));
 
 export async function GET(req: NextRequest) {
   try {
@@ -94,24 +98,27 @@ export async function GET(req: NextRequest) {
     let products;
     
     if (order === 'popularity') {
-      // Sort by the number of reviews
-      products = await Product.aggregate([
-        { $match: searchCriteria }, // Apply filters
-        {
-          $lookup: {
-            from: 'review', // Name of the review collection
-            localField: '_id',
-            foreignField: 'product_id',
-            as: 'reviews',
-          },
-        },
-        {
-          $addFields: {
-            reviewCount: { $size: '$reviews' }, // Add reviewCount field
-          },
-        },
-        { $sort: { reviewCount: -1 } }, // Sort by reviewCount in descending order
+      // Fetch products
+      const productList = await Product.find(searchCriteria);
+
+      // Fetch and count approved reviews for each product
+      const reviewCounts = await Review.aggregate([
+        { $match: { approved: true } },
+        { $group: { _id: '$product_id', count: { $sum: 1 } } },
       ]);
+
+      // Map review counts to product IDs
+      const reviewCountMap = reviewCounts.reduce((map, obj) => {
+        map[obj._id.toString()] = obj.count;
+        return map;
+      }, {});
+
+      // Add review count to each product and sort by review count
+      products = productList.map((product) => ({
+        ...product.toObject(),
+        reviewCount: reviewCountMap[product._id.toString()] || 0,
+      })).sort((a, b) => b.reviewCount - a.reviewCount)
+    
     } else {
       let sortCriteria: any = {};
       if (order === 'asc') {
