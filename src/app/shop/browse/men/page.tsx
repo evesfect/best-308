@@ -9,7 +9,6 @@ import Image from "next/image";
 import Link from 'next/link';
 
 
-
 interface Stock {
   S: number;
   M: number;
@@ -123,7 +122,6 @@ const ShoppingPage = () => {
     }
   
     if (!session || !session.user) {
-
       // Handle non-logged-in user cart
       const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
       const existingItemIndex = localCart.findIndex(
@@ -131,7 +129,6 @@ const ShoppingPage = () => {
       );
   
       // get the sale price of the product
-
       const product = products.find((p) => p._id === productId);
       const salePrice = product?.salePrice;
       const name = product?.name;
@@ -206,8 +203,16 @@ const ShoppingPage = () => {
             className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Select Size</option>
-            {product.sizes.map((size) => (
-              <option key={size} value={size}>{size}</option>
+            {product.available_stock &&
+                Object.entries(product.available_stock).map(([size, stock]) => (
+              <option
+                  key={size}
+                  value={size}
+                  disabled={stock === 0}
+                  className={`${stock === 0 ? 'text-gray-400' : ''}`}
+                  >
+                    {`${size} ${stock === 0 ? '- Out of Stock' : ''}`}
+                </option>
             ))}
           </select>
         </div>
@@ -227,16 +232,8 @@ const ShoppingPage = () => {
             className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Select Color</option>
-            {product.available_stock &&
-                Object.entries(product.available_stock).map(([size, stock]) => (
-              <option
-                  key={size}
-                  value={size}
-                  disabled={stock === 0}
-                  className={`${stock === 0 ? 'text-gray-400' : ''}`}
-                  >
-                    {`${size} ${stock === 0 ? '- Out of Stock' : ''}`}
-                </option>
+            {product.colors.map((color) => (
+              <option key={color} value={color}>{color}</option>
             ))}
           </select>
         </div>
@@ -271,14 +268,16 @@ const ShoppingPage = () => {
             value={category}
             onChange={(e) => setCategory(e.target.value)} // Set the category name instead of ID
             className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          >
-            <option value="">All Categories</option>
+            >
+          <option value="">All Categories</option>
             {categories.map((cat) => (
-              <option key={cat._id} value={cat.name}> {/* Use category name as value */}
-                {cat.name}
-              </option>
-            ))}
+
+            <option key={cat._id} value={cat.name}> {/* Use category name as value */}
+              {cat.name}
+            </option>
+          ))}
           </select>
+
 
           <select
             value={order}
@@ -288,6 +287,7 @@ const ShoppingPage = () => {
             <option value="">Order By</option>
             <option value="asc">Price: Low to High</option>
             <option value="desc">Price: High to Low</option>
+            <option value="popularity">Popularity</option>
           </select>
         </div>
 
