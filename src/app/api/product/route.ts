@@ -2,11 +2,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import connectionPromise from '@/lib/mongodb';
+import Review from '@/models/review.model';
 
 const productSchema = new mongoose.Schema({
   name: String,
   description: String,
-  category: String, 
+  category: String, // 
   price: Number,
   total_stock: {
     S: Number,
@@ -68,11 +69,9 @@ export async function GET(req: NextRequest) {
       try {
         // Log the raw category value
         console.log("Raw category value:", category);
-
-        
-        // Use the category name directly for filtering
-        searchCriteria.category = category;
-
+    
+        // Since the category is now a string, no need for ObjectId validation
+        searchCriteria.category = category; // Directly assign the category string to the search criteria
         console.log("Search criteria after category filter:", searchCriteria);
       } catch (error) {
         console.error("Error processing category filter:", error);
@@ -92,32 +91,36 @@ export async function GET(req: NextRequest) {
     console.log("Search criteria:", searchCriteria);
 
     let products;
-    
     if (order === 'popularity') {
-      // Sort by the number of reviews
-      products = await Product.aggregate([
-        { $match: searchCriteria }, // Apply filters
-        {
-          $lookup: {
-            from: 'review', // Name of the review collection
-            localField: '_id',
-            foreignField: 'product_id',
-            as: 'reviews',
-          },
-        },
-        {
-          $addFields: {
-            reviewCount: { $size: '$reviews' }, // Add reviewCount field
-          },
-        },
-        { $sort: { reviewCount: -1 } }, // Sort by reviewCount in descending order
+      // Fetch products
+      const productList = await Product.find(searchCriteria);
+
+      // Fetch and count approved reviews for each product
+      const reviewCounts = await Review.aggregate([
+        { $match: { approved: true } },
+        { $group: { _id: '$product_id', count: { $sum: 1 } } },
       ]);
-    } else {
+
+      // Map review counts to product IDs
+      const reviewCountMap = reviewCounts.reduce((map, obj) => {
+        map[obj._id.toString()] = obj.count;
+        return map;
+      }, {});
+
+      // Add review count to each product and sort by review count
+      products = productList.map((product) => ({
+        ...product.toObject(),
+        reviewCount: reviewCountMap[product._id.toString()] || 0,
+      })).sort((a, b) => b.reviewCount - a.reviewCount);
+
+    }
+    
+    else {
       let sortCriteria: any = {};
       if (order === 'asc') {
-        sortCriteria.salePrice = 1;
+        sortCriteria.price = 1;
       } else if (order === 'desc') {
-        sortCriteria.salePrice = -1;
+        sortCriteria.price = -1;
       }
 
       console.log("Sort criteria:", sortCriteria);
