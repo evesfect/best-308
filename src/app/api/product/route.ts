@@ -7,7 +7,7 @@ import Review from '@/models/review.model';
 const productSchema = new mongoose.Schema({
   name: String,
   description: String,
-  category: String, // 
+  category: String,
   price: Number,
   total_stock: {
     S: Number,
