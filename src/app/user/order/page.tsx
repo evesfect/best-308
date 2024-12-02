@@ -81,7 +81,7 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
       ) : (
         <>
           {/* Left Side: Order List */}
-          <div className="w-1/3 bg-white dark:bg-gray-800">
+          <div className="w-1/3 bg-white">
             <OrderList
               orders={orderData}
               selectedOrder={selectedOrder}
@@ -91,7 +91,7 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
           </div>
 
           {/* Right Side: Order Details */}
-          <div className="flex-1 bg-white dark:bg-gray-900">
+          <div className="flex-1 bg-white">
             {selectedOrder ? (
               <OrderDetails order={selectedOrder} orderedProducts={orderedProducts} />
             ) : (
