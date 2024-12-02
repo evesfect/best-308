@@ -35,10 +35,10 @@ const OrderList: React.FC<OrderListProps> = ({
             return (
               <li
                 key={order._id}
-                className={`p-4 rounded-lg cursor-pointer ${
+                className={`p-4 bg-opacity-95 border border-gray-200 rounded-lg cursor-pointer  ${
                   selectedOrder?._id === order._id
-                    ? "bg-blue-100 dark:bg-blue-900"
-                    : "bg-white dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                    ? "bg-blue-200 dark:bg-blue-900"
+                    : "bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
                 }`}
                 onClick={() => onSelectOrder(order)}
               >
@@ -48,9 +48,9 @@ const OrderList: React.FC<OrderListProps> = ({
                   </span>
                   <span
                     className={`px-2 py-1 rounded text-sm ${
-                      order.status === "processing" ? "bg-red-100 text-red-600"
-                        : order.status === "in-transit" ? "bg-yellow-100 text-yellow-600"
-                        : order.status === "delivered" ? "bg-green-100 text-green-600"
+                      order.status === "processing" ? "bg-red-100 text-red-600 border border-red-600"
+                        : order.status === "in-transit" ? "bg-yellow-100 text-yellow-600 border border-yellow-600"
+                        : order.status === "delivered" ? "bg-green-100 text-green-600 border border-green-600"
                       : "bg-gray-100 text-gray-100"
                     }`}
                   >

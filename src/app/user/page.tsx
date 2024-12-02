@@ -16,7 +16,7 @@ interface MainContentProps {
 
 const MainContent: React.FC<MainContentProps> = ({ activeItem, userData }) => {
     return (
-      <div className="flex-1 p-6 bg-white rounded-lg overflow-y-auto overflow-x-auto hide-scrollbar">
+        <div className="flex-1 p-6 bg-white bg-opacity-95 border border-gray-200 rounded-lg shadow-lg overflow-y-auto overflow-x-auto hide-scrollbar">
         {/* Rendering according to the active sidebar item */}
         {activeItem === 'accountSettings' && (
           <div>
@@ -79,10 +79,12 @@ const UserPanel: React.FC = () => {
     }, [status]);
 
     return (
-        <div>
+        <div className="bg-white min-h-full">
             <TopBar />
-            <div {...handleTabClick} className="flex mt-20 gap-10 p-20 px-20 h-[calc(100vh-96px)]">
-                <UserSidebar onItemClick={setActiveItem} />
+            <div {...handleTabClick} className="flex-grow flex mt-[96px] gap-10 p-20 px-20">
+                <div className="bg-gray-100 bg-white bg-opacity-95 border border-gray-200 rounded-lg shadow-lg flex flex-col h-full">
+                    <UserSidebar onItemClick={setActiveItem} />
+                </div>
                 {userData ? (
                     <MainContent activeItem={activeItem} userData={userData} />
                 ) : (

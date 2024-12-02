@@ -17,11 +17,10 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
   const [orderData, setOrderData] = useState<Order[]>([]);
   const [orderedProducts, setOrderedProducts] = useState<Map<string, Product>>(new Map());
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserOrders = async () => {
-      setLoading(true);
       try {
         const orderResponse = await axios.get("/api/users/orders", {
           params: { user_id: userId },
@@ -65,9 +64,9 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
   }
 
   return (
-    <div className="flex w-full">
+    <div className="flex w-full gap-5">
       {!loading && orderData.length === 0 ? (
-        <div className="flex flex-col justify-center items-center w-full">
+        <div className="flex flex-col justify-center items-center w-full mt-20">
           {/* Updated Icon */}
           <img
             src="/icons/delivery.svg"

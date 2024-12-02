@@ -23,7 +23,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, orderedProducts }) =
   );
 
   return (
-    <div className="min-h-screen flex flex-col p-6 bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen flex flex-col p-6 bg-gray-100 bg-opacity-95 border border-gray-200 rounded-lg shadow-lg dark:bg-gray-900">
       {/* Header Section */}
       <h2 className="text-2xl font-bold mb-4">Order Details</h2>
 
@@ -36,10 +36,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, orderedProducts }) =
           </p>
         </div>
         <span
-          className={`px-3 py-1 rounded text-lg font-medium ${
-            order.status === "processing" ? "bg-red-100 text-red-600"
-              : order.status === "in-transit" ? "bg-yellow-100 text-yellow-600"
-              : order.status === "delivered" ? "bg-green-100 text-green-600"
+          className={`px-3 py-1 rounded text-lg font-medium bg-opacity-95 ${
+            order.status === "processing" ? "bg-red-100 text-red-600 border border-red-600"
+              : order.status === "in-transit" ? "bg-yellow-100 text-yellow-600 border border-yellow-600"
+              : order.status === "delivered" ? "bg-green-100 text-green-600 border border-green-600"
               : "bg-gray-100 text-gray-100"
             }`}
         >
@@ -64,14 +64,14 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, orderedProducts }) =
       </div>
 
       {/* Product Section */}
-      <h3 className="text-xl font-semibold mt-6 mb-4">Products</h3>
+      <h3 className="text-xl font-semibold mb-4">Products</h3>
       <ul className="space-y-4">
         {Object.entries(order.products).map(([productId, quantity]) => {
           const product = orderedProducts.get(productId);
           return (
             <li
               key={productId}
-              className="p-4 rounded-lg border border-gray-300 dark:bg-gray-800 flex items-start space-x-4"
+              className="p-4 rounded-lg shadowed-lg bg-opacity-95 border border-gray-300 dark:bg-gray-800 flex items-start space-x-4"
               onClick = {() => router.push(`/product/${productId}`)}
             >
               <Image
@@ -98,7 +98,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, orderedProducts }) =
       </ul>
 
       {/* Bottom Spacer */}
-      <div className="mt-auto pt-6 border-t border-gray-200 dark:border-gray-700">
+      <div className="mt-auto pt-6 border-t border-gray-300 dark:border-gray-700">
         <p className="text-center text-gray-600 dark:text-gray-400 text-sm">
           Thank you for your order!
         </p>
