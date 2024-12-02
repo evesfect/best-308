@@ -1,9 +1,5 @@
 "use client";
 
-
-
-
-
 import TopBar from '../../../../components/StaticTopBar';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -11,7 +7,6 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import Link from 'next/link';
-
 
 
 interface Stock {
@@ -273,15 +268,14 @@ const ShoppingPage = () => {
             value={category}
             onChange={(e) => setCategory(e.target.value)} // Set the category name instead of ID
             className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-
             >
           <option value="">All Categories</option>
             {categories.map((cat) => (
+
             <option key={cat._id} value={cat.name}> {/* Use category name as value */}
               {cat.name}
             </option>
           ))}
-
           </select>
 
 
@@ -293,6 +287,7 @@ const ShoppingPage = () => {
             <option value="">Order By</option>
             <option value="asc">Price: Low to High</option>
             <option value="desc">Price: High to Low</option>
+            <option value="popularity">Popularity</option>
           </select>
         </div>
 
