@@ -118,9 +118,9 @@ export async function GET(req: NextRequest) {
     else {
       let sortCriteria: any = {};
       if (order === 'asc') {
-        sortCriteria.price = 1;
+        sortCriteria.salePrice = 1;
       } else if (order === 'desc') {
-        sortCriteria.price = -1;
+        sortCriteria.salePprice = -1;
       }
 
       console.log("Sort criteria:", sortCriteria);
