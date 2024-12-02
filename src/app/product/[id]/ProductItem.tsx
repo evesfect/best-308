@@ -221,6 +221,22 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
                                     : `${totalStock} items currently available in stock.`}
                                 </p>
                             )}
+
+                            <div className={styles.productDetails}>
+                                <p>Product ID: <span>{product._id.toString()}</span></p>
+                                {product.model && product.model.length > 0 && (
+                                    <p>Model: <span>{product.model}</span></p>
+                                )}
+                                {product.serialNum && product.serialNum.length > 0 && (
+                                    <p>Serial Number: <span>{product.serialNum}</span></p>
+                                )}
+                                {product.warranty && product.warranty.length > 0 && (
+                                    <p>Warranty: <span>{product.warranty}</span></p>
+                                )}
+                                {product.distributor && product.distributor.length > 0 && (
+                                    <p>Distributor: <span>{product.distributor}</span></p>
+                                )}
+                            </div>
                         </div>
                         <hr className={styles.horizontalLine}/>
 
