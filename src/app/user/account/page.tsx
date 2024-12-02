@@ -18,7 +18,6 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ useData }) => {
         address: useData.address || "",
       });
 
-    const [isFormEditable,setIsFormEditable] = useState(false);
     const [isChanged,setIsChanged] = useState(false);
     const [currentData, setCurrentData] = useState(initialData); // current data entering by the user
     const [errorMessage, setErrorMessage] = useState('');
@@ -47,7 +46,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ useData }) => {
           <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">
             {label}
           </label>
-          {isFormEditable && editableObject ? (
+          {editableObject ? (
             <input
               value={value}
               placeholder={placeholder}
@@ -60,13 +59,14 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ useData }) => {
               className="bg-gray-100 border border-gray-400 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-500 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             ></input>
           ) : (
-            <p className="text-gray-900 dark:text-black">{value}</p>
-          )}
+            <input
+                value={value}
+                readOnly // Makes the input box non-editable
+                className="bg-gray-100 border border-gray-400 text-gray-900 text-sm rounded-lg block w-full p-2.5 cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-500 dark:text-white"
+            />
+            )}
         </div>
       );
-      
-
-    const toggleEdit = () => setIsFormEditable(!isFormEditable);
 
     // tracking changes made by user
     useEffect(() => {
@@ -100,7 +100,6 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ useData }) => {
     
             alert("Changes saved successfully!");
             setInitialData(currentData); // Updating initial data after saving
-            toggleEdit(); // Exit edit mode
             setErrorMessage('');
 
         } catch (error: any) {
@@ -114,17 +113,6 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ useData }) => {
             {/* Header and Edit Button */}
             <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-bold">Account Settings</h1>
-                <button
-                    onClick={() => {
-                        if(isFormEditable){
-                            setCurrentData(initialData);
-                        }
-                        toggleEdit();
-                    }}
-                    className="text-blue-700 hover:text-blue-900 font-medium mt-2"
-                >
-                    {isFormEditable ? 'Cancel' : 'Edit'}
-                </button>
             </div>
 
             {/* The Form */}
@@ -140,29 +128,26 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ useData }) => {
                     </div>
 
                     {/* Save and Cancel Buttons */}
-                    {isFormEditable && (
-                        <div className="flex justify-end mt-9">
-                            {errorMessage && <p className="text-red-600 mr-4">{errorMessage}</p>}
-                            <button
-                                type="submit"
-                                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2
-                                            disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-400"
-                                disabled={!isChanged}
-                            >
-                                Save
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    toggleEdit();
-                                    setCurrentData(initialData);
-                                }}
-                                className="text-gray-700 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5"
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    )}
+                    <div className="flex justify-end mt-9">
+                        {errorMessage && <p className="text-red-600 mr-4">{errorMessage}</p>}
+                        <button
+                            type="submit"
+                            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2
+                                        disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-400"
+                            disabled={!isChanged}
+                        >
+                            Save
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setCurrentData(initialData);
+                            }}
+                            className="text-gray-700 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5"
+                        >
+                            Cancel
+                        </button>
+                    </div>
                 </form>
             </div>
 
