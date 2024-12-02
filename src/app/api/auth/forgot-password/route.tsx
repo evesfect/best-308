@@ -9,7 +9,7 @@ let client: MongoClient;
 
 async function connectToDatabase() {
   if (!client) {
-    client = await MongoClient.connect('mongodb://root:rpassword@localhost:27017/e-commerce?authSource=admin', {
+    client = await MongoClient.connect('mongodb+srv://root:rpassword@cluster0.rz8bd.mongodb.net/e-commerce?retryWrites=true&w=majority', {
       maxPoolSize: 10,
     });
   }
