@@ -120,7 +120,7 @@ export async function GET(req: NextRequest) {
       if (order === 'asc') {
         sortCriteria.salePrice = 1;
       } else if (order === 'desc') {
-        sortCriteria.salePprice = -1;
+        sortCriteria.salePrice = -1;
       }
 
       console.log("Sort criteria:", sortCriteria);
