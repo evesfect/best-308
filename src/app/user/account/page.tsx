@@ -43,7 +43,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ useData }) => {
         placeholder: string = `Enter your ${label}`
       ) => (
         <div className="mb-3">
-          <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">
+          <label className="block mb-2 text-sm font-medium text-gray-900">
             {label}
           </label>
           {editableObject ? (
@@ -56,13 +56,13 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ useData }) => {
                   [fieldName]: e.target.value, // Updating the field dynamically
                 }))
               }
-              className="bg-gray-100 border border-gray-400 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-500 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="bg-gray-100 border border-gray-400 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5"
             ></input>
           ) : (
             <input
                 value={value}
                 readOnly // Makes the input box non-editable
-                className="bg-gray-100 border border-gray-400 text-gray-900 text-sm rounded-lg block w-full p-2.5 cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-500 dark:text-white"
+                className="bg-gray-100 border border-gray-400 text-gray-900 text-sm rounded-lg block w-full p-2.5 cursor-not-allowed"
             />
             )}
         </div>

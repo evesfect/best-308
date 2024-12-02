@@ -23,15 +23,15 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, orderedProducts }) =
   );
 
   return (
-    <div className="min-h-screen flex flex-col p-6 bg-gray-100 bg-opacity-95 border border-gray-200 rounded-lg shadow-lg dark:bg-gray-900">
+    <div className="min-h-screen flex flex-col p-6 bg-gray-100 bg-opacity-95 border border-gray-200 rounded-lg shadow-lg">
       {/* Header Section */}
       <h2 className="text-2xl font-bold mb-4">Order Details</h2>
 
       {/* Delivery Date and Status */}
       <div className="flex justify-between items-center mb-4">
         <div>
-          <p className="text-lg font-semibold text-gray-800 dark:text-white">Date:</p>
-          <p className="text-lg text-gray-600 dark:text-gray-300">
+          <p className="text-lg font-semibold text-gray-800">Date:</p>
+          <p className="text-lg text-gray-600">
             {new Date(order.date).toLocaleDateString()}
           </p>
         </div>
@@ -53,14 +53,14 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, orderedProducts }) =
 
       {/* Delivery Address */}
       <div className="mb-4">
-        <p className="text-lg font-semibold text-gray-800 dark:text-white">Address:</p>
-        <p className="text-gray-600 dark:text-gray-300 text-sm">{order.address}</p>
+        <p className="text-lg font-semibold text-gray-800">Address:</p>
+        <p className="text-gray-600 text-sm">{order.address}</p>
       </div>
 
       {/* Total Price */}
       <div className="mb-4">
-        <p className="text-lg font-semibold text-gray-800 dark:text-white">Total Price:</p>
-        <p className="text-lg text-gray-600 dark:text-gray-300">${orderPrice.toFixed(2)}</p>
+        <p className="text-lg font-semibold text-gray-800">Total Price:</p>
+        <p className="text-lg text-gray-600">${orderPrice.toFixed(2)}</p>
       </div>
 
       {/* Product Section */}
@@ -71,7 +71,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, orderedProducts }) =
           return (
             <li
               key={productId}
-              className="p-4 rounded-lg shadowed-lg bg-opacity-95 border border-gray-300 dark:bg-gray-800 flex items-start space-x-4"
+              className="p-4 rounded-lg shadowed-lg bg-opacity-95 border border-gray-300 flex items-start space-x-4"
               onClick = {() => router.push(`/product/${productId}`)}
             >
               <Image
@@ -82,13 +82,13 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, orderedProducts }) =
                 className="w-24 h-24 object-cover rounded-lg"
               />
               <div className="flex flex-col space-y-1">
-                <p className="text-gray-800 dark:text-white font-medium">
+                <p className="text-gray-800 font-medium">
                   {product?.name}
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
+                <p className="text-sm text-gray-600">
                   Quantity: {quantity}
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
+                <p className="text-sm text-gray-600">
                   Price: ${product?.salePrice.toFixed(2)}
                 </p>
               </div>
@@ -98,8 +98,8 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, orderedProducts }) =
       </ul>
 
       {/* Bottom Spacer */}
-      <div className="mt-auto pt-6 border-t border-gray-300 dark:border-gray-700">
-        <p className="text-center text-gray-600 dark:text-gray-400 text-sm">
+      <div className="mt-auto pt-6 border-t border-gray-300">
+        <p className="text-center text-gray-600 text-sm">
           Thank you for your order!
         </p>
       </div>

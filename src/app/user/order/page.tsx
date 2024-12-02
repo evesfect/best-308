@@ -38,14 +38,26 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
         const productMap = new Map<string, Product>();
         await Promise.all(
           productIds.map(async (productId) => {
-            const productResponse = await axios.get("/api/product", {
-              params: { id: productId },
-            });
-            productMap.set(productId, productResponse.data);
+            try {
+              const productResponse = await axios.get("/api/product", {
+                params: {id: productId},
+              });
+              console.log(productId);
+              productMap.set(productId as string, productResponse.data);
+            }
+            catch (error) {
+              if (axios.isAxiosError(error) && error.response) {
+                console.warn(`Product with ID ${productId} not found or error occurred. Status: ${error.response.status}`);
+              } else {
+                console.error(`Unexpected error fetching product with ID ${productId}:`, error);
+              }
+              return 0; // Return 0 to continue calculation without interruption
+              }
           })
         );
 
         setOrderedProducts(productMap);
+        console.log("Ordered Products:",orderedProducts);
         if (userOrders.length > 0) {
           setSelectedOrder(userOrders[0]);
         }
@@ -81,7 +93,7 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
       ) : (
         <>
           {/* Left Side: Order List */}
-          <div className="w-1/3 bg-white dark:bg-gray-800">
+          <div className="w-1/3 bg-white">
             <OrderList
               orders={orderData}
               selectedOrder={selectedOrder}
@@ -91,7 +103,7 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
           </div>
 
           {/* Right Side: Order Details */}
-          <div className="flex-1 bg-white dark:bg-gray-900">
+          <div className="flex-1 bg-white">
             {selectedOrder ? (
               <OrderDetails order={selectedOrder} orderedProducts={orderedProducts} />
             ) : (

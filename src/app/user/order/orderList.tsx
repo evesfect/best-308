@@ -37,13 +37,13 @@ const OrderList: React.FC<OrderListProps> = ({
                 key={order._id}
                 className={`p-4 bg-opacity-95 border border-gray-200 rounded-lg cursor-pointer  ${
                   selectedOrder?._id === order._id
-                    ? "bg-blue-200 dark:bg-blue-900"
-                    : "bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                    ? "bg-blue-200"
+                    : "bg-gray-100 hover:bg-gray-200"
                 }`}
                 onClick={() => onSelectOrder(order)}
               >
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                  <span className="text-sm text-gray-600">
                     {new Date(order.date).toLocaleDateString()}
                   </span>
                   <span
@@ -61,7 +61,7 @@ const OrderList: React.FC<OrderListProps> = ({
                     }
                   </span>
                 </div>
-                <p className="text-gray-800 dark:text-white font-medium">
+                <p className="text-gray-800 font-medium">
                   Total Price: ${orderPrice.toFixed(2)}
                 </p>
               </li>
