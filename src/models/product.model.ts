@@ -26,6 +26,9 @@ const productSchema = new Schema<ProductType>({
     imageId: { type: String, required: true },
     sizes: { type: [String], required: true },
     colors: { type: [String], required: true },
+    warranty:{type: [String]},
+    distributor:{type: [String]},
+    serialNum:{type: [String]},
 }, {
     timestamps: true
 });

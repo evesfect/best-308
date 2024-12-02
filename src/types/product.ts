@@ -19,4 +19,7 @@ export interface Product {
     imageId: string;
     sizes: string[];
     colors: string[];
+    warranty:string[];
+    distributor:string[];
+    serialNum:string[];
 }
