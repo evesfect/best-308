@@ -43,18 +43,21 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { comment, rating, product_id, user_id } = body;
 
-    if (!comment || !rating || !product_id || !user_id) {
+    if (!rating || !product_id || !user_id) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
+    const approved = !comment;
+
     const newReview = new Review({
       comment,
       rating,
       product_id: new mongoose.Types.ObjectId(product_id),
       user_id: new mongoose.Types.ObjectId(user_id),
+      approved,
     });
 
     await newReview.save();
