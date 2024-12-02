@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { CartItem } from '@/types/cart';
+import {Order} from '@/models/order.model';
 
 interface PaymentFormData {
   address: string;
@@ -48,6 +49,61 @@ const PaymentPage = () => {
       [e.target.name]: e.target.value,
     });
   };
+  
+  const updateStockForCartItems = async (cartItems: CartItem[]) => {
+    for (const item of cartItems) {
+      try {
+        // Fetch the processed product to get the actual product ID
+        console.log(`Fetching processed product for cart item ID: ${item._id}`);
+        const processedProductResponse = await axios.get(`/api/processed-product?id=${item._id}`);
+  
+        const { productId } = processedProductResponse.data; // Extract productId
+        console.log("Processed Product ID Fetched:", productId);
+  
+        if (!productId) {
+          console.error(`Product ID is missing for cart item ID: ${item._id}`);
+          continue;
+        }
+  
+        console.log(`Fetching existing product details for productId: ${productId}`);
+        // Fetch the current product details to preserve `total_stock` and decrement `available_stock`
+        const productResponse = await axios.get(`/api/product?id=${productId}`);
+        const existingProduct = productResponse.data;
+  
+        if (!existingProduct) {
+          console.error(`Product not found for productId: ${productId}`);
+          continue;
+        }
+  
+        console.log("Existing Product Fetched:", existingProduct);
+  
+        // Calculate the new available stock
+        const updatedAvailableStock = { ...existingProduct.available_stock };
+        if (updatedAvailableStock[item.size] !== undefined) {
+          updatedAvailableStock[item.size] -= item.quantity;
+          if (updatedAvailableStock[item.size] < 0) {
+            updatedAvailableStock[item.size] = 0; // Ensure stock doesn't go negative
+          }
+        } else {
+          console.error(`Size ${item.size} does not exist in available stock for productId: ${productId}`);
+          continue;
+        }
+  
+        console.log(`Updating stock for productId: ${productId}`);
+        // Send stock update request to update the available stock
+        const updateResponse = await axios.post("/api/admin/product/updatestock", {
+          _id: productId,
+          total_stock: existingProduct.total_stock, // Preserve total_stock
+          available_stock: updatedAvailableStock, // Updated available_stock
+        });
+  
+        console.log(`Stock updated successfully for productId: ${productId}`, updateResponse.data);
+      } catch (error) {
+        console.error(`Error updating stock for cart item ID ${item._id}:`, error);
+      }
+    }
+  };
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,6 +130,32 @@ const PaymentPage = () => {
 
       // Create URL for invoice preview
       const invoiceUrl = URL.createObjectURL(new Blob([invoiceResponse.data]));
+
+      // Generate the new order
+      const productMap = cartItems.reduce((acc, item) => {
+        acc[item._id] = item.quantity; // Map product ID to its quantity
+        return acc;
+      }, {} as { [key: string]: number });
+      
+      const orderResponse = await axios.post("/api/order", {
+        products: productMap, // Transformed product map
+        user_id: session?.user?.id,
+        address: formData.address,
+        completed: false, // Initially set to incomplete
+        date: new Date(), // Current date
+        status: "processing", // Default status
+      });
+      
+      if (orderResponse.status === 201) {
+        console.log("Order created successfully:", orderResponse.data.order);
+      } else {
+        console.error("Failed to create order:", orderResponse.data.message);
+        setError(orderResponse.data.message || "Failed to create order.");
+        return;
+      }
+  
+    // Fetch processed product and handle stock update
+      await updateStockForCartItems(cartItems);
 
       // Remove each item from cart if user is logged in
       if (session?.user?.id) {
