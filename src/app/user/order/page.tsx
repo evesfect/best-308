@@ -39,7 +39,7 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
         await Promise.all(
           productIds.map(async (productId) => {
             try {
-              const productResponse = await axios.get("/api/product", {
+              const productResponse = await axios.get("/api/product-from-processed", {
                 params: {id: productId},
               });
               console.log(productId);
@@ -87,7 +87,7 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
             width={64} /* Adjusted size for better visibility */
             height={64}
           />
-        <p className="text-xl text-gray-600">You haven't placed any orders yet!</p>
+        <p className="text-xl text-gray-600">You haven&#39;t placed any orders yet!</p>
         <p className="text-sm text-gray-500">Start shopping to see your orders here.</p>
       </div>
       ) : (
