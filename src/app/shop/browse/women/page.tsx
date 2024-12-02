@@ -2,7 +2,7 @@
 
 
 
-import Link from 'next/link';
+
 
 import TopBar from '../../../../components/StaticTopBar';
 import { useState, useEffect } from 'react';

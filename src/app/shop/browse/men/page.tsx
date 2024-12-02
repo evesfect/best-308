@@ -263,16 +263,14 @@ const ShoppingPage = () => {
             value={category}
             onChange={(e) => setCategory(e.target.value)} // Set the category name instead of ID
             className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-
-            >
-          <option value="">All Categories</option>
+          >
+            <option value="">All Categories</option>
             {categories.map((cat) => (
-            <option key={cat._id} value={cat.name}> {/* Use category name as value */}
-              {cat.name}
-            </option>
-          ))}
-
-
+              <option key={cat._id} value={cat.name}> {/* Use category name as value */}
+                {cat.name}
+              </option>
+            ))}
+          </select>
 
           <select
             value={order}
