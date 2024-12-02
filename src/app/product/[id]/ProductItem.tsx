@@ -27,6 +27,10 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
 
+    const totalStock = product.available_stock
+        ? Object.values(product.available_stock).reduce((acc, stock) => acc + stock, 0)
+        : 0;
+
     const addToCart = async () => {
         if (!selectedSize || !selectedColor) {
             toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Please select a size and color before adding to cart.' });
@@ -171,23 +175,51 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
                                     >
                                         Please select size
                                     </div>
-                                    {product.sizes && product.sizes.length > 0 ? (
-                                        product.sizes.map(size => (
+                                    {product.available_stock ? (
+                                        Object.entries(product.available_stock).map(([size, quantity]) => (
                                             <div
                                                 key={size}
-                                                className={styles.sizeOption}
+                                                className={`${styles.sizeOption} ${quantity === 0 ? styles.disabled : ''}`}
                                                 onClick={() => {
-                                                    setSelectedSize(size);
-                                                    setShowSizeDropdown(false);
+                                                    if (quantity > 0) { // Allow selection only if quantity is greater than 0
+                                                        setSelectedSize(size);
+                                                        setShowSizeDropdown(false);
+                                                    }
                                                 }}
                                             >
-                                                {size}
+                                                <span>{size}</span>
+                                                <span
+                                                    className={`${styles.sizeQuantity} ${quantity > 0 && quantity < 5 ? styles.lowStock : ''}`}
+                                                >
+                                                    {quantity >= 5 
+                                                        ? `In Stock: ${quantity}` 
+                                                        : quantity > 0 
+                                                        ? `Low Stock: ${quantity}`  
+                                                        : 'Out of Stock'}
+                                                </span>
                                             </div>
                                         ))
                                     ) : (
                                         <div>No sizes available</div>
                                     )}
                                 </div>
+                            )}
+                            {product.available_stock && (
+                                <p
+                                    className={`${styles.stockMessage} ${
+                                    totalStock === 0
+                                        ? styles.outOfStock
+                                        : totalStock < 10
+                                        ? styles.lowStock
+                                        : ''
+                                    }`}
+                                >
+                                {totalStock === 0
+                                    ? 'Sorry, this product is currently out of stock!'
+                                    : totalStock < 10
+                                    ? `Hurry! Only ${totalStock} items left in stock!`
+                                    : `${totalStock} items currently available in stock.`}
+                                </p>
                             )}
                         </div>
                         <hr className={styles.horizontalLine}/>
