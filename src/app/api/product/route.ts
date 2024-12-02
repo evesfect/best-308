@@ -6,7 +6,7 @@ import connectionPromise from '@/lib/mongodb';
 const productSchema = new mongoose.Schema({
   name: String,
   description: String,
-  category: String, // 
+  category: String, 
   price: Number,
   total_stock: {
     S: Number,
@@ -68,9 +68,11 @@ export async function GET(req: NextRequest) {
       try {
         // Log the raw category value
         console.log("Raw category value:", category);
-    
-        // Since the category is now a string, no need for ObjectId validation
-        searchCriteria.category = category; // Directly assign the category string to the search criteria
+
+        
+        // Use the category name directly for filtering
+        searchCriteria.category = category;
+
         console.log("Search criteria after category filter:", searchCriteria);
       } catch (error) {
         console.error("Error processing category filter:", error);

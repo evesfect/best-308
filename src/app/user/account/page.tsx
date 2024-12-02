@@ -36,27 +36,35 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ useData }) => {
     };
 
     // Dynamic rendering object for each field in the form
-    const RenderObject = (label: string, value: string, fieldName: string, editableObject: boolean = true, placeholder: string = `Enter your ${label}`) => (
+    const RenderObject = (
+        label: string,
+        value: string,
+        fieldName: string,
+        editableObject: boolean = true,
+        placeholder: string = `Enter your ${label}`
+      ) => (
         <div className="mb-3">
-            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                {label}
-            </label>
-            {isFormEditable && editableObject ? (
-                <input
-                    value={value}
-                    placeholder={placeholder}
-                    onChange={(e) => setCurrentData((prev) => ({
-                        ...prev,
-                        [fieldName]: e.target.value, // Updating the field dynamically
-                      }))
-                    }
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                ></input>
-            ) : (
-                <p className="text-gray-900 dark:text-white">{value}</p>
-            )}
+          <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">
+            {label}
+          </label>
+          {isFormEditable && editableObject ? (
+            <input
+              value={value}
+              placeholder={placeholder}
+              onChange={(e) =>
+                setCurrentData((prev) => ({
+                  ...prev,
+                  [fieldName]: e.target.value, // Updating the field dynamically
+                }))
+              }
+              className="bg-gray-100 border border-gray-400 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-500 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            ></input>
+          ) : (
+            <p className="text-gray-900 dark:text-black">{value}</p>
+          )}
         </div>
-    );
+      );
+      
 
     const toggleEdit = () => setIsFormEditable(!isFormEditable);
 

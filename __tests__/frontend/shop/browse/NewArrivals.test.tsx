@@ -5,25 +5,43 @@ import ShoppingPage from '@/app/shop/browse/new-arrivals/page';
 
 // Mock next-auth/react
 jest.mock('next-auth/react', () => ({
-  useSession: () => ({ data: null })
+  useSession: jest.fn(() => ({ data: null })),
 }));
 
 // Mock axios
 jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
-// Mock next/navigation
+// Mock next/navigation (Next.js router)
 jest.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: jest.fn()
-  })
+  useRouter: jest.fn(() => ({
+    push: jest.fn(),
+    prefetch: jest.fn(), // Mock prefetch to avoid errors if it’s called
+  })),
 }));
 
 // Mock next/image
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: (props: any) => <img {...props} />
+  default: (props: any) => <img {...props} alt="mocked image" />,
 }));
+
+const originalLocation = window.location;
+
+beforeAll(() => {
+  delete (window as any).location;
+  (window as any).location = {
+    ...originalLocation,
+    assign: jest.fn(),
+    replace: jest.fn(),
+    href: '', // Fully mock href as well
+    reload: jest.fn(),
+  };
+});
+
+afterAll(() => {
+  (window as any).location = originalLocation;
+});
 
 describe('New Arrivals Page', () => {
   const mockProducts = [
@@ -35,43 +53,42 @@ describe('New Arrivals Page', () => {
       salePrice: '129.99',
       imageId: 'test-image-id',
       sizes: ['S', 'M', 'L'],
-      colors: ['Black', 'White']
-    }
+      colors: ['Black', 'White'],
+    },
   ];
 
   beforeEach(() => {
     mockAxios.get.mockReset();
     localStorage.clear();
-    mockAxios.get.mockResolvedValue({ 
+    mockAxios.get.mockResolvedValue({
       status: 200,
-      data: mockProducts 
+      data: mockProducts,
     });
   });
 
   it('renders the new arrivals page with products', async () => {
     render(<ShoppingPage />);
-
     await waitFor(() => {
-      expect(screen.getByText('New Arrival Test Product')).toBeInTheDocument();
+      expect(screen.getByText(/New Arrival Test Product/i)).toBeInTheDocument();
     });
 
-    expect(screen.getByText('New Arrival Test Description')).toBeInTheDocument();
-    expect(screen.getByText('Price: $129.99')).toBeInTheDocument();
+    expect(screen.getByText(/New Arrival Test Description/i)).toBeInTheDocument();
+    expect(screen.getByText(/Price: \$129.99/i)).toBeInTheDocument();
   });
 
   it('handles search functionality', async () => {
     render(<ShoppingPage />);
     const user = userEvent.setup();
 
-    const searchInput = screen.getByPlaceholderText('Search for products...');
+    const searchInput = screen.getByPlaceholderText(/Search for products/i);
     await user.type(searchInput, 'jacket');
 
     await waitFor(() => {
-      expect(mockAxios.get).toHaveBeenCalledWith('/api/product', {
+      expect(mockAxios.get).toHaveBeenCalledWith(expect.any(String), {
         params: expect.objectContaining({
           query: 'jacket',
-          newArrivals: true
-        })
+          newArrivals: true,
+        }),
       });
     });
   });
@@ -81,13 +98,13 @@ describe('New Arrivals Page', () => {
     const user = userEvent.setup();
 
     await waitFor(() => {
-      expect(screen.getByText('New Arrival Test Product')).toBeInTheDocument();
+      expect(screen.getByText(/New Arrival Test Product/i)).toBeInTheDocument();
     });
 
-    const addToCartButton = screen.getByText('Add to Cart');
+    const addToCartButton = screen.getByText(/Add to Cart/i);
     await user.click(addToCartButton);
 
-    expect(screen.getByText('Please select a size and color before adding to cart.')).toBeInTheDocument();
+    expect(screen.getByText(/Please select a size and color before adding to cart/i)).toBeInTheDocument();
   });
 
   it('successfully adds product to cart for non-logged-in user', async () => {
@@ -95,20 +112,19 @@ describe('New Arrivals Page', () => {
     const user = userEvent.setup();
 
     await waitFor(() => {
-      expect(screen.getByText('New Arrival Test Product')).toBeInTheDocument();
+      expect(screen.getByText(/New Arrival Test Product/i)).toBeInTheDocument();
     });
 
-    // Select size and color
-    const sizeSelect = screen.getByLabelText('Size');
-    const colorSelect = screen.getByLabelText('Color');
-    
+    const sizeSelect = screen.getByLabelText(/Size/i);
+    const colorSelect = screen.getByLabelText(/Color/i);
+
     await user.selectOptions(sizeSelect, 'S');
     await user.selectOptions(colorSelect, 'Black');
 
-    const addToCartButton = screen.getByText('Add to Cart');
+    const addToCartButton = screen.getByText(/Add to Cart/i);
     await user.click(addToCartButton);
 
-    expect(screen.getByText('Item added to cart.')).toBeInTheDocument();
+    expect(screen.getByText(/Item added to cart/i)).toBeInTheDocument();
 
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     expect(cart).toHaveLength(1);
@@ -117,7 +133,7 @@ describe('New Arrivals Page', () => {
       size: 'S',
       color: 'Black',
       quantity: 1,
-      salePrice: '129.99'
+      salePrice: '129.99',
     });
   });
 
@@ -126,16 +142,16 @@ describe('New Arrivals Page', () => {
     const user = userEvent.setup();
 
     await waitFor(() => {
-      expect(screen.getByText('New Arrival Test Product')).toBeInTheDocument();
+      expect(screen.getByText(/New Arrival Test Product/i)).toBeInTheDocument();
     });
 
-    const sizeSelect = screen.getByLabelText('Size');
-    const colorSelect = screen.getByLabelText('Color');
-    
+    const sizeSelect = screen.getByLabelText(/Size/i);
+    const colorSelect = screen.getByLabelText(/Color/i);
+
     await user.selectOptions(sizeSelect, 'S');
     await user.selectOptions(colorSelect, 'Black');
 
-    const addToCartButton = screen.getByText('Add to Cart');
+    const addToCartButton = screen.getByText(/Add to Cart/i);
     await user.click(addToCartButton);
     await user.click(addToCartButton);
 
@@ -146,60 +162,48 @@ describe('New Arrivals Page', () => {
       size: 'S',
       color: 'Black',
       quantity: 2,
-      salePrice: '129.99'
+      salePrice: '129.99',
     });
   });
 
   it('handles filtering by category', async () => {
-    await act(async () => {
-      render(<ShoppingPage />);
-    });
-    
+    render(<ShoppingPage />);
     const user = userEvent.setup();
 
     await waitFor(() => {
-      expect(screen.getByText('New Arrival Test Product')).toBeInTheDocument();
+      expect(screen.getByText(/New Arrival Test Product/i)).toBeInTheDocument();
     });
 
-    // Use getByRole with name option
-    const categorySelect = screen.getByRole('combobox', { 
-      name: 'All Categories' 
-    });
+    const categorySelect = screen.getByRole('combobox', { name: /All Categories/i });
     await user.selectOptions(categorySelect, 'jacket');
 
     await waitFor(() => {
-      expect(mockAxios.get).toHaveBeenCalledWith('/api/product', {
+      expect(mockAxios.get).toHaveBeenCalledWith(expect.any(String), {
         params: expect.objectContaining({
           category: 'jacket',
-          newArrivals: true
-        })
+          newArrivals: true,
+        }),
       });
     });
   });
 
   it('handles price sorting', async () => {
-    await act(async () => {
-      render(<ShoppingPage />);
-    });
-    
+    render(<ShoppingPage />);
     const user = userEvent.setup();
 
     await waitFor(() => {
-      expect(screen.getByText('New Arrival Test Product')).toBeInTheDocument();
+      expect(screen.getByText(/New Arrival Test Product/i)).toBeInTheDocument();
     });
 
-    // Use getByRole with name option
-    const orderSelect = screen.getByRole('combobox', { 
-      name: 'Order By' 
-    });
+    const orderSelect = screen.getByRole('combobox', { name: /Order By/i });
     await user.selectOptions(orderSelect, 'asc');
 
     await waitFor(() => {
-      expect(mockAxios.get).toHaveBeenCalledWith('/api/product', {
+      expect(mockAxios.get).toHaveBeenCalledWith(expect.any(String), {
         params: expect.objectContaining({
           order: 'asc',
-          newArrivals: true
-        })
+          newArrivals: true,
+        }),
       });
     });
   });

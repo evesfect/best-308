@@ -74,16 +74,24 @@ const AdminProducts: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
+  
     try {
+      // Send the category name instead of the ID
+      const categoryName = categories.find(
+        (cat) => cat._id === newProduct.category
+      )?.name;
+  
       const response = await fetch('/api/admin/product/adddel', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newProduct),
+        body: JSON.stringify({
+          ...newProduct,
+          category: categoryName, // Use category name
+        }),
       });
-
+  
       const data = await response.json();
       if (response.ok) {
         setProducts((prevProducts) => [...prevProducts, data.product]);
@@ -92,8 +100,8 @@ const AdminProducts: React.FC = () => {
           name: '',
           description: '',
           sex: '',
-          category: '', // Reset category
-          salePrice: 0,
+          category: '',
+          price: 0,
           total_stock: { S: 0, M: 0, L: 0 },
           available_stock: { S: 0, M: 0, L: 0 },
           sizes: ['S', 'M', 'L'],
@@ -108,6 +116,7 @@ const AdminProducts: React.FC = () => {
       setLoading(false);
     }
   };
+  
 
   const handleAddColor = (color: string) => {
     setNewProduct((prev) => ({

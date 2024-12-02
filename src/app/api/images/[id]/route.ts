@@ -1,47 +1,48 @@
-// File: src/app/api/images/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { gridFSBucket } from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
-import connectionPromise, { gridFSBucket } from '@/lib/mongodb';
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-    const { id } = params;
-
-    if (!id || !ObjectId.isValid(id)) {
-        return NextResponse.json({ error: 'Invalid image ID' }, { status: 400 });
+async function findImageById(id: string) {
+    if (!ObjectId.isValid(id)) {
+        throw new Error('Invalid image ID');
     }
 
+    const imageId = new ObjectId(id);
+    const files = await gridFSBucket!.find({ _id: imageId }).toArray();
+    console.log("found image: ",files);
+    if (files.length === 0) {
+        throw new Error('Image not found');
+    }
+
+    return files[0];
+}
+
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
     try {
-        await connectionPromise;
+        const { id } = params;
+        const file = await findImageById(id);
 
-        const imageId = new ObjectId(id);
-        const all_ = await gridFSBucket.find().toArray();
-        console.log(all_);
-        const fileCursor = await gridFSBucket.find({ _id: imageId }).toArray();
-        if (fileCursor.length === 0) {
-            return NextResponse.json({ error: 'Image not found' }, { status: 404 });
-        }
-
-        const file = fileCursor[0];
         const contentType = file.contentType || 'image/jpeg';
+        const headers = new Headers({ 'Content-Type': contentType });
 
-        const headers = new Headers();
-        headers.set('Content-Type', contentType);
-
-        const downloadStream = gridFSBucket.openDownloadStream(imageId);
+        const downloadStream = gridFSBucket!.openDownloadStream(file._id);
         const stream = new ReadableStream({
             start(controller) {
                 downloadStream.on('data', (chunk) => controller.enqueue(chunk));
                 downloadStream.on('end', () => controller.close());
-                downloadStream.on('error', (error) => {
-                    console.error('Error fetching image:', error);
-                    controller.error(error);
-                });
+                downloadStream.on('error', (error) => controller.error(error));
             },
         });
 
         return new NextResponse(stream, { headers });
     } catch (error) {
-        console.error('Database connection error:', error);
-        return NextResponse.json({ error: 'Database connection error' }, { status: 500 });
+        const status =
+            error instanceof Error && error.message === 'Image not found'
+                ? 404
+                : 400;
+        return NextResponse.json(
+            { error: error instanceof Error ? error.message : 'An unknown error occurred' },
+            { status }
+        );
     }
 }
