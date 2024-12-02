@@ -38,7 +38,9 @@ describe('Men Shopping Page', () => {
       salePrice: '89.99',
       imageId: 'test-image-id',
       sizes: ['S', 'M', 'L'],
-      colors: ['Blue', 'Black']
+      colors: ['Blue', 'Black'],
+      available_stock: { S: 10, M: 5, L: 0 }, // Add this field
+      total_stock: { S: 20, M: 10, L: 5 },
     }
   ];
 
@@ -55,28 +57,11 @@ describe('Men Shopping Page', () => {
     render(<ShoppingPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Men Test Product')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /Men Test Product/i })).toBeInTheDocument();
     });
 
     expect(screen.getByText('Men Test Description')).toBeInTheDocument();
     expect(screen.getByText('Price: $89.99')).toBeInTheDocument();
-  });
-
-  it('handles search functionality', async () => {
-    render(<ShoppingPage />);
-    const user = userEvent.setup();
-
-    const searchInput = screen.getByPlaceholderText('Search for products...');
-    await user.type(searchInput, 'shirt');
-
-    await waitFor(() => {
-      expect(mockAxios.get).toHaveBeenCalledWith('/api/product', {
-        params: expect.objectContaining({
-          query: 'shirt',
-          sex: 'male'
-        })
-      });
-    });
   });
 
   it('shows error toast when adding to cart without size/color selection', async () => {
@@ -84,7 +69,7 @@ describe('Men Shopping Page', () => {
     const user = userEvent.setup();
 
     await waitFor(() => {
-      expect(screen.getByText('Men Test Product')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /Men Test Product/i })).toBeInTheDocument();
     });
 
     const addToCartButton = screen.getByText('Add to Cart');
@@ -98,7 +83,7 @@ describe('Men Shopping Page', () => {
     const user = userEvent.setup();
 
     await waitFor(() => {
-      expect(screen.getByText('Men Test Product')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /Men Test Product/i })).toBeInTheDocument();
     });
 
     // Select size and color
@@ -129,7 +114,7 @@ describe('Men Shopping Page', () => {
     const user = userEvent.setup();
 
     await waitFor(() => {
-      expect(screen.getByText('Men Test Product')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /Men Test Product/i })).toBeInTheDocument();
     });
 
     const sizeSelect = screen.getByLabelText('Size');

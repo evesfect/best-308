@@ -232,9 +232,14 @@ const ShoppingPage = () => {
             className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Select Color</option>
-            {product.colors.map((color) => (
-              <option key={color} value={color}>{color}</option>
-            ))}
+
+            {product.colors &&
+                product.colors.map((color) => (
+                    <option key={color} value={color}>
+                      {color}
+                    </option>
+                ))}
+
           </select>
         </div>
   

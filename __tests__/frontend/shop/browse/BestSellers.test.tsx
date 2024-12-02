@@ -35,7 +35,9 @@ describe('Best Sellers Page', () => {
       salePrice: '99.99',
       imageId: 'test-image-id',
       sizes: ['S', 'M', 'L'],
-      colors: ['Red', 'Blue']
+      colors: ['Red', 'Blue'],
+      available_stock: { S: 10, M: 5, L: 0 }, // Add this field
+      total_stock: { S: 20, M: 10, L: 5 },
     }
   ];
 

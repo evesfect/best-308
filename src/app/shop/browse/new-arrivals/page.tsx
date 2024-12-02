@@ -93,7 +93,7 @@ const ShoppingPage = () => {
     setLoading(true);
     try {
       const response = await axios.get('/api/product', {
-        params: { query, category, order, bestSellers: true },
+        params: { query, category, order, newArrivals: true },
       });
       setProducts(response.data);
     } catch (error) {
@@ -266,6 +266,7 @@ const ShoppingPage = () => {
           />
           <select
             value={category}
+            aria-label="All Categories"
             onChange={(e) => setCategory(e.target.value)} // Set the category name instead of ID
             className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             >
@@ -281,6 +282,7 @@ const ShoppingPage = () => {
 
           <select
             value={order}
+            aria-label="Order By"
             onChange={(e) => setOrder(e.target.value)}
             className="ml-4 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
           >
