@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { CartItem } from '@/types/cart';
 
 
 
@@ -15,17 +16,6 @@ import { useRouter } from 'next/navigation';
 interface Toast {
   message: string;
   type: 'success' | 'error';
-}
-
-// Define the CartItem interface
-interface CartItem {
-  _id: string;
-  name: string;
-  salePrice: string;
-  quantity: number;
-  imageId: string;
-  size: string; // Include size in cart item
-  color: string; // Include color in cart item
 }
 
 // Toast component
@@ -194,24 +184,21 @@ const ShoppingCartPage = () => {
 
   const handleOrderNow = async () => {
     if (!session || !session.user) {
-      // Save the current cart to localStorage to persist it across login
       console.log("Saving cart to localStorage:", cartItems);
       console.log("Cart items:", cartItems);
       console.log("moving on to login");
     
       localStorage.setItem("redirectCart", JSON.stringify(cartItems));
-  
-
-      // Navigate to the login page with a redirect parameter
-
-      // Use the router instance from useRouter hook
 
       router.push("/auth/signin?redirect=/shop/cart");
       return;
     }
   
-    // Navigate to the checkout page for logged-in users
-    router.push("/shop/checkout");
+    // Store cart data before navigation
+    localStorage.setItem("checkoutCart", JSON.stringify(cartItems));
+    localStorage.setItem("checkoutTotal", totalPrice.toString());
+    
+    router.push("/shop/payment");
   };
 
 

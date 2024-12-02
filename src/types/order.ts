@@ -7,9 +7,5 @@ export interface Order {
     address : string;
     completed: boolean;
     date: Date;
-<<<<<<< HEAD
-    status:string;
-=======
     status: string;
->>>>>>> e5a8bb878888451ef8259815aa1b809d956b90a6
 }
