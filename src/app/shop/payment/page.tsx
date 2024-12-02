@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { CartItem } from '@/types/cart';
+import {Order} from '@/models/order.model';
 
 interface PaymentFormData {
   address: string;
@@ -49,6 +50,7 @@ const PaymentPage = () => {
     });
   };
 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -74,6 +76,30 @@ const PaymentPage = () => {
 
       // Create URL for invoice preview
       const invoiceUrl = URL.createObjectURL(new Blob([invoiceResponse.data]));
+
+            // Generate the new order
+            const productMap = cartItems.reduce((acc, item) => {
+              acc[item._id] = item.quantity; // Map product ID to its quantity
+              return acc;
+            }, {} as { [key: string]: number });
+      
+            const orderResponse = await axios.post("/api/order", {
+              products: productMap, // Transformed product map
+              user_id: session?.user?.id,
+              address: formData.address,
+              completed: false, // Initially set to incomplete
+              date: new Date(), // Current date
+              status: "processing", // Default status
+            });
+      
+            if (orderResponse.status === 201) {
+              console.log("Order created successfully:", orderResponse.data.order);
+            } else {
+              console.error("Failed to create order:", orderResponse.data.message);
+              setError(orderResponse.data.message || "Failed to create order.");
+              return;
+            }
+      
 
       // Remove each item from cart if user is logged in
       if (session?.user?.id) {
