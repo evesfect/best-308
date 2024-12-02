@@ -54,6 +54,8 @@ describe('New Arrivals Page', () => {
       imageId: 'test-image-id',
       sizes: ['S', 'M', 'L'],
       colors: ['Black', 'White'],
+      available_stock: { S: 10, M: 5, L: 0 }, // Add this field
+      total_stock: { S: 20, M: 10, L: 5 },
     },
   ];
 
@@ -66,10 +68,34 @@ describe('New Arrivals Page', () => {
     });
   });
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+    localStorage.clear();
+
+    // Mock the products API response
+    mockAxios.get.mockImplementation((url) => {
+      if (url === '/api/product') {
+        return Promise.resolve({
+          status: 200,
+          data: mockProducts,
+        });
+      }
+      if (url === '/api/product/category') {
+        return Promise.resolve({
+          status: 200,
+          data: [
+            { _id: '1', name: 'jacket' }, // Ensure this matches your expected dropdown options
+          ],
+        });
+      }
+      return Promise.reject(new Error('Unexpected API call'));
+    });
+  });
+
   it('renders the new arrivals page with products', async () => {
     render(<ShoppingPage />);
     await waitFor(() => {
-      expect(screen.getByText(/New Arrival Test Product/i)).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /New Arrival Test Product/i })).toBeInTheDocument();
     });
 
     expect(screen.getByText(/New Arrival Test Description/i)).toBeInTheDocument();
@@ -80,11 +106,11 @@ describe('New Arrivals Page', () => {
     render(<ShoppingPage />);
     const user = userEvent.setup();
 
-    const searchInput = screen.getByPlaceholderText(/Search for products/i);
+    const searchInput = screen.getByPlaceholderText('Search for products...');
     await user.type(searchInput, 'jacket');
 
     await waitFor(() => {
-      expect(mockAxios.get).toHaveBeenCalledWith(expect.any(String), {
+      expect(mockAxios.get).toHaveBeenCalledWith('/api/product', {
         params: expect.objectContaining({
           query: 'jacket',
           newArrivals: true,
@@ -93,12 +119,13 @@ describe('New Arrivals Page', () => {
     });
   });
 
+
   it('shows error toast when adding to cart without size/color selection', async () => {
     render(<ShoppingPage />);
     const user = userEvent.setup();
 
     await waitFor(() => {
-      expect(screen.getByText(/New Arrival Test Product/i)).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /New Arrival Test Product/i })).toBeInTheDocument();
     });
 
     const addToCartButton = screen.getByText(/Add to Cart/i);
@@ -112,7 +139,7 @@ describe('New Arrivals Page', () => {
     const user = userEvent.setup();
 
     await waitFor(() => {
-      expect(screen.getByText(/New Arrival Test Product/i)).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /New Arrival Test Product/i })).toBeInTheDocument();
     });
 
     const sizeSelect = screen.getByLabelText(/Size/i);
@@ -142,7 +169,7 @@ describe('New Arrivals Page', () => {
     const user = userEvent.setup();
 
     await waitFor(() => {
-      expect(screen.getByText(/New Arrival Test Product/i)).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /New Arrival Test Product/i })).toBeInTheDocument();
     });
 
     const sizeSelect = screen.getByLabelText(/Size/i);
@@ -170,13 +197,20 @@ describe('New Arrivals Page', () => {
     render(<ShoppingPage />);
     const user = userEvent.setup();
 
+    // Wait for products to load
     await waitFor(() => {
-      expect(screen.getByText(/New Arrival Test Product/i)).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /New Arrival Test Product/i })).toBeInTheDocument();
     });
 
-    const categorySelect = screen.getByRole('combobox', { name: /All Categories/i });
+    // Get the dropdown and log its options
+    const categorySelect = screen.getByRole('combobox', { name: /All Categories/i }) as HTMLSelectElement;
+    const options = Array.from(categorySelect.options).map(option => option.value);
+    console.log('Available options:', options);
+
+    // Select the "Jacket" category
     await user.selectOptions(categorySelect, 'jacket');
 
+    // Assert the API call
     await waitFor(() => {
       expect(mockAxios.get).toHaveBeenCalledWith(expect.any(String), {
         params: expect.objectContaining({
@@ -191,18 +225,21 @@ describe('New Arrivals Page', () => {
     render(<ShoppingPage />);
     const user = userEvent.setup();
 
+    // Wait for the initial products to load
     await waitFor(() => {
-      expect(screen.getByText(/New Arrival Test Product/i)).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /New Arrival Test Product/i })).toBeInTheDocument();
     });
 
+    // Select "Price: Low to High" from the "Order By" dropdown
     const orderSelect = screen.getByRole('combobox', { name: /Order By/i });
     await user.selectOptions(orderSelect, 'asc');
 
+    // Assert the correct API call is made with sorting parameters
     await waitFor(() => {
       expect(mockAxios.get).toHaveBeenCalledWith(expect.any(String), {
         params: expect.objectContaining({
-          order: 'asc',
-          newArrivals: true,
+          order: 'asc',         // Ensure the 'order' parameter is included
+          newArrivals: true,    // Ensure 'newArrivals' is included
         }),
       });
     });
