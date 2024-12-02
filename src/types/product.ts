@@ -22,4 +22,5 @@ export interface Product {
     warranty:string[];
     distributor:string[];
     serialNum:string[];
+    model:string[];
 }

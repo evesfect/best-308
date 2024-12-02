@@ -29,6 +29,7 @@ const productSchema = new Schema<ProductType>({
     warranty:{type: [String]},
     distributor:{type: [String]},
     serialNum:{type: [String]},
+    model: {typer: [String]},
 }, {
     timestamps: true
 });
