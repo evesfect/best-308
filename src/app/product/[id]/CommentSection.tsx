@@ -53,15 +53,14 @@ const CommentSection = ({ productId, initialComments = [] }: CommentSectionProps
       setError('Please log in to leave a comment');
       return;
     }
-    if (!newComment.trim()) {
-      setError('Comment cannot be empty');
+    if (!rating && !newComment.trim()) {
+      setError('Please provide a rating or a comment');
       return;
     }
-    if (rating === 0) {
-      setError('Please select a rating');
+    if (newComment.trim() && !rating) {
+      setError('Please provide a rating with your comment');
       return;
     }
-
     try {
       const response = await fetch('/api/product/comments', {
         method: 'POST',
@@ -69,7 +68,7 @@ const CommentSection = ({ productId, initialComments = [] }: CommentSectionProps
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          comment: newComment,
+          comment: newComment || null,
           rating,
           product_id: productId,
           user_id: session.user.id,
