@@ -20,9 +20,11 @@ export async function POST(req: Request) {
         name: productData.name,
         description: productData.description,
         category: productData.category,
-        price: productData.price,
+        salePrice: productData.price,
         total_stock: productData.total_stock,
         available_stock: productData.available_stock,
+        sizes: productData.sizes,
+        colors:productData.colors,
       };
   
       const result = await db.collection('product').insertOne(newProduct);

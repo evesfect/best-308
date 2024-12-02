@@ -279,6 +279,7 @@ const ShoppingPage = () => {
             <option value="">Order By</option>
             <option value="asc">Price: Low to High</option>
             <option value="desc">Price: High to Low</option>
+            <option value="popularity">Popularity</option>
           </select>
         </div>
 
