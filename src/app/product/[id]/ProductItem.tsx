@@ -8,6 +8,7 @@ import CommentSection from './CommentSection';
 import { Toast } from 'primereact/toast';
 import { useSession } from 'next-auth/react';
 import axios from 'axios';
+import colorMap from "@/types/ColorMap";
 
 interface ProductItemProps {
     product: Product;
@@ -108,7 +109,7 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
                                         <div
                                             key={color}
                                             className={`${styles.colorOption} ${selectedColor === color ? styles.selectedColor : ''}`}
-                                            style={{backgroundColor: color.toLowerCase()}}
+                                            style={{backgroundColor: (color && colorMap[color.toLowerCase()] || 'white'),}}
                                             onClick={() => setSelectedColor(color)}
                                             onMouseEnter={() => setHoveredColor(color)}
                                             onMouseLeave={() => setHoveredColor(null)}
