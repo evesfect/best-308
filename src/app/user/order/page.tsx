@@ -38,14 +38,26 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
         const productMap = new Map<string, Product>();
         await Promise.all(
           productIds.map(async (productId) => {
-            const productResponse = await axios.get("/api/product", {
-              params: { id: productId },
-            });
-            productMap.set(productId, productResponse.data);
+            try {
+              const productResponse = await axios.get("/api/product", {
+                params: {id: productId},
+              });
+              console.log(productId);
+              productMap.set(productId as string, productResponse.data);
+            }
+            catch (error) {
+              if (axios.isAxiosError(error) && error.response) {
+                console.warn(`Product with ID ${productId} not found or error occurred. Status: ${error.response.status}`);
+              } else {
+                console.error(`Unexpected error fetching product with ID ${productId}:`, error);
+              }
+              return 0; // Return 0 to continue calculation without interruption
+              }
           })
         );
 
         setOrderedProducts(productMap);
+        console.log("Ordered Products:",orderedProducts);
         if (userOrders.length > 0) {
           setSelectedOrder(userOrders[0]);
         }
