@@ -101,7 +101,7 @@ const AdminProducts: React.FC = () => {
           description: '',
           sex: '',
           category: '',
-          price: 0,
+          salePrice: 0,
           total_stock: { S: 0, M: 0, L: 0 },
           available_stock: { S: 0, M: 0, L: 0 },
           sizes: ['S', 'M', 'L'],
