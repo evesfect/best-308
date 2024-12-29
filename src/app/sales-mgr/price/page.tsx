@@ -1,21 +1,22 @@
-"use client"
-import React, { useState, useEffect } from 'react';
+"use client";
+import React, { useState, useEffect } from "react";
 
 interface Product {
   _id: string;
   name: string;
-  price: number;
+  salePrice: number;
 }
 
 const UpdatePricePage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [discountRate, setDiscountRate] = useState<number>(0);
+  const [discountRate, setDiscountRate] = useState<number | null>(null);
+  const [newPrice, setNewPrice] = useState<number | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const response = await fetch('/api/product');
+      const response = await fetch("/api/product");
       const data = await response.json();
       setProducts(data);
     };
@@ -24,22 +25,40 @@ const UpdatePricePage: React.FC = () => {
 
   const handleUpdatePrice = async () => {
     if (!selectedProduct) {
-      setMessage('Please select a product');
+      setMessage("Please select a product");
       return;
     }
 
-    const response = await fetch(`/api/admin/product/discount`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ productId: selectedProduct._id, discountRate }),
-    });
+    if (discountRate === null && newPrice === null) {
+      setMessage("Please enter either a discount rate or a new price");
+      return;
+    }
 
-    const data = await response.json();
-    if (response.ok) {
-      setMessage(`Price updated! New price: $${data.newPrice.toFixed(2)}`);
-      setSelectedProduct({ ...selectedProduct, price: data.newPrice });
-    } else {
-      setMessage(data.message || 'Failed to update price');
+    try {
+      const body: Record<string, any> = { productId: selectedProduct._id };
+      if (discountRate !== null) body.discountRate = discountRate;
+      if (newPrice !== null) body.newPrice = newPrice;
+
+      const response = await fetch(`/api/admin/sales/price`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setMessage(
+          discountRate !== null
+            ? `Discount applied! New price: $${data.newPrice.toFixed(2)}`
+            : `Price updated to: $${data.newPrice.toFixed(2)}`
+        );
+        setSelectedProduct({ ...selectedProduct, salePrice  : data.newPrice });
+      } else {
+        setMessage(data.message || "Failed to update price");
+      }
+    } catch (error) {
+      setMessage("An error occurred while updating the price");
+      console.error(error);
     }
   };
 
@@ -49,14 +68,14 @@ const UpdatePricePage: React.FC = () => {
 
       <select
         onChange={(e) =>
-          setSelectedProduct(products.find(p => p._id === e.target.value) || null)
+          setSelectedProduct(products.find((p) => p._id === e.target.value) || null)
         }
         className="w-full p-2 border border-gray-300 rounded-md"
       >
         <option value="">Select a product</option>
         {products.map((product) => (
           <option key={product._id} value={product._id}>
-            {product.name} - ${product.price}
+            {product.name} - ${product.salePrice.toFixed(2)}
           </option>
         ))}
       </select>
@@ -66,20 +85,37 @@ const UpdatePricePage: React.FC = () => {
         <div className="relative w-full">
           <input
             type="number"
-            value={discountRate}
-            onChange={(e) => setDiscountRate(parseFloat(e.target.value))}
+            value={discountRate || ""}
+            onChange={(e) =>
+              setDiscountRate(e.target.value ? parseFloat(e.target.value) : null)
+            }
             placeholder="Discount rate (e.g., 20)"
             className="w-full p-2 border border-gray-300 rounded-md pr-8"
           />
-          <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
+          <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+            %
+          </span>
         </div>
+      </label>
+
+      <label className="w-full text-gray-700">
+        Enter new price ($)
+        <input
+          type="number"
+          value={newPrice || ""}
+          onChange={(e) =>
+            setNewPrice(e.target.value ? parseFloat(e.target.value) : null)
+          }
+          placeholder="New price (e.g., 49.99)"
+          className="w-full p-2 border border-gray-300 rounded-md"
+        />
       </label>
 
       <button
         onClick={handleUpdatePrice}
         className="w-full p-2 bg-blue-600 text-white rounded-md"
       >
-        Apply Discount
+        Update Price
       </button>
 
       {message && <p className="text-center text-gray-700">{message}</p>}
