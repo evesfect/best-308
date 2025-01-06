@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import Link from 'next/link';
+import { Heart } from 'react-bootstrap-icons';
 
 
 interface Stock {
@@ -167,11 +168,49 @@ const ShoppingPage = () => {
   };
   
 
+  const addToWishlist = async (productId: string) => {
+    try {
+      if (!session?.user?.id) {
+        setToast({ message: "Please login to add to wishlist", type: "error" });
+        return;
+      }
+
+      const selected = selectedOptions[productId];
+      if (!selected?.size || !selected?.color) {
+        setToast({ message: "Please select both size and color before adding to wishlist", type: "error" });
+        return;
+      }
+
+      const response = await axios.post('/api/wishlist/add-to-wishlist', {
+        productId,
+        size: selected.size,
+        color: selected.color
+      });
+
+      if (response.status === 200 || response.status === 201) {
+        setToast({ message: "Added to wishlist successfully!", type: "success" });
+      }
+    } catch (error: any) {
+      console.error('Error adding to wishlist:', error);
+      setToast({ 
+        message: error.response?.data?.error || "Failed to add to wishlist", 
+        type: "error" 
+      });
+    }
+  };
+
   const renderProduct = (product: Product) => {
     const selected = selectedOptions[product._id] || { size: '', color: '' };
   
     return (
-      <div key={product._id} className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+      <div key={product._id} className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow relative">
+        <button
+          onClick={() => addToWishlist(product._id)}
+          className="absolute top-2 right-2 z-10 p-2 rounded-full bg-white shadow-md hover:bg-gray-100"
+        >
+          <Heart className="text-gray-500 w-5 h-5" />
+        </button>
+
         <Link href={`/product/${product._id}`} className="cursor-pointer">
           <Image
             src={`/api/images/${product.imageId}`}
