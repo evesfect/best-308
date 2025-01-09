@@ -14,16 +14,50 @@ export async function POST(req: Request) {
         const body = await req.json();
         console.log('Received refund test request:', body);
 
-        // Create new refund document similar to order creation
+        if (!body.user_email) {
+            return NextResponse.json({ message: 'User email is required' }, { status: 400 });
+        }
+
+        // Find the invoice that contains these products for this user
+        const invoice = await db.collection('invoice').findOne({
+            'customerDetails.email': body.user_email,
+            'items': { 
+                $elemMatch: { 
+                    _id: { $in: Object.keys(body.products) }
+                }
+            }
+        });
+
+        if (!invoice) {
+            console.error('Invoice not found for:', {
+                email: body.user_email,
+                products: Object.keys(body.products)
+            });
+            return NextResponse.json({ 
+                message: 'Invoice not found for these items',
+                details: 'Please ensure the order and products are correct'
+            }, { status: 404 });
+        }
+
+        // Calculate refund amount based on the original prices in the invoice
+        let refundAmount = 0;
+        for (const [productId, quantity] of Object.entries(body.products)) {
+            const invoiceItem = invoice.items.find((item: any) => item._id === productId);
+            if (invoiceItem) {
+                refundAmount += invoiceItem.salePrice * (quantity as number);
+            }
+        }
+
+        // Create new refund document
         const newRefund = {
             _id: new mongoose.Types.ObjectId(),
             order_id: new mongoose.Types.ObjectId(body.order_id),
             user_id: new mongoose.Types.ObjectId(body.user_id),
-            products: body.products, // Keep as plain object for now
+            products: body.products,
             reason: body.reason,
             status: 'pending',
             requestDate: new Date(),
-            refundAmount: 100 // Test amount
+            refundAmount: refundAmount
         };
 
         const result = await db.collection('refund').insertOne(newRefund);

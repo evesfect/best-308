@@ -9,6 +9,7 @@ interface OrderListProps {
   onSelectOrder: (order: Order) => void;
   orderedProducts: Map<string, Product>;
   userId: string;
+  userEmail: string;
 }
 
 const OrderList: React.FC<OrderListProps> = ({
@@ -17,6 +18,7 @@ const OrderList: React.FC<OrderListProps> = ({
   onSelectOrder,
   orderedProducts,
   userId,
+  userEmail,
 }) => {
   return (
     <div className="p-4">
@@ -83,6 +85,7 @@ const OrderList: React.FC<OrderListProps> = ({
                             userId={userId}
                             productId={productId}
                             quantity={quantity}
+                            userEmail={userEmail}
                             onRefundSubmitted={() => {
                               // Optionally refresh the orders list
                             }}

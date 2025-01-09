@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import axios from "axios";
 import { ObjectId } from "mongodb";
 import OrderList from "./orderList";
@@ -14,6 +15,7 @@ interface UserOrdersProps {
 }
 
 const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
+  const { data: session } = useSession();
   const [orderData, setOrderData] = useState<Order[]>([]);
   const [orderedProducts, setOrderedProducts] = useState<Map<string, Product>>(new Map());
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -100,6 +102,7 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
               onSelectOrder={setSelectedOrder}
               orderedProducts={orderedProducts}
               userId={userId.toString()}
+              userEmail={session?.user?.email || ''}
             />
           </div>
 

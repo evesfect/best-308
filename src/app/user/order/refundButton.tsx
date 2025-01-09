@@ -6,6 +6,7 @@ interface RefundButtonProps {
     userId: string;
     productId: string;
     quantity: number;
+    userEmail: string;
     onRefundSubmitted: () => void;
 }
 
@@ -14,6 +15,7 @@ const RefundButton: React.FC<RefundButtonProps> = ({
     userId, 
     productId,
     quantity,
+    userEmail,
     onRefundSubmitted 
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,6 +34,7 @@ const RefundButton: React.FC<RefundButtonProps> = ({
                 order_id: orderId,
                 user_id: userId,
                 products: { [productId]: quantity },
+                user_email: userEmail,
                 reason
             });
 
