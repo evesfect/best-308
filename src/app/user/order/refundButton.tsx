@@ -7,6 +7,7 @@ interface RefundButtonProps {
     productId: string;
     quantity: number;
     userEmail: string;
+    purchaseDate: string;
     onRefundSubmitted: () => void;
 }
 
@@ -16,6 +17,7 @@ const RefundButton: React.FC<RefundButtonProps> = ({
     productId,
     quantity,
     userEmail,
+    purchaseDate,
     onRefundSubmitted 
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,16 +51,27 @@ const RefundButton: React.FC<RefundButtonProps> = ({
         }
     };
 
+    const isRefundable = () => {
+        const purchaseDateTime = new Date(purchaseDate);
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        return purchaseDateTime > thirtyDaysAgo;
+    };
+
     return (
         <>
             <button
                 onClick={() => setIsModalOpen(true)}
-                className="px-4 py-2 bg-orange-400 text-white rounded hover:bg-orange-500 text-sm"
+                disabled={!isRefundable()}
+                className={`px-4 py-2 text-white rounded text-sm
+                    ${isRefundable() 
+                        ? 'bg-orange-400 hover:bg-orange-500 cursor-pointer' 
+                        : 'bg-gray-300 cursor-not-allowed opacity-50'}`}
             >
-                Request Refund
+                {isRefundable() ? 'Request Refund' : 'Refund Period Expired'}
             </button>
 
-            {isModalOpen && (
+            {isModalOpen && isRefundable() && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg max-w-md w-full">
                         <h2 className="text-xl font-bold mb-4">Request Refund</h2>

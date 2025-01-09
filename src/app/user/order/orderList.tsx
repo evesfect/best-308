@@ -86,6 +86,7 @@ const OrderList: React.FC<OrderListProps> = ({
                             productId={productId}
                             quantity={quantity}
                             userEmail={userEmail}
+                            purchaseDate={new Date(order.date).toISOString()}
                             onRefundSubmitted={() => {
                               // Optionally refresh the orders list
                             }}
