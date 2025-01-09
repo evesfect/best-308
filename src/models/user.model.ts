@@ -16,6 +16,7 @@ const userSchema = new Schema<UserType>({
     match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address.'],
   },
   phoneNumber: {type: String, required: true, unique: true },
+  taxId: {type: String, required: true},
   password: { type: String, required: true, minlength: 8 },
   role: { type: String, required: true },
   address: { type: String, required: true },

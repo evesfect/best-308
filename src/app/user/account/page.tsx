@@ -16,6 +16,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ useData }) => {
         email: useData.email,
         phoneNumber: useData.phoneNumber || "",
         address: useData.address || "",
+        taxId: useData.taxId || "",
       });
 
     const [isChanged,setIsChanged] = useState(false);
@@ -124,7 +125,8 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ useData }) => {
                         {RenderObject("Surname", currentData.lastName, "lastName")}
                         {RenderObject("E-Mail", currentData.email, "email", false)}
                         {RenderObject("Phone Number", currentData.phoneNumber, "phoneNumber", true, "Enter your Phone Number (5xxxxxxxxx)")}
-                        {RenderObject("Address", currentData.address, "address")}
+                        {RenderObject("Home Address", currentData.address, "address")}
+                        {RenderObject("Tax ID", currentData.address, "taxId")}
                     </div>
 
                     {/* Save and Cancel Buttons */}
