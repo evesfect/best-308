@@ -3,6 +3,8 @@ import { generateInvoicePDF } from '@/utils/invoiceGenerator';
 import { sendEmail } from '@/utils/emailUtil';
 import { CartItem } from '@/types/cart';
 import crypto from 'crypto';
+import connectionPromise from '@/lib/mongodb';
+import Invoice from '@/models/invoice.model';
 
 export async function POST(req: Request) {
   try {
@@ -56,6 +58,18 @@ export async function POST(req: Request) {
         totalAmount,
       });
       console.log('PDF generated successfully, buffer size:', pdfBuffer.length);
+
+      await connectionPromise;
+      const newInvoice = new Invoice({
+        invoiceNumber,
+        date,
+        customerDetails,
+        items,
+        totalAmount,
+        pdfBuffer, // Store PDF as Buffer
+      });
+      await newInvoice.save();
+      console.log('Invoice saved to database:', newInvoice);
 
       // Attempt to send email
       console.log('Attempting to send email to:', customerDetails.email);

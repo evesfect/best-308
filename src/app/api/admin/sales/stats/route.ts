@@ -1,13 +1,10 @@
-/*Need to change the commented out things with the proper
-things. Need to implement the database for stats */
 
 
 import mongoose from 'mongoose';
 import connectionPromise from '@/lib/mongodb';
 import { NextResponse } from 'next/server';
-import Product from '@/models/product.model'; 
 import User from '@/models/user.model';
-import Order from '@/models/order.model';
+import Invoice from '@/models/invoice.model';
 
 export async function GET(req: Request) {
     try {
@@ -28,7 +25,7 @@ export async function GET(req: Request) {
       console.log("Collections:", collections.map(c => c.name));
 
       // Verify that the necessary collections exist
-      const requiredCollections = ['product', 'user', 'order'];
+      const requiredCollections = ['invoice', 'user'];
       requiredCollections.forEach((collection) => {
         if (!collections.some(c => c.name === collection)) {
           console.error(`The '${collection}' collection does not exist in the database`);
@@ -37,20 +34,23 @@ export async function GET(req: Request) {
       });
 
       // Fetch statistics
-      //const totalProducts = await Product.countDocuments();
+      
       const totalUsers = await User.countDocuments();
-      //const totalOrders = await Order.countDocuments();
+  
+      const totalSales = await Invoice.countDocuments(); 
       
-      
+
+      const invoices = await Invoice.find({}, { totalAmount: 1 }); // Fetch only totalAmount
+      const totalMoney = invoices.reduce((sum, invoice) => sum + invoice.totalAmount, 0).toFixed(2);
 
       // Log the fetched statistics
       //console.log("Fetched statistics:", { totalProducts, totalUsers, totalOrders});
 
       // Respond with the statistics
       return NextResponse.json({
-        //products: totalProducts,
+        sales: totalSales,
         users: totalUsers,
-        //orders:totalOrders
+        money: totalMoney,
       });
 
     } catch (error: any) {

@@ -17,9 +17,9 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ message: 'Database connection error' }, { status: 500 });
     }
 
-    const { productId, discountRate } = await req.json();
+    const { productId, newPrice } = await req.json();
 
-    if (!productId || typeof discountRate !== 'number') {
+    if (!productId || typeof newPrice !== 'number') {
       return NextResponse.json({ message: 'Invalid product ID or discount rate' }, { status: 400 });
     }
 
@@ -28,7 +28,6 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ message: 'Product not found' }, { status: 404 });
     }
 
-    const newPrice = product.price * (1 - discountRate / 100);
     await db.collection('product').updateOne(
       { _id: new mongoose.Types.ObjectId(productId) },
       { $set: { salePrice: newPrice } }
