@@ -18,7 +18,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ message: 'User email is required' }, { status: 400 });
         }
 
-        // Find the invoice that contains these products for this user
+        // Find corresponding invoice (uses email and product id)
         const invoice = await db.collection('invoice').findOne({
             'customerDetails.email': body.user_email,
             'items': { 
@@ -39,7 +39,6 @@ export async function POST(req: Request) {
             }, { status: 404 });
         }
 
-        // Calculate refund amount based on the original prices in the invoice
         let refundAmount = 0;
         for (const [productId, quantity] of Object.entries(body.products)) {
             const invoiceItem = invoice.items.find((item: any) => item._id === productId);
@@ -48,7 +47,7 @@ export async function POST(req: Request) {
             }
         }
 
-        // Create new refund document
+        // New refund document
         const newRefund = {
             _id: new mongoose.Types.ObjectId(),
             order_id: new mongoose.Types.ObjectId(body.order_id),

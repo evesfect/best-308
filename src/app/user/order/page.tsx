@@ -53,7 +53,7 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
               } else {
                 console.error(`Unexpected error fetching product with ID ${productId}:`, error);
               }
-              return 0; // Return 0 to continue calculation without interruption
+              return 0;
               }
           })
         );
@@ -81,12 +81,11 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
     <div className="flex w-full gap-5">
       {!loading && orderData.length === 0 ? (
         <div className="flex flex-col justify-center items-center w-full mt-20">
-          {/* Updated Icon */}
           <img
             src="/icons/delivery.svg"
             alt="No orders icon"
             className="mb-4"
-            width={64} /* Adjusted size for better visibility */
+            width={64}
             height={64}
           />
         <p className="text-xl text-gray-600">You haven&#39;t placed any orders yet!</p>

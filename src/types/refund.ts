@@ -4,7 +4,7 @@ export interface Refund {
     _id: ObjectId;
     order_id: ObjectId;
     user_id: ObjectId;
-    products: Map<ObjectId, number>; // Product IDs and quantities being refunded
+    products: Map<ObjectId, number>;
     reason: string;
     status: 'pending' | 'approved' | 'rejected';
     requestDate: Date;

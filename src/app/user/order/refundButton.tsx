@@ -53,7 +53,7 @@ const RefundButton: React.FC<RefundButtonProps> = ({
         <>
             <button
                 onClick={() => setIsModalOpen(true)}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                className="px-4 py-2 bg-orange-400 text-white rounded hover:bg-orange-500 text-sm"
             >
                 Request Refund
             </button>
@@ -85,7 +85,7 @@ const RefundButton: React.FC<RefundButtonProps> = ({
                             <button
                                 onClick={handleSubmit}
                                 disabled={isSubmitting || !reason.trim()}
-                                className="px-4 py-2 bg-red-500 text-white rounded disabled:bg-gray-400"
+                                className="px-4 py-2 bg-orange-400 text-white rounded disabled:bg-gray-400"
                             >
                                 {isSubmitting ? 'Submitting...' : 'Submit'}
                             </button>
