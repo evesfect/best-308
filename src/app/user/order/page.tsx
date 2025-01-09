@@ -26,7 +26,7 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
           params: { user_id: userId },
         });
 
-        const userOrders = Array.isArray(orderResponse.data.userOrders)
+        const userOrders: Order[] = Array.isArray(orderResponse.data.userOrders)
           ? orderResponse.data.userOrders
           : [];
         setOrderData(userOrders);
@@ -99,6 +99,7 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
               selectedOrder={selectedOrder}
               onSelectOrder={setSelectedOrder}
               orderedProducts={orderedProducts}
+              userId={userId.toString()}
             />
           </div>
 
