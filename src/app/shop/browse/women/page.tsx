@@ -176,15 +176,12 @@ const ShoppingPage = () => {
       }
 
       const selected = selectedOptions[productId];
-      if (!selected?.size || !selected?.color) {
-        setToast({ message: "Please select both size and color before adding to wishlist", type: "error" });
-        return;
-      }
+      console.log("Selected options:", selected); // Debug log
 
       const response = await axios.post('/api/wishlist/add-to-wishlist', {
         productId,
-        size: selected.size,
-        color: selected.color
+        size: selected?.size,  // Add size
+        color: selected?.color // Add color
       });
 
       if (response.status === 200 || response.status === 201) {
