@@ -13,18 +13,24 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get itemId from request body
-    const { itemId } = await req.json();
-    if (!itemId) {
-      return NextResponse.json({ error: 'Item ID is required' }, { status: 400 });
+    // Get productId from request body
+    const { productId } = await req.json();
+    if (!productId) {
+      return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
     }
 
     await connectionPromise;
 
-    // Find user's wishlist and remove the item
+    // Find user's wishlist and remove the item by productId
     const result = await Wishlist.updateOne(
       { userId: new Types.ObjectId(session.user.id) },
-      { $pull: { items: { _id: new Types.ObjectId(itemId) } } }
+      { 
+        $pull: { 
+          items: { 
+            productId: new Types.ObjectId(productId) 
+          } 
+        } 
+      }
     );
 
     if (result.modifiedCount === 0) {

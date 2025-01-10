@@ -11,8 +11,8 @@ import StaticTopBar from "@/components/StaticTopBar";
 interface WishlistItem {
   _id: string;
   productId: string;
-  size: string;
-  color: string;
+  size?: string;
+  color?: string;
   product: {
     name: string;
     description: string;
@@ -74,12 +74,12 @@ const WishlistPage = () => {
     }
   };
 
-  const removeFromWishlist = async (itemId: string) => {
+  const removeFromWishlist = async (productId: string) => {
     try {
       await axios.delete('/api/wishlist/remove-from-wishlist', {
-        data: { itemId }
+        data: { productId }
       });
-      setWishlistItems(prevItems => prevItems.filter(item => item._id !== itemId));
+      setWishlistItems(prevItems => prevItems.filter(item => item.productId !== productId));
       setToast({ message: "Item removed from wishlist", type: "success" });
     } catch (error) {
       console.error('Error removing item from wishlist:', error);
@@ -94,14 +94,16 @@ const WishlistPage = () => {
         return;
       }
 
-      await axios.post('/api/cart/add-to-cart', {
+      const cartData: any = {
         userId: session.user.id,
         productId: item.productId,
-        size: item.size,
-        color: item.color,
         quantity: 1
-      });
+      };
 
+      if (item.size) cartData.size = item.size;
+      if (item.color) cartData.color = item.color;
+
+      await axios.post('/api/cart/add-to-cart', cartData);
       setToast({ message: "Item added to cart", type: "success" });
     } catch (error) {
       console.error('Error adding to cart:', error);

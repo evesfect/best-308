@@ -15,26 +15,33 @@ export async function POST(req: Request) {
     }
 
     // Get data from request body
-    const { productId, size, color } = await req.json();
+    const { productId, color, size } = await req.json();
 
     // Log the received data for debugging
-    console.log('Received data:', { productId, size, color, userId: session.user.id });
+    console.log('Received data:', { productId, color, size, userId: session.user.id });
 
-    // Validate required fields
-    if (!productId || !size || !color) {
+    // Only validate productId
+    if (!productId) {
       return NextResponse.json({ 
-        error: 'Missing required fields', 
-        received: { productId, size, color }
+        error: 'Product ID is required', 
+        received: { productId, color, size }
       }, { status: 400 });
     }
 
-    await connectionPromise;
+    // Ensure database connection
+    const db = await connectionPromise;
+    console.log('Database connection established');
 
-    // Verify product exists
+    // Verify product exists and log the result
     const product = await Product.findById(productId).lean();
+    console.log('Product lookup result:', product);
+    
     if (!product) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
+
+    // Log the user ID being used for wishlist lookup
+    console.log('Looking for wishlist with userId:', session.user.id);
 
     // Check if product is in wishlist
     const wishlist = await Wishlist.findOne({ 
@@ -42,26 +49,28 @@ export async function POST(req: Request) {
     });
     
     if (wishlist) {
-      // Check for duplicate item with same productId, size, and color
+      // Check for duplicate considering both color and size
       const existingItem = wishlist.items.find(
-        (item: { productId: string; size: string; color: string }) => 
+        (item: { productId: string; color?: string; size?: string }) => 
           item.productId.toString() === productId && 
-          item.size === size && 
-          item.color === color
+          (!color || item.color === color) &&
+          (!size || item.size === size)
       );
 
       if (existingItem) {
         return NextResponse.json({ 
-          error: 'This item with the same size and color is already in your wishlist' 
+          error: 'This item is already in your wishlist' 
         }, { status: 400 });
       }
 
-      // Add new item to wishlist
-      wishlist.items.push({ 
-        productId: new Types.ObjectId(productId), 
-        size,
-        color 
-      });
+      // Add new item to wishlist with optional color and size
+      const newItem: { productId: Types.ObjectId; color?: string; size?: string } = {
+        productId: new Types.ObjectId(productId)
+      };
+      if (color) newItem.color = color;
+      if (size) newItem.size = size;
+      
+      wishlist.items.push(newItem);
       await wishlist.save();
 
       return NextResponse.json({ 
@@ -71,13 +80,15 @@ export async function POST(req: Request) {
     }
 
     // If no wishlist exists, create a new one
+    const newWishlistItem: { productId: Types.ObjectId; color?: string; size?: string } = {
+      productId: new Types.ObjectId(productId)
+    };
+    if (color) newWishlistItem.color = color;
+    if (size) newWishlistItem.size = size;
+
     const newWishlist = await Wishlist.create({
       userId: new Types.ObjectId(session.user.id),
-      items: [{ 
-        productId: new Types.ObjectId(productId), 
-        size,
-        color 
-      }]
+      items: [newWishlistItem]
     });
 
     return NextResponse.json({ 
@@ -86,9 +97,20 @@ export async function POST(req: Request) {
     }, { status: 201 });
 
   } catch (error) {
-    console.error('Error adding to wishlist:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    // Enhanced error logging
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      details: error.message 
+    }, { status: 500 });
   }
 }
+
+
+
 
 

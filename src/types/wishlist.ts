@@ -1,11 +1,9 @@
-
-
 import { ObjectId } from 'mongoose';
 
 export interface WishlistItem {
   productId: ObjectId;
-  size: string;
-  color: string;
+  size?: string;
+  color?: string;
 }
 
 export interface Wishlist {

@@ -8,7 +8,6 @@ import { Types } from 'mongoose';
 
 export async function GET(req: Request) {
   try {
-    // Get user from session
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -16,10 +15,12 @@ export async function GET(req: Request) {
 
     await connectionPromise;
 
-    // Find user's wishlist
+    // Find user's wishlist and log it for debugging
     const wishlist = await Wishlist.findOne({ 
       userId: new Types.ObjectId(session.user.id) 
     }).lean();
+
+    console.log("Raw wishlist data:", JSON.stringify(wishlist, null, 2)); // Debug log
 
     if (!wishlist) {
       return NextResponse.json({ 
@@ -28,20 +29,19 @@ export async function GET(req: Request) {
       }, { status: 200 });
     }
 
-    // Get product details for each wishlist item
     const populatedItems = await Promise.all(
       wishlist.items.map(async (item: any) => {
+        console.log("Processing wishlist item:", item); // Debug log
+        
         const product = await Product.findById(item.productId).lean();
         
         if (!product) {
-          return null; // Skip if product no longer exists
+          return null;
         }
 
-        return {
+        const wishlistItem: any = {
           _id: item._id,
           productId: item.productId,
-          size: item.size,
-          color: item.color,
           product: {
             name: product.name,
             description: product.description,
@@ -53,10 +53,16 @@ export async function GET(req: Request) {
             sizes: product.sizes
           }
         };
+
+        // Explicitly check and add size and color
+        if (item.size !== undefined) wishlistItem.size = item.size;
+        if (item.color !== undefined) wishlistItem.color = item.color;
+
+        console.log("Processed wishlist item:", wishlistItem); // Debug log
+        return wishlistItem;
       })
     );
 
-    // Filter out any null items (products that no longer exist)
     const validItems = populatedItems.filter(item => item !== null);
 
     return NextResponse.json({ 
