@@ -2,6 +2,7 @@ import connectionPromise from '../../../lib/mongodb';
 import { ObjectId } from 'mongodb';
 import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
+import { parsePhoneNumberFromString, isValidPhoneNumber } from "libphonenumber-js";
 
 export async function GET(req: NextRequest) {
     
@@ -49,57 +50,74 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-
     try {
-        
         await connectionPromise;
         const db = mongoose.connection.db;
-
+  
         if (!db) {
-            return NextResponse.json({ message: "Database connection error" }, { status: 500 });
+            return NextResponse.json(
+                { message: "Database connection error" },
+                { status: 500 }
+            );
         }
-
+  
         const userCollection = db.collection("user");
-
+  
         const url = new URL(req.url);
         const userId = url.searchParams.get("_id");
-
-        // check if user available
+  
         if (!userId || !ObjectId.isValid(userId)) {
-            return NextResponse.json({ message: "Invalid or missing user ID" }, { status: 400 });
+            return NextResponse.json(
+                { message: "Invalid or missing user ID" },
+                { status: 400 }
+            );
         }
-
-        // define updates object and derive from request
+  
         let updates;
         try {
             updates = await req.json();
         } catch {
-            return NextResponse.json({ message: "Invalid JSON in request body" }, { status: 400 });
+            return NextResponse.json(
+                { message: "Invalid JSON in request body" },
+                { status: 400 }
+            );
         }
-
-        // Validate the updates
+  
         if (!updates || typeof updates !== "object" || Array.isArray(updates)) {
-            return NextResponse.json({ message: "Invalid updates provided" }, { status: 400 });
+            return NextResponse.json(
+                { message: "Invalid updates provided" },
+                { status: 400 }
+            );
         }
-
-        // Phone number validation!
-        if (updates.phoneNumber && !/^5\d{9}$/.test(updates.phoneNumber)) {
-            return NextResponse.json({ message: "Phone number must start with '5' and be 10 digits."}, { status: 400 });
+  
+        if (updates.phoneNumber) {
+            const phoneNumberObject = parsePhoneNumberFromString(
+                updates.phoneNumber,
+                "TR" // Default region = Türkiye
+            );
+  
+            if (!phoneNumberObject || !isValidPhoneNumber(updates.phoneNumber, "TR")) {
+                return NextResponse.json(
+                    { message: "Invalid phone number format." },
+                    { status: 400 }
+                );
+            }
+  
+            updates.phoneNumber = phoneNumberObject.number;
         }
-
-        // Update the user according to updates
+  
         const updatedUser = await userCollection.findOneAndUpdate(
-            { _id: new ObjectId(userId) }, // filtering by ID
-            { $set: updates }, // applying updates
-            { returnDocument: "after" } // returning the updated document
+            { _id: new ObjectId(userId) },
+            { $set: updates },
+            { returnDocument: "after" }
         );
-
-        // returning the updated user
+  
         return NextResponse.json({ updatedUser }, { status: 200 });
-    
     } catch (error) {
         console.error("Error updating user information:", error);
-        return NextResponse.json({ message: "Failed to update user information" }, { status: 500 });
+        return NextResponse.json(
+            { message: "Failed to update user information" },
+            { status: 500 }
+        );
     }
 }
-

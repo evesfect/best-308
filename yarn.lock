@@ -632,15 +632,10 @@
   dependencies:
     glob "10.3.10"
 
-"@next/swc-linux-x64-gnu@14.2.15":
+"@next/swc-win32-x64-msvc@14.2.15":
   version "14.2.15"
-  resolved "https://registry.npmjs.org/@next/swc-linux-x64-gnu/-/swc-linux-x64-gnu-14.2.15.tgz"
-  integrity sha512-kE6q38hbrRbKEkkVn62reLXhThLRh6/TvgSP56GkFNhU22TbIrQDEMrO7j0IcQHcew2wfykq8lZyHFabz0oBrA==
-
-"@next/swc-linux-x64-musl@14.2.15":
-  version "14.2.15"
-  resolved "https://registry.npmjs.org/@next/swc-linux-x64-musl/-/swc-linux-x64-musl-14.2.15.tgz"
-  integrity sha512-PZ5YE9ouy/IdO7QVJeIcyLn/Rc4ml9M2G4y3kCM9MNf1YKvFY4heg3pVa/jQbMro+tP6yc4G2o9LjAz1zxD7tQ==
+  resolved "https://registry.npmjs.org/@next/swc-win32-x64-msvc/-/swc-win32-x64-msvc-14.2.15.tgz"
+  integrity sha512-SzqGbsLsP9OwKNUG9nekShTwhj6JSB9ZLMWQ8g1gG6hdE5gQLncbnbymrwy2yVmH9nikSLYRYxYMFu78Ggp7/g==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -4001,6 +3996,11 @@ levn@^0.4.1:
     prelude-ls "^1.2.1"
     type-check "~0.4.0"
 
+libphonenumber-js@^1.11.17:
+  version "1.11.17"
+  resolved "https://registry.npmjs.org/libphonenumber-js/-/libphonenumber-js-1.11.17.tgz"
+  integrity sha512-Jr6v8thd5qRlOlc6CslSTzGzzQW03uiscab7KHQZX1Dfo4R6n6FDhZ0Hri6/X7edLIDv9gl4VMZXhxTjLnl0VQ==
+
 lilconfig@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/lilconfig/-/lilconfig-2.1.0.tgz"
@@ -4234,10 +4234,10 @@ mongodb@~6.10.0:
     bson "^6.7.0"
     mongodb-connection-string-url "^3.0.0"
 
-mongoose@*, mongoose@^8.8.1:
-  version "8.8.1"
-  resolved "https://registry.npmjs.org/mongoose/-/mongoose-8.8.1.tgz"
-  integrity sha512-l7DgeY1szT98+EKU8GYnga5WnyatAu+kOQ2VlVX1Mxif6A0Umt0YkSiksCiyGxzx8SPhGe9a53ND1GD4yVDrPA==
+mongoose@*, mongoose@^8.8.3:
+  version "8.8.3"
+  resolved "https://registry.npmjs.org/mongoose/-/mongoose-8.8.3.tgz"
+  integrity sha512-/I4n/DcXqXyIiLRfAmUIiTjj3vXfeISke8dt4U4Y8Wfm074Wa6sXnQrXN49NFOFf2mM1kUdOXryoBvkuCnr+Qw==
   dependencies:
     bson "^6.7.0"
     kareem "2.6.3"
