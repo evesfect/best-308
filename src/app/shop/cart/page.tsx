@@ -9,6 +9,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { CartItem } from '@/types/cart';
 import StaticTopBar from "@/components/StaticTopBar";
+import colorMap from "@/types/ColorMap";
+import styles from "@/styles/ProductItem.module.css";
 
 
 
@@ -237,7 +239,12 @@ const ShoppingCartPage = () => {
                                 <h3 className="text-lg font-semibold">{item.name}</h3>
                                 <p className="text-gray-600">Price: ${item.salePrice}</p>
                                 <p className="text-gray-500">Size: {item.size}</p>
-                                <p className="text-gray-500">Color: {item.color}</p>
+                                <div className="flex items-center space-x-2 ">
+                                  <p className="text-gray-500">Color: {item.color}</p>
+                                  <div className={`${styles.colorOption}`} style={{backgroundColor: (item.color && colorMap[item.color.toLowerCase()]) || 'white'}}></div>
+                                </div>
+
+
                               </div>
                             </div>
                             {/* Quantity Controls */}
