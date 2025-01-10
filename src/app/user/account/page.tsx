@@ -126,7 +126,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ useData }) => {
                         {RenderObject("E-Mail", currentData.email, "email", false)}
                         {RenderObject("Phone Number", currentData.phoneNumber, "phoneNumber", true, "Enter your Phone Number (5xxxxxxxxx)")}
                         {RenderObject("Home Address", currentData.address, "address")}
-                        {RenderObject("Tax ID", currentData.address, "taxId")}
+                        {RenderObject("Tax ID", currentData.taxId, "taxId")}
                     </div>
 
                     {/* Save and Cancel Buttons */}
