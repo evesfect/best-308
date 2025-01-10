@@ -7,7 +7,8 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import Link from 'next/link';
-import { Heart } from 'react-bootstrap-icons';
+import {Heart, HeartFill} from 'react-bootstrap-icons';
+import {WishlistItem} from "@/types/wishlist";
 
 
 interface Stock {
@@ -71,11 +72,31 @@ const ShoppingPage = () => {
     [key: string]: { size: string; color: string };
   }>({});
   const [toast, setToast] = useState<Toast | null>(null);
+  const [wishlistItems, setWishlistItems] = useState<Set<string>>(new Set());
+
 
   useEffect(() => {
     fetchProducts();
     fetchCategories();
   }, [query, category, order]);
+
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      try {
+        const response = await axios.get('/api/wishlist/view-wishlist');
+        console.log("aha:",response);
+        const items: WishlistItem[] = response.data.items;
+
+        // Extract the relevant field (e.g., `id`) and update the Set
+        const itemIds = new Set(items.map(item => item.productId.toString()));
+        setWishlistItems(itemIds);
+      } catch (error) {
+        console.error('Error fetching wishlist:', error);
+      }
+    };
+
+    fetchWishlist();
+  }, []);
 
   const fetchCategories = async () => {
     try {
@@ -166,46 +187,69 @@ const ShoppingPage = () => {
       setToast({ message: "An error occurred while adding the product to the cart. Please try again.", type: "error" });
     }
   };
-  
 
-  const addToWishlist = async (productId: string) => {
+
+  const toggleWishlistItem = async (productId: string) => {
     try {
       if (!session?.user?.id) {
-        setToast({ message: "Please login to add to wishlist", type: "error" });
+        setToast({ message: "Please login to manage your wishlist", type: "error" });
         return;
       }
 
-      const selected = selectedOptions[productId];
-      console.log("Selected options:", selected); // Debug log
+      if (wishlistItems.has(productId)) {
+        // Remove from wishlist
+        const response = await axios.delete('/api/wishlist/remove-from-wishlist', {
+          data: { productId },
+        });
 
-      const response = await axios.post('/api/wishlist/add-to-wishlist', {
-        productId,
-        size: selected?.size,  // Add size
-        color: selected?.color // Add color
-      });
+        if (response.status === 200 || response.status === 204) {
+          setToast({ message: "Removed from wishlist successfully!", type: "success" });
+          setWishlistItems((prev) => {
+            const updatedSet = new Set(prev);
+            updatedSet.delete(productId); // Remove productId from the Set
+            return updatedSet;
+          });
+        }
+      } else {
+        // Add to wishlist
+        const selected = selectedOptions[productId];
+        console.log("Selected options:", selected); // Debug log
 
-      if (response.status === 200 || response.status === 201) {
-        setToast({ message: "Added to wishlist successfully!", type: "success" });
+        const response = await axios.post('/api/wishlist/add-to-wishlist', {
+          productId,
+          size: selected?.size, // Add size
+          color: selected?.color, // Add color
+        });
+
+        if (response.status === 200 || response.status === 201) {
+          setToast({ message: "Added to wishlist successfully!", type: "success" });
+          setWishlistItems((prev) => new Set(prev).add(productId)); // Add productId to the Set
+        }
       }
     } catch (error: any) {
-      console.error('Error adding to wishlist:', error);
-      setToast({ 
-        message: error.response?.data?.error || "Failed to add to wishlist", 
-        type: "error" 
+      console.error('Error managing wishlist:', error);
+      setToast({
+        message: error.response?.data?.error || "Failed to manage wishlist",
+        type: "error",
       });
     }
   };
 
   const renderProduct = (product: Product) => {
     const selected = selectedOptions[product._id] || { size: '', color: '' };
-  
+    const isInWishlist = wishlistItems.has(product._id);
+
     return (
       <div key={product._id} className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow relative">
         <button
-          onClick={() => addToWishlist(product._id)}
+          onClick={() => toggleWishlistItem(product._id)}
           className="absolute top-2 right-2 z-10 p-2 rounded-full bg-white shadow-md hover:bg-gray-100"
         >
-          <Heart className="text-gray-500 w-5 h-5" />
+          {isInWishlist ? (
+              <HeartFill className="text-red-500 w-5 h-5" />
+          ) : (
+              <Heart className="text-gray-500 w-5 h-5" />
+          )}
         </button>
 
         <Link href={`/product/${product._id}`} className="cursor-pointer">
