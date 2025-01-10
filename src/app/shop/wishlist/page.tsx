@@ -126,6 +126,9 @@ const WishlistPage = () => {
   return (
       <>
         <StaticTopBar></StaticTopBar>
+        {Array.from({ length: 2 }).map((_, index) => (
+            <br key={index} />
+        ))}
         <div className="min-h-screen bg-gray-100 flex justify-center items-center">
           <div className="container mx-auto py-12 px-6 bg-white shadow-md rounded-lg">
             <h1 className="text-3xl font-bold text-center mb-8 text-blue-600">
@@ -150,8 +153,8 @@ const WishlistPage = () => {
                           <div>
                             <h3 className="text-lg font-semibold">{item.product.name}</h3>
                             <p className="text-gray-600">Price: ${item.product.salePrice}</p>
-                            <p className="text-gray-500">Size: {item.size}</p>
-                            <p className="text-gray-500">Color: {item.color}</p>
+                            {item.size && <p className="text-gray-500">Size: {item.size}</p>}
+                            {item.color && <p className="text-gray-500">Color: {item.color}</p>}
                             <p className="text-gray-500">Category: {item.product.category}</p>
                           </div>
                         </div>
