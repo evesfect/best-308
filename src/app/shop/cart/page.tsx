@@ -241,7 +241,8 @@ const ShoppingCartPage = () => {
                                 <p className="text-gray-500">Size: {item.size}</p>
                                 <div className="flex items-center space-x-2 ">
                                   <p className="text-gray-500">Color: {item.color}</p>
-                                  <div className={`${styles.colorOption}`} style={{backgroundColor: (item.color && colorMap[item.color.toLowerCase()]) || 'white'}}></div>
+                                  <div className={`${styles.colorOption}`}
+                                       style={{backgroundColor: (item.color && colorMap[item.color.toLowerCase()]) || 'white'}}></div>
                                 </div>
 
 
@@ -276,9 +277,16 @@ const ShoppingCartPage = () => {
             <div className="w-1/4 bg-white shadow-md rounded-lg p-6">
               <h2 className="text-2xl font-bold text-gray-700 mb-4">Summary</h2>
               <div className="text-lg text-gray-600 mb-4">
-                <p>Total Items: <span
-                    className="font-semibold">{cartItems.reduce((sum, item) => sum + item.quantity, 0)}</span></p>
-                <p>Total Price: <span className="font-semibold">${totalPrice.toFixed(2)}</span></p>
+                <p>
+                  Total Items:{" "}
+                  <span className="font-semibold">
+        {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+      </span>
+                </p>
+                <p>
+                  Total Price:{" "}
+                  <span className="font-semibold">${totalPrice.toFixed(2)}</span>
+                </p>
               </div>
               <button
                   className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex justify-center items-center space-x-2"
@@ -291,12 +299,34 @@ const ShoppingCartPage = () => {
                     viewBox="0 0 20 20"
                     fill="currentColor"
                 >
-                  <path fillRule="evenodd"
-                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                        clipRule="evenodd"/>
+                  <path
+                      fillRule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a 1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clipRule="evenodd"
+                  />
                 </svg>
               </button>
+              {/* Returns Section */}
+              <div className="mt-4 text-sm text-gray-600 border-t pt-4">
+                <h3 className="font-semibold text-gray-700 mb-2">Returns</h3>
+                <p>
+                  You can make a return request within <strong>30 days</strong> of the delivery date. We provide a free
+                  pickup service at your home.
+                </p>
+              </div>
+              {/* Payment Methods Section */}
+              <div className="mt-4 text-sm text-gray-600 border-t pt-4">
+                <h3 className="font-semibold text-gray-700 mb-2">Payment Methods</h3>
+                <p>We accept all major credit cards.</p>
+              </div>
+              {/* Privacy Section */}
+              <div className="mt-4 text-sm text-gray-600 border-t pt-4">
+                <h3 className="font-semibold text-gray-700 mb-2">Privacy</h3>
+                <p>Your personal information is protected and handled securely. We do not share your data with third
+                  parties without your consent.</p>
+              </div>
             </div>
+
           </div>
           {toast && (
               <Toast
