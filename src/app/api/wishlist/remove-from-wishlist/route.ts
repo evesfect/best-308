@@ -15,30 +15,30 @@ export async function DELETE(req: Request) {
 
     // Get productId from request body
     const { productId } = await req.json();
-    if (!productId) {
-      return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
-    }
+    console.log('Removing product:', productId); // Debug log
 
     await connectionPromise;
 
-    // Find user's wishlist and remove the item by productId
-    const result = await Wishlist.updateOne(
+    // Modified query to ensure proper removal
+    const result = await Wishlist.findOneAndUpdate(
       { userId: new Types.ObjectId(session.user.id) },
       { 
         $pull: { 
-          items: { 
-            productId: new Types.ObjectId(productId) 
-          } 
+          items: { productId: productId }  // Make sure this matches your schema structure
         } 
-      }
+      },
+      { new: true }
     );
 
-    if (result.modifiedCount === 0) {
-      return NextResponse.json({ error: 'Item not found in wishlist' }, { status: 404 });
+    console.log('Update result:', result); // Debug log
+
+    if (!result) {
+      return NextResponse.json({ error: 'Wishlist not found' }, { status: 404 });
     }
 
     return NextResponse.json({ 
-      message: 'Item removed from wishlist successfully' 
+      message: 'Item removed from wishlist successfully',
+      wishlist: result 
     }, { status: 200 });
 
   } catch (error) {

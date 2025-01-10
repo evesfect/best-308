@@ -80,7 +80,13 @@ const WishlistPage = () => {
       await axios.delete('/api/wishlist/remove-from-wishlist', {
         data: { productId }
       });
-      setWishlistItems(prevItems => prevItems.filter(item => item.productId !== productId));
+      
+      setWishlistItems(prevItems => 
+        prevItems.filter(item => item.productId !== productId)
+      );
+      
+      await fetchWishlistItems();
+      
       setToast({ message: "Item removed from wishlist", type: "success" });
     } catch (error) {
       console.error('Error removing item from wishlist:', error);
@@ -172,7 +178,7 @@ const WishlistPage = () => {
                             Add to Cart
                           </button>
                           <button
-                              onClick={() => removeFromWishlist(item._id)}
+                              onClick={() => removeFromWishlist(item.productId)}
                               className="text-red-500 hover:text-red-600 transition"
                           >
                             <Trash size={20}/>
