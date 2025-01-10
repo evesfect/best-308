@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Trash } from 'react-bootstrap-icons';
 import StaticTopBar from "@/components/StaticTopBar";
+import Link from 'next/link';
 
 interface WishlistItem {
   _id: string;
@@ -143,20 +144,24 @@ const WishlistPage = () => {
                           className="flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition"
                       >
                         <div className="flex items-center space-x-4">
-                          <Image
-                              src={`/api/images/${item.product.imageId}`}
-                              alt={item.product.name}
-                              width={300}
-                              height={300}
-                              className="w-24 h-24 object-cover rounded-lg"
-                          />
-                          <div>
-                            <h3 className="text-lg font-semibold">{item.product.name}</h3>
-                            <p className="text-gray-600">Price: ${item.product.salePrice}</p>
-                            {item.size && <p className="text-gray-500">Size: {item.size}</p>}
-                            {item.color && <p className="text-gray-500">Color: {item.color}</p>}
-                            <p className="text-gray-500">Category: {item.product.category}</p>
-                          </div>
+                          <Link href={`/product/${item.productId}`}>
+                            <div className="flex items-center space-x-4 cursor-pointer hover:opacity-80">
+                              <Image
+                                src={`/api/images/${item.product.imageId}`}
+                                alt={item.product.name}
+                                width={300}
+                                height={300}
+                                className="w-24 h-24 object-cover rounded-lg"
+                              />
+                              <div>
+                                <h3 className="text-lg font-semibold">{item.product.name}</h3>
+                                <p className="text-gray-600">Price: ${item.product.salePrice}</p>
+                                {item.size && <p className="text-gray-500">Size: {item.size}</p>}
+                                {item.color && <p className="text-gray-500">Color: {item.color}</p>}
+                                <p className="text-gray-500">Category: {item.product.category}</p>
+                              </div>
+                            </div>
+                          </Link>
                         </div>
 
                         <div className="flex items-center space-x-4">
