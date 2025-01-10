@@ -31,6 +31,10 @@ const ProductMgrMainPage = () => {
     router.push('/sales-mgr/graph')
   }
 
+  const goToRefund = () =>{
+    router.push('/sales-mgr/refund')
+  }
+
   return (
     <div className="min-h-screen p-8 bg-gray-100 space-y-20">
       <h1 className="text-3xl font-bold mb-6">Product Dashboard</h1>
@@ -45,7 +49,7 @@ const ProductMgrMainPage = () => {
         </div>
         <div className="p-6 bg-white rounded shadow">
           <h2 className="text-xl font-semibold">Total Money Made</h2>
-          <p className="text-3xl mt-2">{stats?.money || 0}</p>
+          <p className="text-3xl mt-2">{stats?.money || 0}$</p>
         </div>
       </div>
 
@@ -68,6 +72,12 @@ const ProductMgrMainPage = () => {
           className="p-10 bg-yellow-500 text-white rounded shadow w-48 text-lg font-bold" // Set a fixed width
         >
           Invoices
+        </button>
+        <button
+          onClick={goToRefund}
+          className="p-10 bg-red-500 text-white rounded shadow w-48 text-lg font-bold"
+          >
+          Refund
         </button>
       </div>
     </div>

@@ -22,5 +22,5 @@ const refundSchema = new Schema<RefundType>({
     timestamps: true
 });
 
-export const Refund = models.Refund || model<RefundType>('Refund', refundSchema);
+export const Refund = models.Refund || model<RefundType>('Refund', refundSchema, 'refund');
 export default Refund;
