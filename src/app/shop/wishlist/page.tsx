@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Trash } from 'react-bootstrap-icons';
+import StaticTopBar from "@/components/StaticTopBar";
 
 interface WishlistItem {
   _id: string;
@@ -110,81 +111,89 @@ const WishlistPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex justify-center items-center">
-        <p className="text-xl font-semibold">Loading wishlist...</p>
-      </div>
+        <>
+          <StaticTopBar></StaticTopBar>
+          <div className="min-h-screen bg-gray-100 flex justify-center items-center">
+            <p className="text-xl font-semibold">Loading wishlist...</p>
+          </div>
+        </>
+
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center items-center">
-      <div className="container mx-auto py-12 px-6 bg-white shadow-md rounded-lg">
-        <h1 className="text-3xl font-bold text-center mb-8 text-blue-600">
-          Your Wishlist
-        </h1>
+      <>
+        <StaticTopBar></StaticTopBar>
+        <div className="min-h-screen bg-gray-100 flex justify-center items-center">
+          <div className="container mx-auto py-12 px-6 bg-white shadow-md rounded-lg">
+            <h1 className="text-3xl font-bold text-center mb-8 text-blue-600">
+              Your Wishlist
+            </h1>
 
-        {wishlistItems.length > 0 ? (
-          <div className="space-y-6">
-            {wishlistItems.map((item) => (
-              <div
-                key={item._id}
-                className="flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition"
-              >
-                <div className="flex items-center space-x-4">
-                  <Image
-                    src={`/api/images/${item.product.imageId}`}
-                    alt={item.product.name}
-                    width={300}
-                    height={300}
-                    className="w-24 h-24 object-cover rounded-lg"
-                  />
-                  <div>
-                    <h3 className="text-lg font-semibold">{item.product.name}</h3>
-                    <p className="text-gray-600">Price: ${item.product.salePrice}</p>
-                    <p className="text-gray-500">Size: {item.size}</p>
-                    <p className="text-gray-500">Color: {item.color}</p>
-                    <p className="text-gray-500">Category: {item.product.category}</p>
-                  </div>
+            {wishlistItems.length > 0 ? (
+                <div className="space-y-6">
+                  {wishlistItems.map((item) => (
+                      <div
+                          key={item._id}
+                          className="flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition"
+                      >
+                        <div className="flex items-center space-x-4">
+                          <Image
+                              src={`/api/images/${item.product.imageId}`}
+                              alt={item.product.name}
+                              width={300}
+                              height={300}
+                              className="w-24 h-24 object-cover rounded-lg"
+                          />
+                          <div>
+                            <h3 className="text-lg font-semibold">{item.product.name}</h3>
+                            <p className="text-gray-600">Price: ${item.product.salePrice}</p>
+                            <p className="text-gray-500">Size: {item.size}</p>
+                            <p className="text-gray-500">Color: {item.color}</p>
+                            <p className="text-gray-500">Category: {item.product.category}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-4">
+                          <button
+                              onClick={() => addToCart(item)}
+                              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+                          >
+                            Add to Cart
+                          </button>
+                          <button
+                              onClick={() => removeFromWishlist(item._id)}
+                              className="text-red-500 hover:text-red-600 transition"
+                          >
+                            <Trash size={20}/>
+                          </button>
+                        </div>
+                      </div>
+                  ))}
                 </div>
-
-                <div className="flex items-center space-x-4">
+            ) : (
+                <div className="text-center">
+                  <p className="text-xl text-gray-500 mb-4">Your wishlist is empty.</p>
                   <button
-                    onClick={() => addToCart(item)}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+                      onClick={() => router.push('/shop/browse/best-sellers')}
+                      className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition"
                   >
-                    Add to Cart
-                  </button>
-                  <button
-                    onClick={() => removeFromWishlist(item._id)}
-                    className="text-red-500 hover:text-red-600 transition"
-                  >
-                    <Trash size={20} />
+                    Browse Products
                   </button>
                 </div>
-              </div>
-            ))}
+            )}
           </div>
-        ) : (
-          <div className="text-center">
-            <p className="text-xl text-gray-500 mb-4">Your wishlist is empty.</p>
-            <button
-              onClick={() => router.push('/shop/browse/best-sellers')}
-              className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition"
-            >
-              Browse Products
-            </button>
-          </div>
-        )}
-      </div>
 
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
-    </div>
+          {toast && (
+              <Toast
+                  message={toast.message}
+                  type={toast.type}
+                  onClose={() => setToast(null)}
+              />
+          )}
+        </div>
+      </>
+
   );
 };
 
