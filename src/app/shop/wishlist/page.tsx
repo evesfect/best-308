@@ -171,12 +171,12 @@ const WishlistPage = () => {
                         </div>
 
                         <div className="flex items-center space-x-4">
-                          <button
+                          {item.color && item.size && <button
                               onClick={() => addToCart(item)}
                               className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
                           >
                             Add to Cart
-                          </button>
+                          </button>}
                           <button
                               onClick={() => removeFromWishlist(item.productId)}
                               className="text-red-500 hover:text-red-600 transition"
