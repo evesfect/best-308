@@ -9,7 +9,7 @@ import { Toast } from 'primereact/toast';
 import { useSession } from 'next-auth/react';
 import axios from 'axios';
 import colorMap from "@/types/ColorMap";
-
+import { productCategoryInfo, sizeAndFit, deliveryAndReturns, payment } from '../../../types/description.ts'
 interface ProductItemProps {
     product: Product;
 }
@@ -192,10 +192,10 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
                                                 <span
                                                     className={`${styles.sizeQuantity} ${quantity > 0 && quantity < 5 ? styles.lowStock : ''}`}
                                                 >
-                                                    {quantity >= 5 
-                                                        ? `In Stock: ${quantity}` 
-                                                        : quantity > 0 
-                                                        ? `Low Stock: ${quantity}`  
+                                                    {quantity >= 5
+                                                        ? `In Stock: ${quantity}`
+                                                        : quantity > 0
+                                                        ? `Low Stock: ${quantity}`
                                                         : 'Out of Stock'}
                                                 </span>
                                             </div>
@@ -260,21 +260,21 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
 
                 <div className={styles.additionalInfo}>
                     <h3>Fabric & Care</h3>
-                    <p>This section provides details on the materials used and how to properly care for the garment.</p>
+                    <p>{productCategoryInfo[product.category.toLowerCase()] || "Fabric & Care details not available for this category."}</p>
 
                     <h3>Size & Fit</h3>
-                    <p>Here you will find guidance on sizing and the fit of the product to ensure the best choice for your needs.</p>
+                    <p>{sizeAndFit}</p>
 
                     <h3>Delivery & Returns</h3>
-                    <p>This outlines the delivery options available and the process for returning the product if necessary.</p>
+                    <p>{deliveryAndReturns}</p>
 
                     <h3>Payment</h3>
-                    <p>This section covers the accepted payment methods and any additional payment-related information.</p>
+                    <p>{payment}</p>
                 </div>
             </div>
 
-            <CommentSection productId={product._id.toString()} />
-            <Toast ref={toast} />
+            <CommentSection productId={product._id.toString()}/>
+            <Toast ref={toast}/>
         </>
     );
 };
