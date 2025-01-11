@@ -1,5 +1,5 @@
 // File: ProductItem.tsx
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Product } from '@/types/product';
 import Image from 'next/image';
 import { Button } from 'primereact/button';
@@ -9,6 +9,9 @@ import { Toast } from 'primereact/toast';
 import { useSession } from 'next-auth/react';
 import axios from 'axios';
 import colorMap from "@/types/ColorMap";
+import { Heart, HeartFill } from 'react-bootstrap-icons';
+import { WishlistItem } from "@/types/wishlist";
+import { productCategoryInfo, sizeAndFit, deliveryAndReturns, payment } from '../../../types/description.ts'
 
 interface ProductItemProps {
     product: Product;
@@ -22,6 +25,7 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
     const [quantity, setQuantity] = useState(1);
     const toast = useRef<Toast>(null);
     const { data: session } = useSession();
+    const [wishlistItems, setWishlistItems] = useState<Set<string>>(new Set());
 
     const formattedProductName = product.name
         .split(' ')
@@ -31,6 +35,77 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
     const totalStock = product.available_stock
         ? Object.values(product.available_stock).reduce((acc, stock) => acc + stock, 0)
         : 0;
+
+    useEffect(() => {
+        const fetchWishlist = async () => {
+            try {
+                const response = await axios.get('/api/wishlist/view-wishlist');
+                const items: WishlistItem[] = response.data.items;
+                const itemIds = new Set(items.map(item => item.productId.toString()));
+                setWishlistItems(itemIds);
+            } catch (error) {
+                console.error('Error fetching wishlist:', error);
+            }
+        };
+
+        fetchWishlist();
+    }, []);
+
+    const toggleWishlistItem = async () => {
+        try {
+            if (!session?.user?.id) {
+                toast.current?.show({ 
+                    severity: 'error', 
+                    summary: 'Error', 
+                    detail: 'Please login to manage your wishlist' 
+                });
+                return;
+            }
+
+            if (wishlistItems.has(product._id)) {
+                // Remove from wishlist
+                const response = await axios.delete('/api/wishlist/remove-from-wishlist', {
+                    data: { productId: product._id },
+                });
+
+                if (response.status === 200 || response.status === 204) {
+                    toast.current?.show({ 
+                        severity: 'success', 
+                        summary: 'Success', 
+                        detail: 'Removed from wishlist successfully!' 
+                    });
+                    setWishlistItems(prev => {
+                        const updatedSet = new Set(prev);
+                        updatedSet.delete(product._id);
+                        return updatedSet;
+                    });
+                }
+            } else {
+                // Add to wishlist
+                const response = await axios.post('/api/wishlist/add-to-wishlist', {
+                    productId: product._id,
+                    size: selectedSize,
+                    color: selectedColor,
+                });
+
+                if (response.status === 200 || response.status === 201) {
+                    toast.current?.show({ 
+                        severity: 'success', 
+                        summary: 'Success', 
+                        detail: 'Added to wishlist successfully!' 
+                    });
+                    setWishlistItems(prev => new Set(prev).add(product._id));
+                }
+            }
+        } catch (error: any) {
+            console.error('Error managing wishlist:', error);
+            toast.current?.show({ 
+                severity: 'error', 
+                summary: 'Error', 
+                detail: error.response?.data?.error || "Failed to manage wishlist"
+            });
+        }
+    };
 
     const addToCart = async () => {
         if (!selectedSize || !selectedColor) {
@@ -94,7 +169,20 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
 
                 <div className={styles.detailsSection}>
                     <div className={styles.namePriceSection}>
-                        <h1 className={styles.productName}>{formattedProductName}</h1>
+                        <div className={`${styles.nameWishlistContainer} flex items-center justify-between`}>
+                            <h1 className={styles.productName}>{formattedProductName}</h1>
+                            <button
+                                onClick={toggleWishlistItem}
+                                className={`${styles.wishlistButton} ${wishlistItems.has(product._id) ? styles.active : ''}`}
+                                title={wishlistItems.has(product._id) ? "Remove from Wishlist" : "Add to Wishlist"}
+                            >
+                                {wishlistItems.has(product._id) ? (
+                                    <HeartFill className="text-red-500 w-7 h-7"/>
+                                ) : (
+                                    <Heart className="text-gray-500 w-7 h-7"/>
+                                )}
+                            </button>
+                        </div>
                         <p className={styles.productPrice}>${product.salePrice}</p>
                         <hr className={styles.horizontalLine}/>
 
@@ -192,10 +280,10 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
                                                 <span
                                                     className={`${styles.sizeQuantity} ${quantity > 0 && quantity < 5 ? styles.lowStock : ''}`}
                                                 >
-                                                    {quantity >= 5 
-                                                        ? `In Stock: ${quantity}` 
-                                                        : quantity > 0 
-                                                        ? `Low Stock: ${quantity}`  
+                                                    {quantity >= 5
+                                                        ? `In Stock: ${quantity}`
+                                                        : quantity > 0
+                                                        ? `Low Stock: ${quantity}`
                                                         : 'Out of Stock'}
                                                 </span>
                                             </div>
@@ -241,11 +329,13 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
                         </div>
                         <hr className={styles.horizontalLine}/>
 
-                        <Button
-                            label="ADD TO CART"
-                            className={styles.addToCartButton}
-                            onClick={addToCart}
-                        />
+                        <div className={styles.actionButtons}>
+                            <Button
+                                label="ADD TO CART"
+                                className={styles.addToCartButton}
+                                onClick={addToCart}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -260,21 +350,21 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
 
                 <div className={styles.additionalInfo}>
                     <h3>Fabric & Care</h3>
-                    <p>This section provides details on the materials used and how to properly care for the garment.</p>
+                    <p>{productCategoryInfo[product.category.toLowerCase()] || "Fabric & Care details not available for this category."}</p>
 
                     <h3>Size & Fit</h3>
-                    <p>Here you will find guidance on sizing and the fit of the product to ensure the best choice for your needs.</p>
+                    <p>{sizeAndFit}</p>
 
                     <h3>Delivery & Returns</h3>
-                    <p>This outlines the delivery options available and the process for returning the product if necessary.</p>
+                    <p>{deliveryAndReturns}</p>
 
                     <h3>Payment</h3>
-                    <p>This section covers the accepted payment methods and any additional payment-related information.</p>
+                    <p>{payment}</p>
                 </div>
             </div>
 
-            <CommentSection productId={product._id.toString()} />
-            <Toast ref={toast} />
+            <CommentSection productId={product._id.toString()}/>
+            <Toast ref={toast}/>
         </>
     );
 };

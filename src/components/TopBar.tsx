@@ -39,6 +39,10 @@ const TopBar: React.FC<TopBarProps> = ({ scrollPosition }) => {
     router.push('/shop/cart');
   };
 
+  const goToWishlist = () => {
+    router.push('/shop/wishlist');
+  };
+
   const bgColorClass = scrollPosition > 0 ? 'bg-semi-transparent' : 'bg-transparent';
 
   const backgroundColor = `rgba(255, 255, 255, ${Math.min(scrollPosition / 100, 1)})`;
@@ -110,11 +114,33 @@ const TopBar: React.FC<TopBarProps> = ({ scrollPosition }) => {
                 </div>
               )}
             </div>
-            <button aria-label="Favorites" className="flex items-center">
-              <Image src="/icons/heart.svg" alt="Favorites" width={20} height={20} className={`transition-colors duration-300`} style={{ filter: `invert(${iconColor === 'white' ? 1 : 0})` }} />
+            <button 
+              aria-label="Wishlist" 
+              className="flex items-center"
+              onClick={goToWishlist}
+            >
+              <Image 
+                src="/icons/heart.svg" 
+                alt="Wishlist" 
+                width={20} 
+                height={20} 
+                className={`transition-colors duration-300`} 
+                style={{ filter: `invert(${iconColor === 'white' ? 1 : 0})` }} 
+              />
             </button>
-            <button aria-label="Shopping Cart" className="flex items-center" onClick={goToShoppingCart}>
-              <Image src="/icons/cart.svg" alt="Shopping Cart" width={20} height={20} className={`transition-colors duration-300`} style={{ filter: `invert(${iconColor === 'white' ? 1 : 0})` }} />
+            <button 
+              aria-label="Shopping Cart" 
+              className="flex items-center" 
+              onClick={goToShoppingCart}
+            >
+              <Image 
+                src="/icons/cart.svg" 
+                alt="Shopping Cart" 
+                width={20} 
+                height={20} 
+                className={`transition-colors duration-300`} 
+                style={{ filter: `invert(${iconColor === 'white' ? 1 : 0})` }} 
+              />
             </button>
           </div>
         </div>
