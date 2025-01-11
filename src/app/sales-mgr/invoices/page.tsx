@@ -1,5 +1,5 @@
 //Should see invoices in given date range, save and dowload them as pdf's"use client";
-
+"use client"
 import { useState, useEffect } from "react";
 import axios from "axios";
 
