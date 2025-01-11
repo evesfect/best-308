@@ -28,6 +28,18 @@ const MainContent: React.FC<MainContentProps> = ({ activeItem, userData }) => {
             <UserOrders userId={userData._id}/>
           </div>
         )}
+        {activeItem === 'comments' && (
+          <div>
+            <h1 className="text-2xl font-bold">Comments & Ratings</h1>
+            <p>Here you can manage your comments and ratings.</p>
+          </div>
+        )}
+        {activeItem === 'changePassword' && (
+          <div>
+            <h1 className="text-2xl font-bold">Change Password</h1>
+            <p>Here you can change your password.</p>
+          </div>
+        )}
       </div>
     );
   };
