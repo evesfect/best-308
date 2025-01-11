@@ -138,6 +138,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ useData }) => {
       alert("Changes saved successfully!");
       setInitialData(currentData);
       setErrorMessage("");
+      setIsChanged(false);
     } catch (error: any) {
       setErrorMessage(error.message || "An unexpected error occurred. Please try again.");
     }
