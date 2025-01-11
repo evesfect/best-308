@@ -61,7 +61,7 @@ const UserPanel: React.FC = () => {
     }, [status]);
 
     return (
-        <div className="bg-white min-h-full">
+        <div className="min-h-screen bg-gray-100 flex justify-center items-start py-4">
             <TopBar />
             <div {...handleTabClick} className="flex-grow flex mt-[96px] gap-10 p-20 px-20">
                 <div className="bg-gray-100 bg-white bg-opacity-95 border border-gray-200 rounded-lg shadow-lg flex flex-col h-full">
