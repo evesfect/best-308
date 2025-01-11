@@ -15,6 +15,9 @@ export async function DELETE(req: Request) {
 
     // Get productId from request body
     const { productId } = await req.json();
+    if (!productId) {
+      return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
+    }
     console.log('Removing product:', productId); // Debug log
 
     await connectionPromise;
