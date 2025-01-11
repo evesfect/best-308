@@ -8,6 +8,9 @@ import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { CartItem } from '@/types/cart';
+import StaticTopBar from "@/components/StaticTopBar";
+import colorMap from "@/types/ColorMap";
+import styles from "@/styles/ProductItem.module.css";
 
 
 
@@ -204,89 +207,136 @@ const ShoppingCartPage = () => {
 
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center items-center"> 
+      <>
+        <StaticTopBar></StaticTopBar>
+        {Array.from({ length: 6 }).map((_, index) => (
+            <br key={index} />
+        ))}
+        <div className="min-h-screen bg-gray-100 flex justify-center items-start py-12 px-6">
+          <div className="container mx-auto flex space-x-6">
+            {/* Products Section */}
+            <div className="w-3/4 bg-white shadow-md rounded-lg p-6">
+              <h1 className="text-3xl font-bold mb-8 text-black-600">
+                Shopping Cart
+              </h1>
+              {cartItems.length > 0 ? (
+                  <>
+                    <div className="space-y-6">
+                      {cartItems.map((item) => (
+                          <div
+                              key={item._id}
+                              className="flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition"
+                          >
+                            <div className="flex items-center space-x-4">
+                              <Image
+                                  src={`/api/images/${item.imageId}`}
+                                  alt={item.name}
+                                  width={300}
+                                  height={300}
+                                  className="w-20 h-20 object-cover rounded-lg"
+                              />
+                              <div>
+                                <h3 className="text-lg font-semibold">{item.name}</h3>
+                                <p className="text-gray-600">Price: ${item.salePrice}</p>
+                                <p className="text-gray-500">Size: {item.size}</p>
+                                <div className="flex items-center space-x-2 ">
+                                  <p className="text-gray-500">Color: {item.color}</p>
+                                  <div className={`${styles.colorOption}`}
+                                       style={{backgroundColor: (item.color && colorMap[item.color.toLowerCase()]) || 'white'}}></div>
+                                </div>
 
-      <div className="container mx-auto py-12 px-6 bg-white shadow-md rounded-lg">
-        <h1 className="text-3xl font-bold text-center mb-8 text-blue-600">
-          Your Shopping Cart
-        </h1> 
 
-        {cartItems.length > 0 ? (
-          <>
-            <div className="space-y-6">
-              {cartItems.map((item) => (
-                <div
-                  key={item._id}
-                  className="flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition"
-                >
-                  <div className="flex items-center space-x-4">
-                    <Image
-                      src={`/api/images/${item.imageId}`}
-                      alt={item.name}
-                      width={300}
-                      height={300}
-                      className="w-24 h-24 object-cover rounded-lg"
-                    />
-                    <div>
-                      <h3 className="text-lg font-semibold">{item.name}</h3>
-                      <p className="text-gray-600">Price: ${item.salePrice}</p>
-                      <p className="text-gray-500">Size: {item.size}</p>
-                      <p className="text-gray-500">Color: {item.color}</p>
+                              </div>
+                            </div>
+                            {/* Quantity Controls */}
+                            <div className="flex items-center space-x-4">
+                              <button
+                                  onClick={() => updateQuantity(item._id, item.size, item.color, -1)}
+                                  className="bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition"
+                              >
+                                -
+                              </button>
+                              <p className="text-gray-500 font-bold">{item.quantity}</p>
+                              <button
+                                  onClick={() => updateQuantity(item._id, item.size, item.color, 1)}
+                                  className="bg-green-500 text-white px-3 py-2 rounded-lg hover:bg-green-600 transition"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                      ))}
                     </div>
-                  </div>
-                  {/* Quantity Controls */}
-                  <div className="flex items-center space-x-4">
-                    <button
-                      onClick={() => updateQuantity(item._id, item.size, item.color, -1)}
-                      className="bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition"
-                    >
-                      -
-                    </button>
-                    <p className="text-gray-500 font-bold">{item.quantity}</p>
-                    <button
-                      onClick={() => updateQuantity(item._id, item.size, item.color, 1)}
-                      className="bg-green-500 text-white px-3 py-2 rounded-lg hover:bg-green-600 transition"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              ))}
+                  </>
+              ) : (
+                  <p className="text-center text-xl text-gray-500">Your cart is empty.</p>
+              )}
             </div>
-            <div className="mt-6 border-t pt-4">
-              <div className="flex justify-between items-center">
-                <div className="text-lg font-semibold">
-                  Total Price: ${totalPrice.toFixed(2)}
-                </div>
-                <button 
-                  className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center space-x-2"
+
+            {/* Summary Section */}
+            <div className="w-1/4 bg-white shadow-md rounded-lg p-6">
+              <h2 className="text-2xl font-bold text-gray-700 mb-4">Summary</h2>
+              <div className="text-lg text-gray-600 mb-4">
+                <p>
+                  Total Items:{" "}
+                  <span className="font-semibold">
+        {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+      </span>
+                </p>
+                <p>
+                  Total Price:{" "}
+                  <span className="font-semibold">${totalPrice.toFixed(2)}</span>
+                </p>
+              </div>
+              <button
+                  className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex justify-center items-center space-x-2"
                   onClick={handleOrderNow}
-                >
-                  <span>Order Now</span>
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    className="h-5 w-5" 
-                    viewBox="0 0 20 20" 
+              >
+                <span>Order Now</span>
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
                     fill="currentColor"
-                  >
-                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                  </svg>
-                </button>
+                >
+                  <path
+                      fillRule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a 1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+              {/* Returns Section */}
+              <div className="mt-4 text-sm text-gray-600 border-t pt-4">
+                <h3 className="font-semibold text-gray-700 mb-2">Returns</h3>
+                <p>
+                  You can make a return request within <strong>30 days</strong> of the delivery date. We provide a free
+                  pickup service at your home.
+                </p>
+              </div>
+              {/* Payment Methods Section */}
+              <div className="mt-4 text-sm text-gray-600 border-t pt-4">
+                <h3 className="font-semibold text-gray-700 mb-2">Payment Methods</h3>
+                <p>We accept all major credit cards.</p>
+              </div>
+              {/* Privacy Section */}
+              <div className="mt-4 text-sm text-gray-600 border-t pt-4">
+                <h3 className="font-semibold text-gray-700 mb-2">Privacy</h3>
+                <p>Your personal information is protected and handled securely. We do not share your data with third
+                  parties without your consent.</p>
               </div>
             </div>
-          </>
-        ) : (
-          <p className="text-center text-xl text-gray-500">Your cart is empty.</p>
-        )}
-      </div>
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
-    </div>
+
+          </div>
+          {toast && (
+              <Toast
+                  message={toast.message}
+                  type={toast.type}
+                  onClose={() => setToast(null)}
+              />
+          )}
+        </div>
+      </>
   );
 };
 
