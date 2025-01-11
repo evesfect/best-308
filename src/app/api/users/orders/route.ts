@@ -28,7 +28,7 @@ export async function GET(req: NextRequest){
         }
             
         try {
-            const userOrders = await orderCollection.find({ user_id: userId }).sort({ orderDate: -1 }).toArray();
+            const userOrders = await orderCollection.find({ user_id: userId }).sort({ date: -1 }).toArray();
 
             return NextResponse.json({ userOrders: userOrders ?? [] }, { status: 200 });
 
