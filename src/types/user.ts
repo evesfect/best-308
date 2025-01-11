@@ -10,6 +10,7 @@ export interface User extends Document {
   lastName: string;
   email: string;
   phoneNumber: string;
+  taxId: string;
   password: string;
   role: string;
   address: string;
