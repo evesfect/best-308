@@ -1,17 +1,15 @@
-import { MongoClient } from 'mongodb';
 import nodemailer from 'nodemailer';
 import { NextResponse } from 'next/server';
-import connectionPromise from '@/lib/mongodb'
-import User from '@/models/user.model'
-import Product from '@/models/product.model'
+import connectionPromise from '@/lib/mongodb';
+import Product from '@/models/product.model';
 
 export async function POST(req: Request) {
     try {
-        const { productId, email } = await req.json();
+        const { productId, emails } = await req.json();
 
-        if (!productId || !email) {
-            return NextResponse.json({ 
-                error: 'Product ID and email are required' 
+        if (!productId || !Array.isArray(emails) || emails.length === 0) {
+            return NextResponse.json({
+                error: 'Product ID and a list of emails are required'
             }, { status: 400 });
         }
 
@@ -34,8 +32,8 @@ export async function POST(req: Request) {
             },
         });
 
-        // Send email
-        await transporter.sendMail({
+        // Prepare the email details
+        const mailOptions = emails.map(email => ({
             to: email,
             subject: 'Product Discount Alert!',
             html: `
@@ -44,16 +42,19 @@ export async function POST(req: Request) {
                 <p>Don't miss out on this great deal - check it out now!</p>
                 <a href="http://localhost:3000/products/${productId}">View Product</a>
             `,
-        });
+        }));
 
-        return NextResponse.json({ 
-            message: 'Discount notification email sent successfully.' 
+        // Send emails in parallel
+        await Promise.all(mailOptions.map(options => transporter.sendMail(options)));
+
+        return NextResponse.json({
+            message: 'Discount notification emails sent successfully.'
         }, { status: 200 });
 
     } catch (error) {
         console.error("Error sending discount notification:", error);
         return NextResponse.json(
-            { error: "Failed to send discount notification" },
+            { error: "Failed to send discount notifications" },
             { status: 500 }
         );
     }
