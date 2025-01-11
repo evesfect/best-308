@@ -59,7 +59,7 @@ const ProductMgrMainPage = () => {
           onClick={goToGraph}
           className="p-10 bg-blue-500 text-white rounded shadow w-48 text-lg font-bold" // Set a fixed width
         >
-          Graph
+          Charts
         </button>
         <button
           onClick={goToPrice}

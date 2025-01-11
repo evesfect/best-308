@@ -2,46 +2,61 @@ import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import connectionPromise from '@/lib/mongodb';
 
-// Import the Order model
+// Import the refund model
 import Refund from '@/models/refund.model';
 
 export async function GET(req: NextRequest) {
   try {
-    // Establish database connection
     await connectionPromise;
     console.log("Database connected successfully");
 
-    const db = mongoose.connection.db;
-    if (!db) {
-      console.error("Database connection is undefined");
-      return NextResponse.json({ message: 'Database connection error' }, { status: 500 });
+    const url = new URL(req.url);
+    const startDate = url.searchParams.get('startDate');
+    const endDate = url.searchParams.get('endDate');
+
+    console.log("Query parameters:", { startDate, endDate });
+
+    let filter = {};
+
+    if (startDate || endDate) {
+      if (startDate && isNaN(Date.parse(startDate))) {
+        return NextResponse.json({ message: 'Invalid startDate format. Use ISO 8601 format.' }, { status: 400 });
+      }
+      if (endDate && isNaN(Date.parse(endDate))) {
+        return NextResponse.json({ message: 'Invalid endDate format. Use ISO 8601 format.' }, { status: 400 });
+      }
+      if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+        return NextResponse.json({ message: 'startDate cannot be after endDate.' }, { status: 400 });
+      }
+
+      filter = {
+        requestDate: {
+          ...(startDate ? { $gte: new Date(`${startDate}T00:00:00.000Z`) } : {}),
+          ...(endDate ? { $lte: new Date(`${endDate}T23:59:59.999Z`) } : {}),
+        },
+      };
+      
+
+      console.log("Constructed filter for query:", filter);
     }
 
-    // Check if the 'order' collection exists
-    const collections = await db.listCollections().toArray();
-    console.log("Collections:", collections.map(c => c.name));
+    const refunds = await Refund.find(filter).sort({ requestDate: 1 });
 
-    if (!collections.some(c => c.name === 'refund')) {
-      console.error("The 'order' collection does not exist in the database");
-      return NextResponse.json({ message: 'Order collection not found' }, { status: 500 });
+    console.log("Refund fetched count:", refunds.length);
+    refunds.forEach(refund => console.log("Fetched refund requestDate:", refund.requestDate));
+
+    if (refunds.length === 0) {
+      console.log("No refunds found for the given date range.");
     }
 
-    // Fetch all orders
-    const refund = await Refund.find();
-    console.log("refund fetched:", refund.length);
+    return NextResponse.json(refunds);
 
-    if (refund.length === 0) {
-      console.log("No orders found in the database.");
-    }
-
-    // Respond with the fetched orders
-    return NextResponse.json(refund);
-
-  } catch (error: any) {
-    console.error("Error fetching orders:", error);
-    return NextResponse.json({ message: 'Error fetching orders', error: error.toString() }, { status: 500 });
+  } catch (error) {
+    console.error("Error fetching refunds:", error);
+    return NextResponse.json({ message: 'Error fetching refunds', error: (error as Error).toString() }, { status: 500 });
   }
 }
+
 
 interface StatusUpdateRequest {
     _id: string;
