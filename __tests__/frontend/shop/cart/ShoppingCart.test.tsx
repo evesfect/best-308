@@ -79,7 +79,14 @@ describe('Shopping Cart Page', () => {
       expect(screen.getByText('Price: $99.99')).toBeInTheDocument();
       expect(screen.getByText('Size: M')).toBeInTheDocument();
       expect(screen.getByText('Color: Blue')).toBeInTheDocument();
-      expect(screen.getByText('Total Price: $99.99')).toBeInTheDocument();
+      expect(
+          screen.getByText((content, element) => {
+            return (
+                content.startsWith('Total Price:') &&
+                element?.querySelector('span')?.textContent === '$99.99'
+            );
+          })
+      ).toBeInTheDocument();
     });
   });
 
