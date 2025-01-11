@@ -168,7 +168,7 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
 
                 <div className={styles.detailsSection}>
                     <div className={styles.namePriceSection}>
-                        <div className={styles.nameWishlistContainer}>
+                        <div className={`${styles.nameWishlistContainer} flex items-center justify-between`}>
                             <h1 className={styles.productName}>{formattedProductName}</h1>
                             <button
                                 onClick={toggleWishlistItem}
@@ -176,9 +176,9 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
                                 title={wishlistItems.has(product._id) ? "Remove from Wishlist" : "Add to Wishlist"}
                             >
                                 {wishlistItems.has(product._id) ? (
-                                    <HeartFill className={styles.wishlistIconFilled} />
+                                    <HeartFill className="text-red-500 w-7 h-7"/>
                                 ) : (
-                                    <Heart className={styles.wishlistIcon} />
+                                    <Heart className="text-gray-500 w-7 h-7"/>
                                 )}
                             </button>
                         </div>
