@@ -1,0 +1,67 @@
+.actionButtons {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.addToCartButton {
+    flex: 2;
+}
+
+.nameWishlistContainer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.productName {
+    flex: 1;
+    margin: 0;
+}
+
+.wishlistButton {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+}
+
+.wishlistButton:hover {
+    background-color: #f3f4f6;
+    transform: scale(1.1);
+}
+
+.wishlistIcon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: #6b7280;
+    transition: color 0.3s ease;
+}
+
+.wishlistIconFilled {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: #dc2626;
+    transition: color 0.3s ease;
+}
+
+.wishlistButton:hover .wishlistIcon {
+    color: #374151;
+}
+
+.wishlistButton:hover .wishlistIconFilled {
+    color: #b91c1c;
+}
+
+.wishlistButton:active {
+    transform: scale(0.95);
+}
+
+/* Remove the tooltip styles since we're now showing text directly */ 
