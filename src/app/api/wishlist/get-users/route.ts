@@ -18,10 +18,17 @@ export async function GET(request: Request) {
     // Connect to database
     await connectionPromise;
 
-    // Find all wishlist items containing the productId
-    const wishlistItems = await Wishlist.find({ 
-      products: productId 
-    }).select('userId');
+    // Query for wishlist items that contain the productId in the items array
+    const wishlistItems = await Wishlist.find({
+      "items.productId": productId, // Query inside the items array
+    }).select('userId'); // Only return the userId field
+
+    if (!wishlistItems.length) {
+      return NextResponse.json(
+          { message: "No users found for the provided product ID." },
+          { status: 404 }
+      );
+    }
 
     // Extract user IDs from the wishlist items
     const userIds = wishlistItems.map(item => item.userId);
