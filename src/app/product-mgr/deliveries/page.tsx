@@ -97,7 +97,7 @@ const OrderManagement: React.FC = () => {
                 <td className="px-4 py-2 text-sm text-gray-800">{order.user_id}</td>
                 <td className="px-4 py-2 text-sm text-gray-800">{order.address}</td>
                 <td className="px-4 py-2 text-sm text-gray-800">
-                  ${order.totalPrice.toFixed(2)}
+                  ${order.totalPrice}
                 </td>
                 <td className="px-4 py-2 text-sm text-gray-800">{order.status}</td>
                 <td className="px-4 py-2 text-sm">
