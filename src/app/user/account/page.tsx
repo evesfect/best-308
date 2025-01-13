@@ -16,6 +16,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ useData }) => {
     phoneNumber: useData.phoneNumber || "",
     address: useData.address || "",
     taxId: useData.taxId || "",
+    id: useData._id.toString() || "",
   });
 
   const [currentData, setCurrentData] = useState(initialData);
@@ -148,6 +149,7 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ useData }) => {
     <div>
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Account Settings</h1>
+        <h1 className="text-1xl">{initialData.id}</h1>
       </div>
 
       <div className="mt-12">

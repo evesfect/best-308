@@ -63,7 +63,7 @@ const ProductMgrMainPage = () => {
         </button>
         <button
           onClick={goToPrice}
-          className="p-10 bg-green-500 text-white rounded shadow w-48 text-lg font-bold" // Set a fixed width
+          className="p-10 bg-green-500 text-white rounded shadow w-60 text-lg font-bold" // Set a fixed width
         >
           Price & Discount
         </button>

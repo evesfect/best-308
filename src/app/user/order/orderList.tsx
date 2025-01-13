@@ -10,6 +10,7 @@ interface OrderListProps {
   orderedProducts: Map<string, Product>;
   userId: string;
   userEmail: string;
+  updateOrderedProducts: any,
 }
 
 interface Toast {
@@ -43,6 +44,7 @@ const OrderList: React.FC<OrderListProps> = ({
   orderedProducts,
   userId,
   userEmail,
+  updateOrderedProducts,
 }) => {
   const [toast, setToast] = useState<Toast | null>(null);
   const [refundRequested, setRefundRequested] = useState<Set<string>>(new Set()); // Track requested refunds
@@ -63,6 +65,7 @@ const OrderList: React.FC<OrderListProps> = ({
       console.log("Order canceled successfully:", data);
 
       setToast({ message: "Order canceled successfully!", type: "success" });
+      updateOrderedProducts();
     } catch (error) {
       console.error("Error canceling order:", error);
       setToast({ message: "Failed to cancel order. Please try again.", type: "error" });
@@ -71,6 +74,7 @@ const OrderList: React.FC<OrderListProps> = ({
 
   const handleRefundSubmitted = (productId: string) => {
     setRefundRequested((prev) => new Set(prev).add(productId)); // Mark refund as requested
+    updateOrderedProducts();
   };
 
   return (
