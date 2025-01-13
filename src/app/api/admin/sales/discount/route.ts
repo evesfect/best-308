@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import connectionPromise from '@/lib/mongodb';
 import { NextResponse } from 'next/server';
 
+
 export async function PATCH(req: Request) {
   try {
     await connectionPromise;
@@ -36,7 +37,25 @@ export async function PATCH(req: Request) {
       { _id: new mongoose.Types.ObjectId(productId) },
       { $set: { salePrice: newPrice } }
     );
-
+    
+    // Trigger email notifications after successful discount update
+    try {
+      console.log('Attempting to send notifications for productId:', productId);
+      const notifyResponse = await fetch('http://localhost:3000/api/wishlist/notify-users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ productId }),
+      });
+      
+      const notifyData = await notifyResponse.json();
+      console.log('Notification response:', notifyData);
+      
+    } catch (notifyError) {
+      console.error('Error sending notifications:', notifyError);
+    }
+    
     return NextResponse.json({ message: 'Product price updated', newPrice }, { status: 200 });
   } catch (error) {
     console.error('Error updating price:', error);
