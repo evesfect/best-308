@@ -12,10 +12,32 @@ interface Refund {
     refundAmount: number; 
   }
 
+interface Toast {
+  message: string;
+  type: 'success' | 'error';
+}
+
+const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+      <div className={`fixed bottom-4 right-4 p-4 rounded-lg shadow-lg text-white transition-opacity duration-500
+      ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
+        {message}
+      </div>
+  );
+};
+
 const OrderManagement: React.FC = () => {
   const [refunds, setRefunds] = useState<Refund[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<Toast | null>(null);
 
   useEffect(() => {
     fetchRefunds();
@@ -52,7 +74,13 @@ const OrderManagement: React.FC = () => {
         throw new Error(`Failed to update status: ${response.statusText}`);
       }
 
-      
+      if (response.ok) {
+        setToast({ message: "Refund status updated successfully!", type: "success" });
+        fetchRefunds(); // Refresh refunds
+      } else {
+        const data = await response.json();
+        setToast({ message: `Failed to update status: ${data.message || response.statusText}`, type: "error" });
+      }
       fetchRefunds(); // This will refresh the orders automatically
     } catch (err: any) {
       setError(err.message);
@@ -114,6 +142,7 @@ const OrderManagement: React.FC = () => {
           </tbody>
         </table>
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 };

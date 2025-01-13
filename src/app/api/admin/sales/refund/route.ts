@@ -4,6 +4,8 @@ import connectionPromise from '@/lib/mongodb';
 
 // Import the refund model
 import Refund from '@/models/refund.model';
+import ProcessedProduct from "@/models/processed-product.model";
+import Product from "@/models/product.model";
 
 export async function GET(req: NextRequest) {
   try {
@@ -62,74 +64,82 @@ interface StatusUpdateRequest {
     _id: string;
     status: 'pending' | 'approved' | 'rejected';
   }
-  
-  export async function POST(req: Request) {
+
+export async function POST(req: Request) {
+  try {
+    const body: StatusUpdateRequest = await req.json();
+    console.log('Received status update request:', body);
+
+    if (!body || !body._id || !body.status) {
+      return NextResponse.json({ message: 'Invalid request body' }, { status: 400 });
+    }
+
+    await connectionPromise;
+
+    const validStatuses: StatusUpdateRequest['status'][] = ['pending', 'approved', 'rejected'];
+    if (!validStatuses.includes(body.status)) {
+      return NextResponse.json({ message: 'Invalid status value' }, { status: 400 });
+    }
+
+    let refundId;
     try {
-      // Log the incoming request body for debugging
-      const body: StatusUpdateRequest = await req.json();
-      console.log('Received status update request:', body);
-  
-      // Validate basic request structure
-      if (!body) {
-        console.error('No request body received');
-        return NextResponse.json({ message: 'Invalid request body' }, { status: 400 });
+      refundId = new mongoose.Types.ObjectId(body._id);
+    } catch {
+      return NextResponse.json({ message: 'Invalid order ID' }, { status: 400 });
+    }
+
+    const existingRefund = await Refund.findById(refundId);
+
+    if (!existingRefund) {
+      return NextResponse.json({ message: 'Order not found' }, { status: 404 });
+    }
+
+    existingRefund.status = body.status;
+    existingRefund.updatedAt = new Date();
+
+    const updatedOrder = await existingRefund.save();
+    console.log('Updated refund order:', updatedOrder);
+
+    if (body.status === 'approved') {
+      console.log('Refund approved. Updating stock quantities...');
+
+      const products = updatedOrder.products;
+      for (const [processedProductId] of products.entries()) {
+        // Fetch ProcessedProduct
+        const processedProduct = await ProcessedProduct.findById(processedProductId);
+        const quantity = processedProduct.quantity;
+        const size = processedProduct.size;
+        if (!processedProduct) {
+          console.error(`ProcessedProduct not found for ID: ${processedProductId}`);
+          continue;
+        }
+
+        // Fetch Product using productId from ProcessedProduct
+        const product = await Product.findById(processedProduct.productId);
+        console.log("product:",product);
+        console.log("processedProduct:",processedProduct);
+
+        if (!product) {
+          console.error(`Product not found for ID: ${processedProduct.productId}`);
+          continue;
+        }
+
+        product.available_stock.set(size, product.available_stock.get(size) + quantity);
+        // Save the updated product
+        await product.save();
+        console.log(`Updated stock for Product ID: ${product._id}, Size: ${size}, Quantity: ${quantity}`);
       }
-  
-      if (!body._id) {
-        console.error('Order ID is missing');
-        return NextResponse.json({ message: 'Order ID is required' }, { status: 400 });
-      }
-  
-      if (!body.status) {
-        console.error('Status is missing');
-        return NextResponse.json({ message: 'Status is required' }, { status: 400 });
-      }
-  
-      // Ensure connection to database
-      await connectionPromise;
-  
-      // Validate the status value
-      const validStatuses: StatusUpdateRequest['status'][] = ['pending', 'approved', 'rejected'];
-      if (!validStatuses.includes(body.status)) {
-        console.error('Invalid status');
-        return NextResponse.json({ message: 'Invalid status value' }, { status: 400 });
-      }
-  
-      // Convert ID to MongoDB ObjectId
-      let refundId;
-      try {
-        refundId = new mongoose.Types.ObjectId(body._id);
-      } catch (idError) {
-        console.error('Invalid order ID format', idError);
-        return NextResponse.json({ message: 'Invalid order ID' }, { status: 400 });
-      }
-  
-      // Find the order by ID
-      const existingRefund = await Refund.findById(refundId);
-  
-      if (!existingRefund) {
-        console.error('Order not found', body._id);
-        return NextResponse.json({ message: 'Order not found' }, { status: 404 });
-      }
-  
-      // Update the order status
-      existingRefund.status = body.status;
-      existingRefund.lastModified = new Date(); // Update lastModified field
-  
-      const updatedOrder = await existingRefund.save();
-  
-      return NextResponse.json(
+    }
+
+    return NextResponse.json(
         { message: 'Order status updated successfully', order: updatedOrder },
         { status: 200 }
-      );
-  
-    } catch (error) {
-      // Log the full error for server-side debugging
-      console.error('Unexpected error in order status update:', error);
-  
-      return NextResponse.json(
+    );
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return NextResponse.json(
         { message: 'Error updating order status', error: error instanceof Error ? error.message : String(error) },
         { status: 500 }
-      );
-    }
+    );
   }
+}
