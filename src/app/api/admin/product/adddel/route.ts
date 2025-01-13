@@ -20,7 +20,7 @@ export async function POST(req: Request) {
         name: productData.name,
         description: productData.description,
         category: productData.category,
-        salePrice: productData.price,
+        salePrice: productData.salePprice || 0,
         total_stock: productData.total_stock,
         available_stock: productData.available_stock,
         sizes: productData.sizes,

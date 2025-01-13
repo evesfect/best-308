@@ -340,16 +340,6 @@ const AdminProducts: React.FC = () => {
               />
             </div>
             <div className="flex flex-col">
-              <label className="mb-2">Price</label>
-              <input
-                type="number"
-                value={newProduct.salePrice}
-                onChange={(e) => setNewProduct({ ...newProduct, salePrice: Number(e.target.value) })}
-                className="border p-2"
-                required
-              />
-            </div>
-            <div className="flex flex-col">
               <label className="mb-2">Sex</label>
               <select
                 value={newProduct.sex}
