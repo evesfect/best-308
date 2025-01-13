@@ -21,24 +21,23 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchUserOrders = async () => {
-      try {
-        const orderResponse = await axios.get("/api/users/orders", {
-          params: { user_id: userId },
-        });
+  const fetchUserOrders = async () => {
+    try {
+      const orderResponse = await axios.get("/api/users/orders", {
+        params: { user_id: userId },
+      });
 
-        const userOrders: Order[] = Array.isArray(orderResponse.data.userOrders)
+      const userOrders: Order[] = Array.isArray(orderResponse.data.userOrders)
           ? orderResponse.data.userOrders
           : [];
-        setOrderData(userOrders);
+      setOrderData(userOrders);
 
-        const productIds = Array.from(
+      const productIds = Array.from(
           new Set(userOrders.flatMap((order) => Object.keys(order.products)))
-        );
+      );
 
-        const productMap = new Map<string, Product>();
-        await Promise.all(
+      const productMap = new Map<string, Product>();
+      await Promise.all(
           productIds.map(async (productId) => {
             try {
               const productResponse = await axios.get("/api/product-from-processed", {
@@ -54,21 +53,22 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
                 console.error(`Unexpected error fetching product with ID ${productId}:`, error);
               }
               return 0;
-              }
+            }
           })
-        );
+      );
 
-        setOrderedProducts(productMap);
-        console.log("Ordered Products:",orderedProducts);
-        if (userOrders.length > 0) {
-          setSelectedOrder(userOrders[0]);
-        }
-      } catch (error) {
-        console.error("Error fetching order data:", error);
-      } finally {
-        setLoading(false);
+      setOrderedProducts(productMap);
+      console.log("Ordered Products:",orderedProducts);
+      if (userOrders.length > 0) {
+        setSelectedOrder(userOrders[0]);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching order data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
 
     fetchUserOrders();
   }, [userId]);
@@ -102,6 +102,7 @@ const UserOrders: React.FC<UserOrdersProps> = ({ userId }) => {
               orderedProducts={orderedProducts}
               userId={userId.toString()}
               userEmail={session?.user?.email || ''}
+              updateOrderedProducts={fetchUserOrders}
             />
           </div>
 
