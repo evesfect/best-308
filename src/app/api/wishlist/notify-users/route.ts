@@ -5,13 +5,35 @@ import Product from '@/models/product.model';
 
 export async function POST(req: Request) {
     try {
-        const { productId, emails } = await req.json();
+        const { productId } = await req.json();
+        console.log('Received notification request for productId:', productId);
 
-        if (!productId || !Array.isArray(emails) || emails.length === 0) {
+        if (!productId) {
             return NextResponse.json({
-                error: 'Product ID and a list of emails are required'
+                error: 'Product ID is required'
             }, { status: 400 });
         }
+
+        // Use relative URL instead of environment variable
+        const getUsersResponse = await fetch(`http://localhost:3000/api/wishlist/get-users?productId=${productId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        
+        const userData = await getUsersResponse.json();
+        console.log('Received user data:', userData);
+
+        if (!userData.emails || userData.emails.length === 0) {
+            console.log('No emails found in userData');
+            return NextResponse.json({
+                message: 'No users found with this product in wishlist'
+            }, { status: 404 });
+        }
+
+        const emails = userData.emails;
+        console.log('Preparing to send emails to:', emails);
 
         await connectionPromise;
 
