@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 
 interface RefundButtonProps {
@@ -10,6 +10,27 @@ interface RefundButtonProps {
     purchaseDate: string;
     onRefundSubmitted: () => void;
 }
+
+interface Toast {
+    message: string;
+    type: 'success' | 'error';
+}
+
+const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) => {
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            onClose();
+        }, 3000);
+        return () => clearTimeout(timer);
+    }, [onClose]);
+
+    return (
+        <div className={`fixed bottom-4 right-4 p-4 rounded-lg shadow-lg text-white transition-opacity duration-500
+      ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
+            {message}
+        </div>
+    );
+};
 
 const RefundButton: React.FC<RefundButtonProps> = ({ 
     orderId, 
@@ -25,6 +46,7 @@ const RefundButton: React.FC<RefundButtonProps> = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
     const [response, setResponse] = useState<any>(null);
+    const [toast, setToast] = useState<Toast | null>(null);
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
@@ -41,10 +63,12 @@ const RefundButton: React.FC<RefundButtonProps> = ({
             });
 
             setResponse(result.data);
+            setToast({ message: 'Refund request submitted successfully!', type: 'success' }); // Success toast
             setIsModalOpen(false);
             onRefundSubmitted();
         } catch (error) {
             console.error('Refund request error:', error);
+            setToast({ message: 'Failed to submit refund request.', type: 'error' }); // Error toast
             setError('Failed to submit refund request. Please try again.');
         } finally {
             setIsSubmitting(false);
@@ -106,6 +130,7 @@ const RefundButton: React.FC<RefundButtonProps> = ({
                     </div>
                 </div>
             )}
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
         </>
     );
 };
