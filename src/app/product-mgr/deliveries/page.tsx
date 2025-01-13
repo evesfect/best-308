@@ -1,4 +1,5 @@
-"use client"
+"use client";
+
 import React, { useEffect, useState } from 'react';
 
 interface Order {
@@ -9,6 +10,7 @@ interface Order {
   completed: boolean;
   date: string;
   status: 'processing' | 'in-transit' | 'delivered';
+  totalPrice: number; // Add totalPrice attribute
 }
 
 const OrderManagement: React.FC = () => {
@@ -39,7 +41,7 @@ const OrderManagement: React.FC = () => {
   const updateOrderStatus = async (orderId: string, newStatus: Order['status']) => {
     try {
       const response = await fetch(`/api/admin/product/orders`, {
-        method: 'POST', // Send POST request to update status
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           _id: orderId,
@@ -51,8 +53,7 @@ const OrderManagement: React.FC = () => {
         throw new Error(`Failed to update status: ${response.statusText}`);
       }
 
-      // After successfully updating the status, re-fetch the orders
-      fetchOrders(); // This will refresh the orders automatically
+      fetchOrders();
     } catch (err: any) {
       setError(err.message);
     }
@@ -77,6 +78,7 @@ const OrderManagement: React.FC = () => {
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border">Products</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border">User</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border">Address</th>
+              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border">Total Price</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border">Status</th>
               <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border">Actions</th>
             </tr>
@@ -94,6 +96,9 @@ const OrderManagement: React.FC = () => {
                 </td>
                 <td className="px-4 py-2 text-sm text-gray-800">{order.user_id}</td>
                 <td className="px-4 py-2 text-sm text-gray-800">{order.address}</td>
+                <td className="px-4 py-2 text-sm text-gray-800">
+                  ${order.totalPrice.toFixed(2)}
+                </td>
                 <td className="px-4 py-2 text-sm text-gray-800">{order.status}</td>
                 <td className="px-4 py-2 text-sm">
                   <select

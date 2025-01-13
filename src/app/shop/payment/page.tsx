@@ -131,6 +131,12 @@ const PaymentPage = () => {
       // Create URL for invoice preview
       const invoiceUrl = URL.createObjectURL(new Blob([invoiceResponse.data]));
 
+      const totalPrice = cartItems.reduce((sum, item) => {
+        const salePrice = parseFloat(item.salePrice); // Ensure salePrice is a number
+        const quantity = item.quantity || 0; // Ensure quantity is defined
+        return sum + salePrice * quantity;
+      }, 0).toFixed(2);
+
       // Generate the new order
       const productMap = cartItems.reduce((acc, item) => {
         acc[item._id] = item.quantity; // Map product ID to its quantity
@@ -144,6 +150,7 @@ const PaymentPage = () => {
         completed: false, // Initially set to incomplete
         date: new Date(), // Current date
         status: "processing", // Default status
+        totalPrice: totalPrice,
       });
       
       if (orderResponse.status === 201) {

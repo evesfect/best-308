@@ -22,6 +22,7 @@ export async function POST(req: Request){
             completed: orderData.completed,
             date: new Date(),
             status: orderData.status,
+            totalPrice: orderData.totalPrice,
         };
 
         const result = await db.collection('order').insertOne(newOrder);
