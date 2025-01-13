@@ -1,4 +1,3 @@
-// src/app/api/admin/product/discount/route.ts
 import mongoose from 'mongoose';
 import connectionPromise from '@/lib/mongodb';
 import { NextResponse } from 'next/server';
@@ -7,14 +6,11 @@ export async function PATCH(req: Request) {
   try {
     await connectionPromise;
     console.log("Database connected successfully");
-  
-    // Log the current database and collections
+
     const db = mongoose.connection.db;
-    if (db) {
-    console.log("Current database:", db.databaseName);
-    } else {
-    console.error("Database connection is undefined");
-    return NextResponse.json({ message: 'Database connection error' }, { status: 500 });
+    if (!db) {
+      console.error("Database connection is undefined");
+      return NextResponse.json({ message: 'Database connection error' }, { status: 500 });
     }
 
     const { productId, discountRate } = await req.json();
@@ -28,7 +24,14 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ message: 'Product not found' }, { status: 404 });
     }
 
-    const newPrice = product.price * (1 - discountRate / 100);
+    // Use `salePrice` or fallback to `price` for calculation
+    const currentPrice = product.salePrice || product.price;
+    if (typeof currentPrice !== 'number') {
+      return NextResponse.json({ message: 'Invalid product price' }, { status: 400 });
+    }
+
+    const newPrice = parseFloat((currentPrice * (1 - discountRate / 100)).toFixed(2));
+
     await db.collection('product').updateOne(
       { _id: new mongoose.Types.ObjectId(productId) },
       { $set: { salePrice: newPrice } }

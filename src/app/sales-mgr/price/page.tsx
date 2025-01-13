@@ -28,31 +28,45 @@ const UpdatePricePage: React.FC = () => {
       setMessage("Please select a product");
       return;
     }
-
+  
     if (discountRate === null && newPrice === null) {
       setMessage("Please enter either a discount rate or a new price");
       return;
     }
-
+  
+    console.log("Selected Product:", selectedProduct);
+    console.log("Discount Rate:", discountRate);
+    console.log("New Price:", newPrice);
+  
     try {
       const body: Record<string, any> = { productId: selectedProduct._id };
-      if (discountRate !== null) body.discountRate = discountRate;
-      if (newPrice !== null) body.newPrice = newPrice;
-
-      const response = await fetch(`/api/admin/sales/price`, {
+      let apiEndpoint = "";
+  
+      if (discountRate !== null && newPrice === null) {
+        body.discountRate = discountRate;
+        apiEndpoint = "/api/admin/sales/discount";
+      } else if (newPrice !== null && discountRate === null) {
+        body.newPrice = newPrice;
+        apiEndpoint = "/api/admin/sales/price";
+      } else {
+        setMessage("Please provide either a discount rate or a new price, not both");
+        return;
+      }
+  
+      const response = await fetch(apiEndpoint, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-
+  
       const data = await response.json();
       if (response.ok) {
         setMessage(
-          discountRate !== null
+          apiEndpoint.includes("discount")
             ? `Discount applied! New price: $${data.newPrice.toFixed(2)}`
             : `Price updated to: $${data.newPrice.toFixed(2)}`
         );
-        setSelectedProduct({ ...selectedProduct, salePrice  : data.newPrice });
+        setSelectedProduct({ ...selectedProduct, salePrice: data.newPrice });
       } else {
         setMessage(data.message || "Failed to update price");
       }
@@ -61,6 +75,8 @@ const UpdatePricePage: React.FC = () => {
       console.error(error);
     }
   };
+  
+  
 
   return (
     <div className="flex flex-col items-center p-6 max-w-md mx-auto space-y-6">
@@ -86,9 +102,10 @@ const UpdatePricePage: React.FC = () => {
           <input
             type="number"
             value={discountRate || ""}
-            onChange={(e) =>
-              setDiscountRate(e.target.value ? parseFloat(e.target.value) : null)
-            }
+            onChange={(e) => {
+              const value = parseFloat(e.target.value);
+              setDiscountRate(!isNaN(value) ? value : null);
+            }}
             placeholder="Discount rate (e.g., 20)"
             className="w-full p-2 border border-gray-300 rounded-md pr-8"
           />
