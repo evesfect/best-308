@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Order } from "@/types/order";
 import { Product } from "@/types/product";
 import RefundButton from "./refundButton";
@@ -10,7 +10,6 @@ interface OrderListProps {
   orderedProducts: Map<string, Product>;
   userId: string;
   userEmail: string;
-  updateOrderedProducts: any,
 }
 
 interface Toast {
@@ -19,7 +18,7 @@ interface Toast {
 }
 
 const Toast = ({ message, type, onClose }: { message: string; type: "success" | "error"; onClose: () => void }) => {
-  React.useEffect(() => {
+  useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
     }, 3000);
@@ -44,10 +43,26 @@ const OrderList: React.FC<OrderListProps> = ({
   orderedProducts,
   userId,
   userEmail,
-  updateOrderedProducts,
 }) => {
   const [toast, setToast] = useState<Toast | null>(null);
-  const [refundRequested, setRefundRequested] = useState<Set<string>>(new Set()); // Track requested refunds
+  const [refundRequested, setRefundRequested] = useState<Set<string>>(new Set());
+
+  // Restore refund state from local storage
+  useEffect(() => {
+    const storedRefunds = localStorage.getItem("refundRequested");
+    if (storedRefunds) {
+      setRefundRequested(new Set(JSON.parse(storedRefunds)));
+    }
+  }, []);
+
+  // Handle refund submission
+  const handleRefundSubmitted = (productId: string) => {
+    setRefundRequested((prev) => {
+      const updatedSet = new Set(prev).add(productId);
+      localStorage.setItem("refundRequested", JSON.stringify(Array.from(updatedSet))); // Persist to local storage
+      return updatedSet;
+    });
+  };
 
   const handleCancelOrder = async (order: Order) => {
     try {
@@ -65,16 +80,10 @@ const OrderList: React.FC<OrderListProps> = ({
       console.log("Order canceled successfully:", data);
 
       setToast({ message: "Order canceled successfully!", type: "success" });
-      updateOrderedProducts();
     } catch (error) {
       console.error("Error canceling order:", error);
       setToast({ message: "Failed to cancel order. Please try again.", type: "error" });
     }
-  };
-
-  const handleRefundSubmitted = (productId: string) => {
-    setRefundRequested((prev) => new Set(prev).add(productId)); // Mark refund as requested
-    updateOrderedProducts();
   };
 
   return (
